@@ -79,6 +79,11 @@ function topLevelKnownKeys(schema: EffectSchema.Top): string[] {
 
 function topLevelExtraKeys(schema: EffectSchema.Top, data: unknown) {
   if (typeof data !== "object" || data === null || Array.isArray(data)) return []
+  // Only run the extra-key check on plain object schemas. For unions,
+  // transformations, or schemas with index signatures, defer to the Effect
+  // decoder (reporting every key as "unrecognized" against an empty known set
+  // would be a false positive).
+  if (schema.ast._tag !== "Objects" || schema.ast.indexSignatures.length > 0) return []
   const known = new Set(topLevelKnownKeys(schema))
   return Object.keys(data).filter((key) => !known.has(key))
 }
