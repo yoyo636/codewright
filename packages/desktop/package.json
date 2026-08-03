@@ -1,12 +1,12 @@
 {
-  "name": "@opencode-ai/desktop",
+  "name": "@codewright-ai/desktop",
   "private": true,
-  "version": "1.18.11",
+  "version": "1.1.0",
   "type": "module",
   "license": "MIT",
   "homepage": "https://opencode.ai",
   "author": {
-    "name": "OpenCode",
+    "name": "Codewright",
     "email": "hello@opencode.ai"
   },
   "scripts": {
@@ -35,8 +35,8 @@
   "devDependencies": {
     "@actions/artifact": "4.0.0",
     "@lydell/node-pty": "catalog:",
-    "@opencode-ai/app": "workspace:*",
-    "@opencode-ai/ui": "workspace:*",
+    "@codewright-ai/app": "workspace:*",
+    "@codewright-ai/ui": "workspace:*",
     "@sentry/solid": "catalog:",
     "@sentry/vite-plugin": "catalog:",
     "@solid-primitives/i18n": "2.2.1",

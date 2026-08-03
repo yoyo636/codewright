@@ -1,14 +1,14 @@
 import "@pierre/trees/web-components"
 import { FileTree } from "@pierre/trees"
-import { Dialog, DialogBody, DialogFooter, DialogHeader, DialogTitle } from "@opencode-ai/ui/v2/dialog-v2"
-import { ButtonV2 } from "@opencode-ai/ui/v2/button-v2"
-import { TextInputV2 } from "@opencode-ai/ui/v2/text-input-v2"
-import { useDialog } from "@opencode-ai/ui/context/dialog"
+import { Dialog, DialogBody, DialogFooter, DialogHeader, DialogTitle } from "@codewright-ai/ui/v2/dialog-v2"
+import { ButtonV2 } from "@codewright-ai/ui/v2/button-v2"
+import { TextInputV2 } from "@codewright-ai/ui/v2/text-input-v2"
+import { useDialog } from "@codewright-ai/ui/context/dialog"
 import { createEffect, createMemo, createResource, createSignal, For, onCleanup, onMount, Show } from "solid-js"
 import { useGlobal } from "@/context/global"
 import { useLanguage } from "@/context/language"
 import { ServerConnection } from "@/context/server"
-import type { Path } from "@opencode-ai/sdk/v2/client"
+import type { Path } from "@codewright-ai/sdk/v2/client"
 import {
   absoluteTreePath,
   activeTreeNavigation,
@@ -28,8 +28,8 @@ import {
   pickerRoot,
 } from "./directory-picker-domain"
 import "./dialog-select-directory-v2.css"
-import { DividerV2 } from "@opencode-ai/ui/v2/divider-v2"
-import { getFilename } from "@opencode-ai/core/util/path"
+import { DividerV2 } from "@codewright-ai/ui/v2/divider-v2"
+import { getFilename } from "@codewright-ai/core/util/path"
 
 interface DialogSelectDirectoryV2Props {
   title?: string
@@ -93,22 +93,28 @@ export function DialogSelectDirectoryV2(props: DialogSelectDirectoryV2Props) {
     const typed = cleaned.replace(/\/+$/, "")
     const current = displayPickerPath(root(), value, home()).replace(/\/+$/, "")
     if (!cleaned || (root() && typed === current)) return { query: value, items: [] }
-    const directories = (await search(value)).map((absolute) => ({ absolute, type: "directory" as const }))
+    const directories = (await search(value)).map((absolute): { absolute: string; type: "file" | "directory" } => ({
+      absolute,
+      type: "directory",
+    }))
     if (!policy.includeFiles) return { query: value, items: directories.slice(0, 5) }
     const base = pickerRoot(cleaned) || root() || start()
     if (!base) return { query: value, items: directories.slice(0, 5) }
-    const files = await sdk.api.file
-      .find({
-        location: { directory: base },
+    const files = await sdk.api.find
+      .files({
+        directory: base,
         query: pickerFileSearchQuery(base, value, home()),
         type: "file",
         limit: 20,
       })
-      .then((result) => result.data)
-      .catch(() => [])
-    const results = [
+      .then((result) => (Array.isArray(result.data) ? result.data : []))
+      .catch(() => [] as string[])
+    const results: { absolute: string; type: "file" | "directory" }[] = [
       ...directories,
-      ...files.map((entry) => ({ absolute: absoluteTreePath(base, entry.path), type: "file" as const })),
+      ...files.map((entry): { absolute: string; type: "file" | "directory" } => ({
+        absolute: absoluteTreePath(base, entry),
+        type: "file",
+      })),
     ]
     return {
       query: value,
@@ -128,10 +134,10 @@ export function DialogSelectDirectoryV2(props: DialogSelectDirectoryV2Props) {
       loads.schedule(`${generation}:${key}`, eager ? "background" : "user", () => {
         if (!activeTreeNavigation(generation, navigation)) return Promise.resolve(undefined)
         return sdk.api.file
-          .list({ location: { directory: absolute } })
+          .list({ directory: absolute, path: "" })
           .then((result) =>
-            result.data.map((entry) => ({
-              name: getFilename(entry.path.replace(/[\\/]+$/, "")),
+            (result.data ?? []).map((entry) => ({
+              name: getFilename(entry.absolute.replace(/[\\/]+$/, "")),
               type: entry.type,
             })),
           )

@@ -46,7 +46,7 @@ function format(input: unknown) {
   return /^[^\s="\\]+$/.test(value) ? value : JSON.stringify(value)
 }
 
-export function fileLogger(file = path.join(Global.Path.log, "opencode.log"), id: string = runID) {
+export function fileLogger(file = path.join(Global.Path.log, "codewright.log"), id: string = runID) {
   // Do not set batchWindow to 0; it causes high idle CPU usage.
   return Logger.toFile(formatter(id), file, { flag: "a" })
 }
@@ -56,7 +56,7 @@ const stderrLogger = Logger.make((options) => process.stderr.write(formatter().l
 let warnedInvalidLogLevel = false
 
 export function minimumLogLevel() {
-  const value = process.env.OPENCODE_LOG_LEVEL?.toUpperCase()
+  const value = process.env.CODEWRIGHT_LOG_LEVEL?.toUpperCase()
   const levels = {
     DEBUG: "Debug",
     INFO: "Info",
@@ -67,7 +67,7 @@ export function minimumLogLevel() {
   if (value && !warnedInvalidLogLevel) {
     warnedInvalidLogLevel = true
     process.stderr.write(
-      `opencode: OPENCODE_LOG_LEVEL="${process.env.OPENCODE_LOG_LEVEL}" is not valid. ` +
+      `codewright: CODEWRIGHT_LOG_LEVEL="${process.env.CODEWRIGHT_LOG_LEVEL}" is not valid. ` +
         `Expected one of: DEBUG, INFO, WARN, ERROR. Falling back to INFO.\n`,
     )
   }
@@ -75,7 +75,7 @@ export function minimumLogLevel() {
 }
 
 export function loggers() {
-  return process.env.OPENCODE_PRINT_LOGS === "1" ? [fileLogger(), stderrLogger] : [fileLogger()]
+  return process.env.CODEWRIGHT_PRINT_LOGS === "1" ? [fileLogger(), stderrLogger] : [fileLogger()]
 }
 
 export * as Logging from "./logging"

@@ -1,10 +1,10 @@
 import { For, Show, createEffect, createMemo, on, onCleanup, onMount } from "solid-js"
 import { createStore } from "solid-js/store"
 import { makeEventListener } from "@solid-primitives/event-listener"
-import { Tabs } from "@opencode-ai/ui/tabs"
-import { ResizeHandle } from "@opencode-ai/ui/resize-handle"
-import { IconButton } from "@opencode-ai/ui/icon-button"
-import { TooltipKeybind } from "@opencode-ai/ui/tooltip"
+import { Tabs } from "@codewright-ai/ui/tabs"
+import { ResizeHandle } from "@codewright-ai/ui/resize-handle"
+import { IconButton } from "@codewright-ai/ui/icon-button"
+import { TooltipKeybind } from "@codewright-ai/ui/tooltip"
 import { DragDropProvider, DragDropSensors, DragOverlay, SortableProvider, closestCenter } from "@thisbeyond/solid-dnd"
 import type { DragEvent } from "@thisbeyond/solid-dnd"
 import { ConstrainDragYAxis, getDraggableId } from "@/utils/solid-dnd"
@@ -21,6 +21,7 @@ import { terminalTabLabel } from "@/pages/session/terminal-label"
 import { createSizing, focusTerminalById } from "@/pages/session/helpers"
 import { getTerminalHandoff, setTerminalHandoff } from "@/pages/session/handoff"
 import { useSessionLayout } from "@/pages/session/session-layout"
+import "./terminal-panel.css"
 
 export function TerminalPanel() {
   const delays = [120, 240]

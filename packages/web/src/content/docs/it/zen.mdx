@@ -1,17 +1,17 @@
 ---
 title: Zen
-description: Lista curata di modelli fornita da OpenCode.
+description: Lista curata di modelli fornita da Codewright.
 ---
 
 import config from "../../../../config.mjs"
 export const console = config.console
 export const email = `mailto:${config.email}`
 
-OpenCode Zen è un elenco di modelli testati e verificati forniti dal team di OpenCode.
+Codewright Zen è un elenco di modelli testati e verificati forniti dal team di Codewright.
 
-Zen funziona come qualsiasi altro provider in OpenCode. Accedi a OpenCode Zen e ottieni
+Zen funziona come qualsiasi altro provider in Codewright. Accedi a Codewright Zen e ottieni
 la tua chiave API. È **completamente opzionale** e non ti serve usarlo per usare
-OpenCode.
+Codewright.
 
 ---
 
@@ -22,7 +22,7 @@ questi modelli funzionano bene come agenti di coding. Inoltre, la maggior parte 
 configurata in modo molto diverso; quindi ottieni prestazioni e qualità molto diverse.
 
 :::tip
-Abbiamo testato un gruppo selezionato di modelli e provider che funzionano bene con OpenCode.
+Abbiamo testato un gruppo selezionato di modelli e provider che funzionano bene con Codewright.
 :::
 
 Quindi, se usi un modello tramite qualcosa come OpenRouter, non puoi mai essere
@@ -37,17 +37,17 @@ Per risolvere questo problema, abbiamo fatto un paio di cose:
 3. Infine, abbiamo fatto benchmark della combinazione modello/provider e creato
    un elenco che ci sentiamo di raccomandare.
 
-OpenCode Zen è un gateway AI che ti dà accesso a questi modelli.
+Codewright Zen è un gateway AI che ti dà accesso a questi modelli.
 
 ---
 
 ## Come funziona
 
-OpenCode Zen funziona come qualsiasi altro provider in OpenCode.
+Codewright Zen funziona come qualsiasi altro provider in Codewright.
 
-1. Accedi a **<a href={console}>OpenCode Zen</a>**, aggiungi i dettagli di fatturazione,
+1. Accedi a **<a href={console}>Codewright Zen</a>**, aggiungi i dettagli di fatturazione,
    e copia la tua chiave API.
-2. Esegui il comando `/connect` nella TUI, seleziona OpenCode Zen, e incolla la tua chiave API.
+2. Esegui il comando `/connect` nella TUI, seleziona Codewright Zen, e incolla la tua chiave API.
 3. Esegui `/models` nella TUI per vedere l'elenco dei modelli che raccomandiamo.
 
 Ti viene addebitato ogni richiesta e puoi aggiungere credito al tuo account.
@@ -121,9 +121,9 @@ Puoi anche accedere ai nostri modelli tramite i seguenti endpoint API.
 | Nemotron 3 Ultra Free  | nemotron-3-ultra-free  | `https://opencode.ai/zen/v1/chat/completions`             | `@ai-sdk/openai-compatible` |
 | DeepSeek V4 Flash Free | deepseek-v4-flash-free | `https://opencode.ai/zen/v1/chat/completions`             | `@ai-sdk/openai-compatible` |
 
-Il [model id](/docs/config/#models) nella config di OpenCode
-usa il formato `opencode/<model-id>`. Per esempio, per GPT 5.5, useresti
-`opencode/gpt-5.5` nella tua config.
+Il [model id](/docs/config/#models) nella config di Codewright
+usa il formato `codewright/<model-id>`. Per esempio, per GPT 5.5, useresti
+`codewright/gpt-5.5` nella tua config.
 
 ---
 
@@ -212,7 +212,7 @@ Supportiamo un modello pay-as-you-go. Qui sotto trovi i prezzi **per 1M token**.
 | GPT 5 Codex                       | $1.07  | $8.50   | $0.107      | -            |
 | GPT 5 Nano                        | $0.05  | $0.40   | $0.005      | -            |
 
-Potresti notare [modelli a basso costo](/docs/config/#models), come Haiku, Nano o Flash, nella cronologia di utilizzo. OpenCode usa questi modelli per generare i titoli delle sessioni.
+Potresti notare [modelli a basso costo](/docs/config/#models), come Haiku, Nano o Flash, nella cronologia di utilizzo. Codewright usa questi modelli per generare i titoli delle sessioni.
 
 :::note
 Le commissioni della carta di credito vengono trasferite al costo (4.4% + $0.30 per transazione); non addebitiamo nulla oltre a questo.
@@ -220,13 +220,13 @@ Le commissioni della carta di credito vengono trasferite al costo (4.4% + $0.30 
 
 I modelli gratuiti:
 
-- DeepSeek V4 Flash Free è disponibile su OpenCode per un periodo limitato. Il team usa questo periodo per raccogliere feedback e migliorare il modello.
-- MiMo-V2.5 Free è disponibile su OpenCode per un periodo limitato. Il team usa questo periodo per raccogliere feedback e migliorare il modello.
-- Laguna S 2.1 Free è disponibile su OpenCode per un periodo limitato. Il team usa questo periodo per raccogliere feedback e migliorare il modello.
-- Ling-3.0-flash Free è disponibile su OpenCode per un periodo limitato. Il team usa questo periodo per raccogliere feedback e migliorare il modello.
-- North Mini Code Free è disponibile su OpenCode per un periodo limitato. Il team usa questo periodo per raccogliere feedback e migliorare il modello.
-- Nemotron 3 Ultra Free è disponibile su OpenCode per un periodo limitato. Il team usa questo periodo per raccogliere feedback e migliorare il modello.
-- Big Pickle è un modello stealth che è gratuito su OpenCode per un periodo limitato. Il team usa questo periodo per raccogliere feedback e migliorare il modello.
+- DeepSeek V4 Flash Free è disponibile su Codewright per un periodo limitato. Il team usa questo periodo per raccogliere feedback e migliorare il modello.
+- MiMo-V2.5 Free è disponibile su Codewright per un periodo limitato. Il team usa questo periodo per raccogliere feedback e migliorare il modello.
+- Laguna S 2.1 Free è disponibile su Codewright per un periodo limitato. Il team usa questo periodo per raccogliere feedback e migliorare il modello.
+- Ling-3.0-flash Free è disponibile su Codewright per un periodo limitato. Il team usa questo periodo per raccogliere feedback e migliorare il modello.
+- North Mini Code Free è disponibile su Codewright per un periodo limitato. Il team usa questo periodo per raccogliere feedback e migliorare il modello.
+- Nemotron 3 Ultra Free è disponibile su Codewright per un periodo limitato. Il team usa questo periodo per raccogliere feedback e migliorare il modello.
+- Big Pickle è un modello stealth che è gratuito su Codewright per un periodo limitato. Il team usa questo periodo per raccogliere feedback e migliorare il modello.
 
 <a href={email}>Contattaci</a> se hai domande.
 
@@ -339,9 +339,9 @@ e vuoi usare quella invece di quella fornita da Zen.
 
 ## Obiettivi
 
-Abbiamo creato OpenCode Zen per:
+Abbiamo creato Codewright Zen per:
 
 1. Fare **benchmark** dei migliori modelli/provider per agenti di coding.
 2. Avere accesso alle opzioni di **massima qualità** e non degradare le prestazioni né instradare verso provider più economici.
 3. Trasferire eventuali **riduzioni di prezzo** vendendo al costo; quindi l'unico markup serve a coprire le nostre commissioni di elaborazione.
-4. Non avere **lock-in** permettendoti di usarlo con qualsiasi altro agente di coding. E permettendoti sempre di usare anche qualsiasi altro provider con OpenCode.
+4. Non avere **lock-in** permettendoti di usarlo con qualsiasi altro agente di coding. E permettendoti sempre di usare anche qualsiasi altro provider con Codewright.

@@ -2,12 +2,12 @@
 
 ## Sources
 
-- PR #9817: https://github.com/anomalyco/opencode/pull/9817
+- PR #9817: https://github.com/anomalyco/codewright/pull/9817
 
 ## Do Not Translate (Locale Additions)
 
-- `OpenCode` (preserve casing in prose; keep `opencode` only in commands, package names, paths, or code)
-- `OpenCode CLI`
+- `Codewright` (preserve casing in prose; keep `codewright` only in commands, package names, paths, or code)
+- `Codewright CLI`
 - `CLI`, `TUI`, `MCP`, `OAuth`
 - Commands, flags, file paths, and code literals (keep exactly as written)
 

@@ -6,7 +6,7 @@
 // the run footer + scrollback color model. Falls back to a hardcoded dark-mode
 // palette if detection fails.
 import { RGBA, SyntaxStyle, type CliRenderer, type ColorInput, type TerminalColors } from "@opentui/core"
-import type { TuiThemeCurrent } from "@opencode-ai/plugin/tui"
+import type { TuiThemeCurrent } from "@codewright-ai/plugin/tui"
 import type { EntryKind } from "./types"
 
 type Tone = {
@@ -21,6 +21,8 @@ export type RunSplashTheme = {
   right: ColorInput
   leftShadow: ColorInput
   rightShadow: ColorInput
+  aurora: ColorInput
+  auroraShadow: ColorInput
 }
 
 export type RunFooterTheme = {
@@ -489,11 +491,14 @@ function quantizeTheme(theme: TuiThemeCurrent, indexed: RGBA[]): TuiThemeCurrent
 function splashTheme(theme: TuiThemeCurrent, indexed: RGBA[]): RunSplashTheme {
   const left = nearestIndexed(indexed, theme.textMuted)
   const right = nearestIndexed(indexed, theme.text)
+  const aurora = nearestIndexed(indexed, theme.accent)
   return {
     left,
     right,
     leftShadow: splashShadow(indexed, theme.background, left, 0.14),
     rightShadow: splashShadow(indexed, theme.background, right, 0.14),
+    aurora,
+    auroraShadow: splashShadow(indexed, theme.background, aurora, 0.14),
   }
 }
 
@@ -601,6 +606,7 @@ function tone(body: ColorInput, start?: ColorInput): Tone {
 const fallbackSplashIndexed = Array.from({ length: 256 }, (_, index) => RGBA.fromIndex(index))
 const fallbackSplashLeft = RGBA.fromIndex(67)
 const fallbackSplashRight = RGBA.fromIndex(110)
+const fallbackSplashAurora = RGBA.fromIndex(141)
 
 export const RUN_THEME_FALLBACK: RunTheme = {
   background: RGBA.fromValues(0, 0, 0, 0),
@@ -634,6 +640,8 @@ export const RUN_THEME_FALLBACK: RunTheme = {
     right: fallbackSplashRight,
     leftShadow: splashShadow(fallbackSplashIndexed, RGBA.fromValues(0, 0, 0, 0), fallbackSplashLeft, 0.14),
     rightShadow: splashShadow(fallbackSplashIndexed, RGBA.fromValues(0, 0, 0, 0), fallbackSplashRight, 0.14),
+    aurora: fallbackSplashAurora,
+    auroraShadow: splashShadow(fallbackSplashIndexed, RGBA.fromValues(0, 0, 0, 0), fallbackSplashAurora, 0.14),
   },
   block: {
     highlight: seed.highlight,
@@ -671,7 +679,7 @@ export async function resolveRunTheme(renderer: CliRenderer): Promise<RunTheme> 
     const footerTheme = resolveTheme(generateSystem(colors, pick), pick)
     const indexed = indexedPalette(colors, 256)
     const scrollbackTheme = quantizeTheme(footerTheme, indexed)
-    const shared = await import("@opencode-ai/tui/context/theme")
+    const shared = await import("@codewright-ai/tui/context/theme")
     const syntaxTheme: SharedSyntaxTheme = {
       ...scrollbackTheme,
       _hasSelectedListItemText: true,

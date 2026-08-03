@@ -1,7 +1,7 @@
 import { usePlatform } from "@/context/platform"
 import { ServerConnection } from "@/context/server"
 import { authTokenFromCredentials, createSdkForServer } from "./server"
-import { ClientError, OpenCode } from "@opencode-ai/client"
+import { createCodewrightClient } from "@codewright-ai/sdk/v2/client"
 import { Accessor, createEffect, onCleanup } from "solid-js"
 import { createStore, reconcile } from "solid-js/store"
 
@@ -62,7 +62,6 @@ function wait(ms: number, signal?: AbortSignal) {
 
 function retryable(error: unknown, signal?: AbortSignal) {
   if (signal?.aborted) return false
-  if (error instanceof ClientError) return error.reason === "Transport"
   if (!(error instanceof Error)) return false
   if (error.name === "AbortError" || error.name === "TimeoutError") return false
   if (error instanceof TypeError) return true
@@ -85,7 +84,7 @@ export async function checkServerHealth(
       .catch(() => ({ healthy: false }))
   }
   const attempt = async (count: number): Promise<ServerHealth> => {
-    const current = await OpenCode.make({
+    const current = await createCodewrightClient({
       baseUrl: server.url,
       fetch,
       headers: server.password
@@ -94,20 +93,26 @@ export async function checkServerHealth(
           }
         : undefined,
     })
-      .health.get({ signal })
-      .then((x) =>
-        typeof x.healthy === "boolean"
-          ? { data: { healthy: x.healthy, version: x.version } }
-          : { error: new Error("Invalid health response") },
-      )
-      .catch((error) => ({ error }))
+      .v2.health.get({ signal })
+      .then((x) => {
+        const data = (x as { data?: { healthy?: boolean; version?: string } }).data
+        if (data && typeof data.healthy === "boolean") {
+          return { data: { healthy: data.healthy, version: data.version } }
+        }
+        return { error: new Error("Invalid health response") }
+      })
+      .catch((error: unknown) => ({ error }))
     if ("data" in current && current.data) return current.data
     if (signal?.aborted) return { healthy: false }
 
     return createSdkForServer({ server, fetch, signal })
       .global.health()
-      .then((x) => (x.error ? next(count, x.error) : { healthy: x.data?.healthy === true, version: x.data?.version }))
-      .catch((error) => next(count, error))
+      .then((x) => {
+        if (x.error) return next(count, x.error)
+        const data = (x as { data?: { healthy?: boolean; version?: string } }).data
+        return { healthy: data?.healthy === true, version: data?.version }
+      })
+      .catch((error: unknown) => next(count, error))
   }
   return attempt(0).finally(() => timeout?.clear?.())
 }

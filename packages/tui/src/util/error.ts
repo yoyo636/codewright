@@ -24,8 +24,8 @@ export function cliErrorMessage(input: unknown): string | undefined {
     return [
       `Model not found: ${field(model, "providerID")}/${field(model, "modelID")}`,
       ...(suggestions.length ? ["Did you mean: " + suggestions.join(", ")] : []),
-      "Try: `opencode models` to list available models",
-      "Or check your config (opencode.json) provider/model names",
+      "Try: `codewright models` to list available models",
+      "Or check your config (codewright.json) provider/model names",
     ].join("\n")
   }
 
@@ -34,7 +34,7 @@ export function cliErrorMessage(input: unknown): string | undefined {
     const providerID = field(provider, "providerID")
     return [
       `Failed to initialize provider "${providerID}".`,
-      `Run \`opencode auth login\` to set up credentials, or check the provider block in your \`opencode.json\`.`,
+      `Run \`codewright auth login\` to set up credentials, or check the provider block in your \`codewright.json\`.`,
     ].join("\n")
   }
 
@@ -42,9 +42,9 @@ export function cliErrorMessage(input: unknown): string | undefined {
   if (configData(input, "ProviderNoProvidersError")) {
     return [
       `No AI providers are configured.`,
-      `Run \`opencode auth login\` to connect a provider (Anthropic, OpenAI, OpenRouter, and more),`,
+      `Run \`codewright auth login\` to connect a provider (Anthropic, OpenAI, OpenRouter, and more),`,
       `or set an API key environment variable such as \`ANTHROPIC_API_KEY\`.`,
-      `List available providers and models with \`opencode models\`.`,
+      `List available providers and models with \`codewright models\`.`,
     ].join("\n")
   }
 
@@ -54,7 +54,7 @@ export function cliErrorMessage(input: unknown): string | undefined {
     const providerID = field(noModels, "providerID")
     return [
       `No models are available${providerID ? ` for provider "${providerID}"` : ""}.`,
-      `Run \`opencode models\` to see available models, or check your \`opencode.json\` provider/model configuration.`,
+      `Run \`codewright models\` to see available models, or check your \`codewright.json\` provider/model configuration.`,
     ].join("\n")
   }
 
@@ -95,7 +95,7 @@ export function cliErrorMessage(input: unknown): string | undefined {
   if (tagged(input, "UICancelledError") || named(input, "UICancelledError")) return ""
   if (isRecord(input) && named(input, "MCPFailed")) {
     const name = isRecord(input.data) ? field(input.data, "name") : undefined
-    return `MCP server "${name}" failed. Run \`opencode mcp login ${name}\` if it requires authentication.`
+    return `MCP server "${name}" failed. Run \`codewright mcp login ${name}\` if it requires authentication.`
   }
   return undefined
 }

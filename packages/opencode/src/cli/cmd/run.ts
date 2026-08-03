@@ -1,14 +1,14 @@
-import type { PermissionV1 } from "@opencode-ai/core/v1/permission"
-import { FSUtil } from "@opencode-ai/core/fs-util"
-// CLI entry point for `opencode run` and `opencode --mini`.
+import type { PermissionV1 } from "@codewright-ai/core/v1/permission"
+import { FSUtil } from "@codewright-ai/core/fs-util"
+// CLI entry point for `codewright run` and `codewright --mini`.
 //
 // Handles three modes:
 //   1. Non-interactive (default): sends a single prompt, streams events to
 //      stdout, and exits when the session goes idle.
-//   2. Interactive local (`opencode --mini`): boots the split-footer direct mode
+//   2. Interactive local (`codewright --mini`): boots the split-footer direct mode
 //      with an in-process server (no external HTTP).
-//   3. Interactive attach (`opencode --mini --attach`): connects to a running
-//      opencode server and runs interactive mode against it.
+//   3. Interactive attach (`codewright --mini --attach`): connects to a running
+//      codewright server and runs interactive mode against it.
 //
 // Also supports `--command` for slash-command execution, `--format json` for
 // raw event streaming, `--continue` / `--session` for session resumption,
@@ -23,11 +23,11 @@ import { effectCmd } from "../effect-cmd"
 import { EOL } from "os"
 import { Filesystem } from "@/util/filesystem"
 import { errorMessage } from "@/util/error"
-import { createOpencodeClient, type OpencodeClient, type ToolPart } from "@opencode-ai/sdk/v2"
+import { createCodewrightClient, type CodewrightClient, type ToolPart } from "@codewright-ai/sdk/v2"
 import { FormatError, FormatUnknownError } from "../error"
 import { INTERACTIVE_INPUT_ERROR, resolveInteractiveStdin } from "./run/runtime.stdin"
 
-type ModelInput = Parameters<OpencodeClient["session"]["prompt"]>[0]["model"]
+type ModelInput = Parameters<CodewrightClient["session"]["prompt"]>[0]["model"]
 
 function pick(value: string | undefined): ModelInput | undefined {
   if (!value) return undefined
@@ -89,8 +89,8 @@ function formatRunError(error: unknown) {
   if (friendly) return friendly
   // Avoid leaking raw stack traces by default. Show the message + a hint, and gate
   // the full stack behind --print-logs for debugging.
-  const detail = process.env.OPENCODE_PRINT_LOGS === "1" ? FormatUnknownError(error) : errorMessage(error)
-  return `${detail}\n\nFor more detail, run again with --print-logs, or view the log file with \`opencode logs\`.`
+  const detail = process.env.CODEWRIGHT_PRINT_LOGS === "1" ? FormatUnknownError(error) : errorMessage(error)
+  return `${detail}\n\nFor more detail, run again with --print-logs, or view the log file with \`codewright logs\`.`
 }
 
 async function tool(part: ToolPart) {
@@ -131,7 +131,7 @@ async function toolError(part: ToolPart) {
 
 export const RunCommand = effectCmd({
   command: "run [message..]",
-  describe: "run opencode with a message",
+  describe: "run codewright with a message",
   // --attach connects to a remote server (no local instance needed); the
   // default path runs an in-process server and needs the project instance.
   instance: (args) => !args.attach,
@@ -195,17 +195,17 @@ export const RunCommand = effectCmd({
       })
       .option("attach", {
         type: "string",
-        describe: "attach to a running opencode server (e.g., http://localhost:4096)",
+        describe: "attach to a running codewright server (e.g., http://localhost:4096)",
       })
       .option("password", {
         alias: ["p"],
         type: "string",
-        describe: "basic auth password (defaults to OPENCODE_SERVER_PASSWORD)",
+        describe: "basic auth password (defaults to CODEWRIGHT_SERVER_PASSWORD)",
       })
       .option("username", {
         alias: ["u"],
         type: "string",
-        describe: "basic auth username (defaults to OPENCODE_SERVER_USERNAME or 'opencode')",
+        describe: "basic auth username (defaults to CODEWRIGHT_SERVER_USERNAME or 'codewright')",
       })
       .option("dir", {
         type: "string",
@@ -353,7 +353,7 @@ export const RunCommand = effectCmd({
         ? ServerAuth.headers({ password: args.password, username: args.username })
         : undefined
       const attachSDK = (dir?: string) => {
-        return createOpencodeClient({
+        return createCodewrightClient({
           baseUrl: args.attach!,
           directory: dir,
           headers: attachHeaders,
@@ -459,7 +459,7 @@ export const RunCommand = effectCmd({
         return message.slice(0, 50) + (message.length > 50 ? "..." : "")
       }
 
-      async function session(sdk: OpencodeClient): Promise<SessionInfo | undefined> {
+      async function session(sdk: CodewrightClient): Promise<SessionInfo | undefined> {
         if (args.session) {
           const current = await sdk.session
             .get({
@@ -538,7 +538,7 @@ export const RunCommand = effectCmd({
         }
       }
 
-      async function share(sdk: OpencodeClient, sessionID: string) {
+      async function share(sdk: CodewrightClient, sessionID: string) {
         const cfg = await sdk.config.get()
         if (!cfg.data) return
         if (cfg.data.share !== "auto" && !flags.autoShare && !args.share) return
@@ -554,7 +554,7 @@ export const RunCommand = effectCmd({
       }
 
       async function createFreshSession(
-        sdk: OpencodeClient,
+        sdk: CodewrightClient,
         input: { agent: string | undefined; model: ModelInput | undefined; variant: string | undefined },
       ): Promise<SessionInfo> {
         const result = await sdk.session.create({
@@ -581,7 +581,7 @@ export const RunCommand = effectCmd({
         }
       }
 
-      async function current(sdk: OpencodeClient): Promise<string> {
+      async function current(sdk: CodewrightClient): Promise<string> {
         if (!args.attach) {
           return directory ?? root
         }
@@ -624,7 +624,7 @@ export const RunCommand = effectCmd({
         return name
       }
 
-      async function attachAgent(sdk: OpencodeClient) {
+      async function attachAgent(sdk: CodewrightClient) {
         if (!args.agent) return undefined
         const name = args.agent
 
@@ -664,7 +664,7 @@ export const RunCommand = effectCmd({
         return name
       }
 
-      async function pickAgent(sdk: OpencodeClient) {
+      async function pickAgent(sdk: CodewrightClient) {
         if (!args.agent) return undefined
         if (args.attach) {
           return attachAgent(sdk)
@@ -673,7 +673,7 @@ export const RunCommand = effectCmd({
         return localAgent()
       }
 
-      async function execute(sdk: OpencodeClient) {
+      async function execute(sdk: CodewrightClient) {
         const sess = await session(sdk)
         if (!sess?.id) {
           UI.error("Session not found")
@@ -700,7 +700,7 @@ export const RunCommand = effectCmd({
         // to stdout/UI. `client` is passed explicitly because attach mode may
         // rebind the SDK to the session's directory after the subscription is
         // created, and replies issued from inside the loop must use that client.
-        async function loop(client: OpencodeClient, events: Awaited<ReturnType<typeof sdk.event.subscribe>>) {
+        async function loop(client: CodewrightClient, events: Awaited<ReturnType<typeof sdk.event.subscribe>>) {
           const toggles = new Map<string, boolean>()
           let error: string | undefined
 
@@ -954,8 +954,8 @@ export const RunCommand = effectCmd({
         if (auth) headers.set("Authorization", auth)
         return Server.Default().app.fetch(new Request(request, { headers }))
       }) as typeof globalThis.fetch
-      const sdk = createOpencodeClient({
-        baseUrl: "http://opencode.internal",
+      const sdk = createCodewrightClient({
+        baseUrl: "http://codewright.internal",
         fetch: fetchFn,
         directory,
       })
@@ -983,7 +983,7 @@ type MiniCommandInput = {
 export async function runMini(input: MiniCommandInput) {
   if (!RunCommand.handler) throw new Error("Mini command handler is unavailable")
   await RunCommand.handler({
-    $0: "opencode",
+    $0: "codewright",
     _: ["mini"],
     message: input.prompt ? [input.prompt] : [],
     command: undefined,

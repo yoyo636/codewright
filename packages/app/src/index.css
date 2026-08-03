@@ -1,7 +1,8 @@
-@import "@opencode-ai/ui/styles/tailwind";
-@import "@opencode-ai/session-ui/styles";
-@import "@opencode-ai/ui/v2/styles/tailwind.css";
+@import "@codewright-ai/ui/styles/tailwind";
+@import "@codewright-ai/session-ui/styles";
+@import "@codewright-ai/ui/v2/styles/tailwind.css";
 @import "tw-animate-css";
+@import "./styles/glass-app.css";
 
 @font-face {
   font-family: "JetBrainsMono Nerd Font Mono";

@@ -245,7 +245,7 @@ export function nativePickerPath(path: string) {
   if (/^[A-Za-z]:\//.test(value) || value.startsWith("//")) return value.replaceAll("/", "\\")
   return value
 }
-import { getFilename } from "@opencode-ai/core/util/path"
+import { getFilename } from "@codewright-ai/core/util/path"
 import fuzzysort from "fuzzysort"
 import { ServerSDK } from "@/context/server-sdk"
 
@@ -343,14 +343,14 @@ export function createDirectorySearch(args: { sdk: ServerSDK; base: () => string
     const existing = cache.get(key)
     if (existing) return existing
     const request = args.sdk.api.file
-      .list({ location: { directory: key } })
-      .then((result) => result.data)
-      .catch(() => [])
+      .list({ directory: key, path: "" })
+      .then((result) => (result.data ?? []) as Array<{ absolute: string; path: string; type: "file" | "directory" }>)
+      .catch(() => [] as Array<{ absolute: string; path: string; type: "file" | "directory" }>)
       .then((nodes) =>
         nodes
           .filter((node) => node.type === "directory")
           .map((node) => {
-            const relative = trimPickerPath(normalizePickerDrive(node.path))
+            const relative = trimPickerPath(normalizePickerDrive(node.absolute))
             return { name: getFilename(relative), absolute: joinPickerPath(key, relative) }
           }),
       )
@@ -374,10 +374,10 @@ export function createDirectorySearch(args: { sdk: ServerSDK; base: () => string
     const pathInput = raw.startsWith("~") || !!pickerRoot(raw) || raw.includes("/")
     const query = normalizePickerDrive(input.path)
     if (!pathInput) {
-      const results = await args.sdk.api.file
-        .find({ location: { directory: input.directory }, query, type: "directory", limit: 50 })
-        .then((result) => result.data.map((entry) => entry.path))
-        .catch(() => [])
+      const results = await args.sdk.api.find.files
+        ({ directory: input.directory, query, type: "directory", limit: 50 })
+        .then((result) => (Array.isArray(result.data) ? result.data : []))
+        .catch(() => [] as string[])
       if (!active()) return []
       return results.map((path) => joinPickerPath(input.directory, path)).slice(0, 50)
     }

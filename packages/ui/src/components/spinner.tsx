@@ -1,16 +1,15 @@
 import { ComponentProps, For } from "solid-js"
 
-const outerIndices = new Set([1, 2, 4, 7, 8, 11, 13, 14])
-const cornerIndices = new Set([0, 3, 12, 15])
-const squares = Array.from({ length: 16 }, (_, i) => ({
-  id: i,
-  x: (i % 4) * 4,
-  y: Math.floor(i / 4) * 4,
-  delay: Math.random() * 1.5,
-  duration: 1 + Math.random() * 1,
-  outer: outerIndices.has(i),
-  corner: cornerIndices.has(i),
-}))
+const particles = Array.from({ length: 8 }, (_, i) => {
+  const angle = (i / 8) * Math.PI * 2
+  return {
+    id: i,
+    x: 7.5 + Math.cos(angle) * 5,
+    y: 7.5 + Math.sin(angle) * 5,
+    delay: (i / 8) * 1.6,
+    duration: 1.6,
+  }
+})
 
 export function Spinner(props: {
   class?: string
@@ -26,23 +25,44 @@ export function Spinner(props: {
         ...props.classList,
         [props.class ?? ""]: !!props.class,
       }}
-      fill="currentColor"
     >
-      <For each={squares}>
-        {(square) => (
-          <rect
-            x={square.x}
-            y={square.y}
-            width="3"
-            height="3"
-            rx="1"
+      <defs>
+        <radialGradient id="spinner-core" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="var(--glass-aurora-1)" stop-opacity="1" />
+          <stop offset="50%" stop-color="var(--glass-aurora-2)" stop-opacity="0.7" />
+          <stop offset="100%" stop-color="var(--glass-aurora-3)" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="spinner-particle-1" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="var(--glass-aurora-1)" />
+          <stop offset="100%" stop-color="var(--glass-aurora-1)" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="spinner-particle-2" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="var(--glass-aurora-2)" />
+          <stop offset="100%" stop-color="var(--glass-aurora-2)" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="spinner-particle-3" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="var(--glass-aurora-3)" />
+          <stop offset="100%" stop-color="var(--glass-aurora-3)" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="spinner-particle-4" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="var(--glass-aurora-4)" />
+          <stop offset="100%" stop-color="var(--glass-aurora-4)" stop-opacity="0" />
+        </radialGradient>
+      </defs>
+      <circle cx="7.5" cy="7.5" r="2.4" fill="url(#spinner-core)">
+        <animate attributeName="r" values="1.6;2.6;1.6" dur="1.6s" repeatCount="indefinite" />
+      </circle>
+      <For each={particles}>
+        {(p, i) => (
+          <circle
+            cx={p.x}
+            cy={p.y}
+            r="1.2"
+            fill={`url(#spinner-particle-${(i() % 4) + 1})`}
             style={{
-              opacity: square.corner ? 0 : undefined,
-              animation: square.corner
-                ? undefined
-                : `${square.outer ? "pulse-opacity-dim" : "pulse-opacity"} ${square.duration}s ease-in-out infinite`,
-              "animation-fill-mode": square.corner ? undefined : "both",
-              "animation-delay": square.corner ? undefined : `${square.delay}s`,
+              "transform-origin": "7.5px 7.5px",
+              "animation": `glass-flow-orbit ${p.duration}s cubic-bezier(0.65, 0, 0.35, 1) infinite`,
+              "animation-delay": `${-p.delay}s`,
             }}
           />
         )}

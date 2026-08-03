@@ -3,10 +3,10 @@ import { Schema } from "effect"
 import { logo as glyphs } from "./logo"
 
 const wordmark = [
-  `⠀                                ▄     `,
-  `█▀▀█ █▀▀█ █▀▀█ █▀▀▄ █▀▀▀ █▀▀█ █▀▀█ █▀▀█`,
-  `█  █ █  █ █▀▀▀ █  █ █    █  █ █  █ █▀▀▀`,
-  `▀▀▀▀ █▀▀▀ ▀▀▀▀ ▀  ▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀`,
+  `                                                 `,
+  `█▀▀▀ █▀▀█ █▀▀█ █▀▀█ █  █ █▀▀▄ ▀▀▀▀ █▀▀▀ █  █ ▀▀▀▀`,
+  `█    █  █ █  █ █▀▀▀ █  █ █▀▀█   █  █    █  █   █ `,
+  `▀▀▀▀ ▀▀▀▀ ▀  ▀ ▀▀▀▀ ▀▄▄▀ ▀  ▀ ▀▀▀▀ ▀▀▀▀ ▀  ▀   █ `,
 ]
 
 export class CancelledError extends Schema.TaggedErrorClass<CancelledError>()("UICancelledError", {}) {}
@@ -59,16 +59,21 @@ export function logo(pad?: string) {
   const result: string[] = []
   const reset = "\x1b[0m"
   const left = {
-    fg: "\x1b[90m",
-    shadow: "\x1b[38;5;235m",
-    bg: "\x1b[48;5;235m",
+    fg: "\x1b[38;5;111m",
+    shadow: "\x1b[38;5;67m",
+    bg: "\x1b[48;5;67m",
   }
   const right = {
-    fg: reset,
-    shadow: "\x1b[38;5;238m",
-    bg: "\x1b[48;5;238m",
+    fg: "\x1b[38;5;141m",
+    shadow: "\x1b[38;5;97m",
+    bg: "\x1b[48;5;97m",
   }
-  const gap = " "
+  const aurora = {
+    fg: "\x1b[38;5;219m",
+    shadow: "\x1b[38;5;176m",
+    bg: "\x1b[48;5;176m",
+  }
+  const gap = "  "
   const draw = (line: string, fg: string, shadow: string, bg: string) => {
     const parts: string[] = []
     for (const char of line) {
@@ -92,12 +97,16 @@ export function logo(pad?: string) {
     }
     return parts.join("")
   }
+  const total = glyphs.left.length
   glyphs.left.forEach((row, index) => {
     if (pad) result.push(pad)
-    result.push(draw(row, left.fg, left.shadow, left.bg))
+    const t = total > 1 ? index / (total - 1) : 0
+    const useAurora = t > 0.55
+    const palette = useAurora ? aurora : t > 0.25 ? right : left
+    result.push(draw(row, palette.fg, palette.shadow, palette.bg))
     result.push(gap)
     const other = glyphs.right[index] ?? ""
-    result.push(draw(other, right.fg, right.shadow, right.bg))
+    result.push(draw(other, palette.fg, palette.shadow, palette.bg))
     result.push(EOL)
   })
   return result.join("").trimEnd()
@@ -122,7 +131,17 @@ export function error(message: string) {
   if (message.startsWith("Error: ")) {
     message = message.slice("Error: ".length)
   }
-  println(Style.TEXT_DANGER_BOLD + "Error: " + Style.TEXT_NORMAL + message)
+  const line = "\x1b[38;5;240m│\x1b[0m"
+  const frame = [
+    line,
+    Style.TEXT_DANGER_BOLD + "✖ Error" + Style.TEXT_NORMAL,
+    line,
+    ...message
+      .split("\n")
+      .map((part) => `${line}  ${Style.TEXT_DANGER}${part}${Style.TEXT_NORMAL}`),
+    line,
+  ].join("\n")
+  println(frame)
 }
 
 export function markdown(text: string): string {

@@ -18,9 +18,9 @@ app
     openAPIRouteHandler(app, {
       documentation: {
         info: {
-          title: "Opencode Enterprise API",
+          title: "Codewright Enterprise API",
           version: "1.0.0",
-          description: "Opencode Enterprise API endpoints",
+          description: "Codewright Enterprise API endpoints",
         },
         openapi: "3.1.1",
       },

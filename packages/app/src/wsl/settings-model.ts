@@ -2,7 +2,7 @@ import fuzzysort from "fuzzysort"
 import type {
   WslInstalledDistro,
   WslOnlineDistro,
-  WslOpencodeCheck,
+  WslCodewrightCheck,
   WslServersPlatform,
   WslServerRuntime,
   WslServersState,
@@ -24,7 +24,7 @@ export type AddServerPrimaryButton = {
   variant: "neutral" | "contrast"
   label: AddServerText
   disabled: boolean
-  action: "install-opencode" | "add" | null
+  action: "install-codewright" | "add" | null
   loading: boolean
   width: string | null
 }
@@ -51,10 +51,10 @@ function isHiddenDistro(name: string) {
 export const wslRuntimeRetryable = (runtime: WslServerRuntime) =>
   runtime.kind === "failed" || runtime.kind === "stopped"
 
-export function wslOpencodeAction(check?: WslOpencodeCheck) {
+export function wslCodewrightAction(check?: WslCodewrightCheck) {
   if (!check) return
-  if (!check.resolvedPath) return "Install OpenCode"
-  if (check.matchesDesktop === false) return "Update OpenCode"
+  if (!check.resolvedPath) return "Install Codewright"
+  if (check.matchesDesktop === false) return "Update Codewright"
 }
 
 export function wslDistroReady(state: WslServersState | undefined, name: string) {
@@ -172,9 +172,9 @@ function addServerDistroStatus(input: {
     }
     return
   }
-  if (check.matchesDesktop === false) return { label: { key: "wsl.onboarding.updateOpencode" }, tone: "warning" }
+  if (check.matchesDesktop === false) return { label: { key: "wsl.onboarding.updateCodewright" }, tone: "warning" }
   if (!check.resolvedPath) return { label: { key: "wsl.onboarding.distroStatus.opencodeMissing" }, tone: "warning" }
-  if (check.error) return { label: { key: "wsl.onboarding.installOpencode" }, tone: "warning" }
+  if (check.error) return { label: { key: "wsl.onboarding.installCodewright" }, tone: "warning" }
   return { label: { key: "wsl.onboarding.distroStatus.ready" }, tone: "success" }
 }
 
@@ -185,22 +185,22 @@ function checkingStatus(): DistroStatus {
 function addServerPrimaryButton(input: {
   state: WslServersState | undefined
   selectedDistro: string | null
-  opencodeCheck: WslOpencodeCheck | null
+  opencodeCheck: WslCodewrightCheck | null
   adding: boolean
   probingAddable: boolean
 }): AddServerPrimaryButton {
   const ready = !!input.selectedDistro && wslDistroReady(input.state, input.selectedDistro)
   const probingSelected = input.probingAddable && !addServerSelectedDistroSettled(input.state, input.selectedDistro)
-  const probingOpencode =
+  const probingCodewright =
     probingSelected ||
     (ready &&
       (!input.opencodeCheck ||
         (!!input.selectedDistro &&
           input.state?.job?.kind === "probe-addable" &&
           input.state.job.distros.includes(input.selectedDistro))))
-  const installingOpencode =
-    input.state?.job?.kind === "install-opencode" && input.state.job.distro === input.selectedDistro
-  if (!ready || probingOpencode) {
+  const installingCodewright =
+    input.state?.job?.kind === "install-codewright" && input.state.job.distro === input.selectedDistro
+  if (!ready || probingCodewright) {
     return {
       variant: "contrast",
       label: probingSelected ? { key: "wsl.onboarding.distroStatus.checking" } : { key: "wsl.server.add" },
@@ -210,18 +210,18 @@ function addServerPrimaryButton(input: {
       width: null,
     }
   }
-  if (!addServerOpencodeReady(input.opencodeCheck)) {
+  if (!addServerCodewrightReady(input.opencodeCheck)) {
     const update = !!input.opencodeCheck?.resolvedPath && input.opencodeCheck.matchesDesktop === false
     return {
       variant: "neutral",
-      label: installingOpencode
-        ? { key: "wsl.onboarding.updatingOpencode" }
+      label: installingCodewright
+        ? { key: "wsl.onboarding.updatingCodewright" }
         : update
-          ? { key: "wsl.onboarding.updateOpencode" }
-          : { key: "wsl.onboarding.installOpencode" },
+          ? { key: "wsl.onboarding.updateCodewright" }
+          : { key: "wsl.onboarding.installCodewright" },
       disabled: !!input.state?.job || input.adding,
-      action: "install-opencode",
-      loading: installingOpencode,
+      action: "install-codewright",
+      loading: installingCodewright,
       width: update ? "138px" : "129px",
     }
   }
@@ -235,7 +235,7 @@ function addServerPrimaryButton(input: {
   }
 }
 
-function addServerOpencodeReady(check: WslOpencodeCheck | null) {
+function addServerCodewrightReady(check: WslCodewrightCheck | null) {
   return !!check?.resolvedPath && check.matchesDesktop !== false && !check.error
 }
 
@@ -286,7 +286,7 @@ export function addableProbePlan(input: {
   const pending = ordered.flatMap((item) => {
     if (item.version === 1) return []
     if (!state.distroProbes[item.name]) return [`distro:${item.name}`]
-    if (wslDistroReady(state, item.name) && !state.opencodeChecks[item.name]) return [`opencode:${item.name}`]
+    if (wslDistroReady(state, item.name) && !state.opencodeChecks[item.name]) return [`codewright:${item.name}`]
     return []
   })
   if (!pending.length) return

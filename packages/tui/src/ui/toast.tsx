@@ -31,16 +31,19 @@ export function Toast() {
           paddingRight={2}
           paddingTop={1}
           paddingBottom={1}
-          backgroundColor={theme.backgroundPanel}
+          backgroundColor={theme.backgroundElement}
           borderColor={theme[current().variant]}
           border={["left", "right"]}
           customBorderChars={SplitBorder.customBorderChars}
         >
-          <Show when={current().title}>
-            <text attributes={TextAttributes.BOLD} marginBottom={1} fg={theme.text}>
-              {current().title}
-            </text>
-          </Show>
+          <box flexDirection="row" alignItems="center" gap={1}>
+            <text fg={theme[current().variant]}>◆</text>
+            <Show when={current().title}>
+              <text attributes={TextAttributes.BOLD} fg={theme.text}>
+                {current().title}
+              </text>
+            </Show>
+          </box>
           <text fg={theme.text} wrapMode="word" width="100%">
             {current().message}
           </text>

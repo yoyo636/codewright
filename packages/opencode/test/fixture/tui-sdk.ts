@@ -1,8 +1,8 @@
-import type { GlobalEvent } from "@opencode-ai/sdk/v2"
-import type { EventSource } from "@opencode-ai/tui/context/sdk"
+import type { GlobalEvent } from "@codewright-ai/sdk/v2"
+import type { EventSource } from "@codewright-ai/tui/context/sdk"
 
-export const worktree = "/tmp/opencode"
-export const directory = `${worktree}/packages/opencode`
+export const worktree = "/tmp/codewright"
+export const directory = `${worktree}/packages/codewright`
 
 export function json(data: unknown, init?: ResponseInit) {
   return new Response(JSON.stringify(data), {

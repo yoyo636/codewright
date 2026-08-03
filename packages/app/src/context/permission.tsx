@@ -1,7 +1,7 @@
 import { createEffect, createMemo, createRoot, getOwner, onCleanup } from "solid-js"
 import { createStore, produce } from "solid-js/store"
-import { createSimpleContext } from "@opencode-ai/ui/context"
-import type { PermissionRequest } from "@opencode-ai/sdk/v2/client"
+import { createSimpleContext } from "@codewright-ai/ui/context"
+import type { PermissionRequest } from "@codewright-ai/sdk/v2/client"
 import { Persist, persisted } from "@/utils/persist"
 import type { ServerSDK } from "@/context/server-sdk"
 import type { ServerSync } from "./server-sync"
@@ -249,7 +249,8 @@ function createServerPermissionState(input: { sdk: ServerSDK; sync: ServerSync }
       .reply({
         sessionID: request.sessionID,
         requestID: request.permissionID,
-        reply: request.response,
+        reply:
+          request.response === "once" ? "allow" : request.response === "reject" ? "deny" : request.response,
         location: request.directory ? { directory: request.directory } : undefined,
       })
       .catch(() => {
@@ -263,7 +264,7 @@ function createServerPermissionState(input: { sdk: ServerSDK; sync: ServerSync }
     }
     return input.sdk.api.permission.request
       .list({ location: { directory } })
-      .then((result) => result.data.map(normalizePermissionRequest))
+      .then((result: { data: any[] }) => result.data.map(normalizePermissionRequest))
   }
 
   function respondOnce(permission: PermissionRequest, directory?: string) {

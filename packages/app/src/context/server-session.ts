@@ -1,17 +1,17 @@
-import { Binary } from "@opencode-ai/core/util/binary"
-import { retry } from "@opencode-ai/core/util/retry"
-import type { OpenCodeEvent, SessionApi, SessionMessageInfo } from "@opencode-ai/client/promise"
+import { Binary } from "@codewright-ai/core/util/binary"
+import { retry } from "@codewright-ai/core/util/retry"
+import type { OpenCodeEvent as CodewrightEvent, SessionApi, SessionMessageInfo } from "@codewright-ai/client/promise"
 import type {
   Message,
-  OpencodeClient,
+  CodewrightClient,
   Part,
   PermissionRequest,
   QuestionRequest,
   Session,
   SessionStatus,
   Todo,
-} from "@opencode-ai/sdk/v2/client"
-import type { FileDiffInfo } from "@opencode-ai/client/promise"
+} from "@codewright-ai/sdk/v2/client"
+import type { FileDiffInfo } from "@codewright-ai/client/promise"
 import { batch } from "solid-js"
 import { createStore, produce, reconcile } from "solid-js/store"
 import { message as cleanMessage } from "@/utils/diffs"
@@ -23,7 +23,7 @@ import { dropSessionCaches, pickSessionCacheEvictions, SESSION_CACHE_LIMIT } fro
 import { createV2SessionReducer, type V2SessionReduction } from "./server-session-v2-reducer"
 import type { ServerApi } from "@/utils/server"
 
-type MessageApi = ServerApi["message"]
+type MessageApi = CodewrightClient["v2"]["session"]
 
 const cmp = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0)
 const cmpMessage = (a: Message, b: Message) => a.time.created - b.time.created || cmp(a.id, b.id)
@@ -186,7 +186,7 @@ function reconcileFetched<T extends { id: string }>(
 type ServerSessionOptions = { retry?: typeof retry; protocol?: Promise<"v1" | "v2"> }
 
 export function createServerSession(
-  client: OpencodeClient,
+  client: CodewrightClient,
   sessionApiOrOptions?: SessionApi | ServerSessionOptions,
   messageApi?: MessageApi,
   currentOptions?: ServerSessionOptions,
@@ -542,7 +542,15 @@ export function createServerSession(
       const request = (cursor?: string) =>
         (options?.retry ?? retry)(() => {
           onAttempt?.()
-          return messageApi.list(cursor ? { sessionID, limit, cursor } : { sessionID, limit, order: "desc" })
+          return messageApi
+            .messages({ sessionID, limit, ...(cursor ? { cursor } : { order: "desc" as const }) })
+            .then((x) => {
+              const data = (x as { data?: { data?: SessionMessageInfo[]; cursor?: { next?: string } } }).data
+              if (data && Array.isArray(data.data)) {
+                return { data: data.data, cursor: { next: data.cursor?.next } }
+              }
+              return { data: [], cursor: { next: undefined } }
+            })
         })
       const first = await request(before)
       const pages = [first]
@@ -934,7 +942,7 @@ export function createServerSession(
       .catch(() => {})
   }
 
-  const applyV2 = (event: OpenCodeEvent) => {
+  const applyV2 = (event: CodewrightEvent) => {
     if (!("data" in event) || !("sessionID" in event.data) || typeof event.data.sessionID !== "string") return
     const sessionID = event.data.sessionID
     const reduction = v2.reduce(data.session_message[sessionID] ?? [], event)

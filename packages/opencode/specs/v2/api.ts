@@ -1,13 +1,13 @@
 // @ts-nocheck
 
-import { OpenCode } from "@opencode-ai/core"
-import { ReadTool } from "@opencode-ai/core/tools"
+import { Codewright } from "@codewright-ai/core"
+import { ReadTool } from "@codewright-ai/core/tools"
 
-const opencode = OpenCode.make({})
+const codewright = Codewright.make({})
 
-opencode.tool.add(ReadTool)
+codewright.tool.add(ReadTool)
 
-opencode.tool.add({
+codewright.tool.add({
   name: "bash",
   schema: {
     type: "object",
@@ -22,13 +22,13 @@ opencode.tool.add({
   execute(input, ctx) {},
 })
 
-opencode.auth.add({
+codewright.auth.add({
   provider: "openai",
   type: "api",
   value: process.env.OPENAI_API_KEY,
 })
 
-opencode.agent.add({
+codewright.agent.add({
   name: "build",
   permissions: [],
   model: {
@@ -38,20 +38,20 @@ opencode.agent.add({
   },
 })
 
-const sessionID = await opencode.session.create({
+const sessionID = await codewright.session.create({
   agent: "build",
 })
 
-opencode.subscribe((event) => {
+codewright.subscribe((event) => {
   console.log(event)
 })
 
-await opencode.session.prompt({
+await codewright.session.prompt({
   sessionID,
   text: "hey what is up",
 })
 
-await opencode.session.prompt({
+await codewright.session.prompt({
   sessionID,
   text: "what is up with this",
   files: [
@@ -62,6 +62,6 @@ await opencode.session.prompt({
   ],
 })
 
-await opencode.session.wait()
+await codewright.session.wait()
 
-console.log(await opencode.session.messages(sessionID))
+console.log(await codewright.session.messages(sessionID))

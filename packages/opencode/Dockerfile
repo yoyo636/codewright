@@ -7,12 +7,12 @@ ENV BUN_RUNTIME_TRANSPILER_CACHE_PATH=${BUN_RUNTIME_TRANSPILER_CACHE_PATH}
 RUN apk add libgcc libstdc++ ripgrep
 
 FROM base AS build-amd64
-COPY dist/opencode-linux-x64-baseline-musl/bin/opencode /usr/local/bin/opencode
+COPY dist/codewright-linux-x64-baseline-musl/bin/codewright /usr/local/bin/codewright
 
 FROM base AS build-arm64
-COPY dist/opencode-linux-arm64-musl/bin/opencode /usr/local/bin/opencode
+COPY dist/codewright-linux-arm64-musl/bin/codewright /usr/local/bin/codewright
 
 ARG TARGETARCH
 FROM build-${TARGETARCH}
-RUN opencode --version
-ENTRYPOINT ["opencode"]
+RUN codewright --version
+ENTRYPOINT ["codewright"]

@@ -65,10 +65,14 @@
   width: 100%;
   column-gap: 10px;
   cursor: default;
-  border: none;
-  background: none;
+  border: 1px solid transparent;
+  background: transparent;
   padding: 4px 10px;
   border-radius: var(--radius-sm);
+  transition:
+    background var(--glass-duration-base, 280ms) var(--glass-ease-soft, cubic-bezier(0.22, 1, 0.36, 1)),
+    border-color var(--glass-duration-base, 280ms) var(--glass-ease-soft, cubic-bezier(0.22, 1, 0.36, 1)),
+    box-shadow var(--glass-duration-base, 280ms) var(--glass-ease-soft, cubic-bezier(0.22, 1, 0.36, 1));
 }
 
 [data-slot="message-nav-title-preview"] {
@@ -88,14 +92,29 @@
 
 [data-slot="message-nav-item"]:has([data-slot="message-nav-title-preview"][data-active])
   [data-slot="message-nav-message-button"] {
-  background-color: var(--surface-base-active);
+  background: linear-gradient(
+    90deg,
+    rgba(125, 211, 255, 0.16) 0%,
+    rgba(162, 128, 255, 0.1) 100%
+  );
+  border: 1px solid rgba(125, 211, 255, 0.28);
+  box-shadow: 0 0 12px rgba(125, 211, 255, 0.12);
 }
 
 [data-slot="message-nav-item"]:hover [data-slot="message-nav-message-button"] {
-  background-color: var(--surface-base);
+  background: linear-gradient(
+    90deg,
+    rgba(125, 211, 255, 0.08) 0%,
+    rgba(162, 128, 255, 0.06) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 [data-slot="message-nav-item"]:active [data-slot="message-nav-message-button"] {
-  background-color: var(--surface-base-active);
+  background: linear-gradient(
+    90deg,
+    rgba(125, 211, 255, 0.16) 0%,
+    rgba(162, 128, 255, 0.1) 100%
+  );
 }
 
 [data-slot="message-nav-item"]:active [data-slot="message-nav-title-preview"] {
@@ -109,17 +128,21 @@
   justify-content: center;
   align-items: start;
   border-radius: var(--radius-md);
-  background: var(--surface-raised-stronger-non-alpha);
+  background: linear-gradient(
+    135deg,
+    rgba(20, 22, 30, 0.78) 0%,
+    rgba(30, 32, 45, 0.78) 100%
+  );
+  backdrop-filter: blur(var(--glass-blur-lg, 32px)) saturate(200%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-lg, 32px)) saturate(200%);
   max-height: min(480px, calc(100vh - 6rem));
   overflow-y: auto;
   overflow-x: hidden;
-
-  /* border/shadow-xs/base */
+  border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow:
-    0 0 0 1px var(--border-weak-base, rgba(17, 0, 0, 0.12)),
-    0 1px 2px -1px rgba(19, 16, 16, 0.04),
-    0 1px 2px 0 rgba(19, 16, 16, 0.06),
-    0 1px 3px 0 rgba(19, 16, 16, 0.08);
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 16px 48px rgba(0, 0, 0, 0.4),
+    0 0 32px rgba(125, 211, 255, 0.08);
 
   * {
     margin: 0 !important;

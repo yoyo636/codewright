@@ -33603,12 +33603,12 @@
       }
     }
   },
-  "opencode-go": {
-    "id": "opencode-go",
-    "env": ["OPENCODE_API_KEY"],
+  "codewright-go": {
+    "id": "codewright-go",
+    "env": ["CODEWRIGHT_API_KEY"],
     "npm": "@ai-sdk/openai-compatible",
     "api": "https://opencode.ai/zen/go/v1",
-    "name": "OpenCode Go",
+    "name": "Codewright Go",
     "doc": "https://opencode.ai/docs/zen",
     "models": {
       "deepseek-v4-flash": {
@@ -90319,12 +90319,12 @@
       }
     }
   },
-  "opencode": {
-    "id": "opencode",
-    "env": ["OPENCODE_API_KEY"],
+  "codewright": {
+    "id": "codewright",
+    "env": ["CODEWRIGHT_API_KEY"],
     "npm": "@ai-sdk/openai-compatible",
     "api": "https://opencode.ai/zen/v1",
-    "name": "OpenCode Zen",
+    "name": "Codewright Zen",
     "doc": "https://opencode.ai/docs/zen",
     "models": {
       "ring-2.6-1t-free": {

@@ -1,5 +1,5 @@
-import type { AssistantMessage } from "@opencode-ai/sdk/v2"
-import type { TuiPlugin, TuiPluginApi } from "@opencode-ai/plugin/tui"
+import type { AssistantMessage } from "@codewright-ai/sdk/v2"
+import type { TuiPlugin, TuiPluginApi } from "@codewright-ai/plugin/tui"
 import type { BuiltinTuiPlugin } from "../builtins"
 import { createMemo } from "solid-js"
 

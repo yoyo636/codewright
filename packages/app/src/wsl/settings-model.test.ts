@@ -6,7 +6,7 @@ import {
   autoProbePlan,
   createProbeFailureGate,
   runAddableProbePlan,
-  wslOpencodeAction,
+  wslCodewrightAction,
   wslRuntimeRetryable,
 } from "./settings-model"
 import type { WslServersState } from "./types"
@@ -37,10 +37,10 @@ describe("WSL server settings presentation", () => {
     expect(wslRuntimeRetryable({ kind: "stopped" })).toBe(true)
   })
 
-  test("offers install and update only when OpenCode needs attention", () => {
-    expect(wslOpencodeAction(undefined)).toBeUndefined()
+  test("offers install and update only when Codewright needs attention", () => {
+    expect(wslCodewrightAction(undefined)).toBeUndefined()
     expect(
-      wslOpencodeAction({
+      wslCodewrightAction({
         distro: "Debian",
         resolvedPath: null,
         version: null,
@@ -48,21 +48,21 @@ describe("WSL server settings presentation", () => {
         matchesDesktop: null,
         error: null,
       }),
-    ).toBe("Install OpenCode")
+    ).toBe("Install Codewright")
     expect(
-      wslOpencodeAction({
+      wslCodewrightAction({
         distro: "Debian",
-        resolvedPath: "/usr/local/bin/opencode",
+        resolvedPath: "/usr/local/bin/codewright",
         version: "1.2.2",
         expectedVersion: "1.2.3",
         matchesDesktop: false,
         error: null,
       }),
-    ).toBe("Update OpenCode")
+    ).toBe("Update Codewright")
     expect(
-      wslOpencodeAction({
+      wslCodewrightAction({
         distro: "Debian",
-        resolvedPath: "/usr/local/bin/opencode",
+        resolvedPath: "/usr/local/bin/codewright",
         version: "1.2.3",
         expectedVersion: "1.2.3",
         matchesDesktop: true,
@@ -179,7 +179,7 @@ describe("WSL server settings presentation", () => {
     expect(model.busy).toBe(true)
   })
 
-  test("does not report ready when OpenCode is present but cannot run", () => {
+  test("does not report ready when Codewright is present but cannot run", () => {
     const model = addServerViewModel({
       state: {
         ...readyWslState,
@@ -191,11 +191,11 @@ describe("WSL server settings presentation", () => {
         opencodeChecks: {
           Debian: {
             distro: "Debian",
-            resolvedPath: "/home/me/.opencode/bin/opencode",
+            resolvedPath: "/home/me/.codewright/bin/codewright",
             version: null,
             expectedVersion: "1.2.3",
             matchesDesktop: null,
-            error: "opencode is installed but could not run",
+            error: "codewright is installed but could not run",
           },
         },
       },
@@ -208,10 +208,10 @@ describe("WSL server settings presentation", () => {
     })
 
     expect(model.distroStatuses.Debian).toEqual({
-      label: { key: "wsl.onboarding.installOpencode" },
+      label: { key: "wsl.onboarding.installCodewright" },
       tone: "warning",
     })
-    expect(model.primaryButton.action).toBe("install-opencode")
+    expect(model.primaryButton.action).toBe("install-codewright")
   })
 
   test("delegates addable probe plans to one batch command", async () => {

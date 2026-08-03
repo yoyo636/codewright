@@ -16,17 +16,17 @@ import { useNavigate, useParams } from "@solidjs/router"
 import { useLayout, LocalProject } from "@/context/layout"
 import { useServerSync } from "@/context/server-sync"
 import { Persist, persisted } from "@/utils/persist"
-import { base64Encode } from "@opencode-ai/core/util/encode"
+import { base64Encode } from "@codewright-ai/core/util/encode"
 import { decode64 } from "@/utils/base64"
-import { ResizeHandle } from "@opencode-ai/ui/resize-handle"
-import { Button } from "@opencode-ai/ui/button"
-import { Icon as IconV2 } from "@opencode-ai/ui/v2/icon"
-import { IconButton } from "@opencode-ai/ui/icon-button"
-import { Tooltip } from "@opencode-ai/ui/tooltip"
-import { DropdownMenu } from "@opencode-ai/ui/dropdown-menu"
-import { Dialog } from "@opencode-ai/ui/dialog"
-import { getFilename } from "@opencode-ai/core/util/path"
-import { Session } from "@opencode-ai/sdk/v2/client"
+import { ResizeHandle } from "@codewright-ai/ui/resize-handle"
+import { Button } from "@codewright-ai/ui/button"
+import { Icon as IconV2 } from "@codewright-ai/ui/v2/icon"
+import { IconButton } from "@codewright-ai/ui/icon-button"
+import { Tooltip } from "@codewright-ai/ui/tooltip"
+import { DropdownMenu } from "@codewright-ai/ui/dropdown-menu"
+import { Dialog } from "@codewright-ai/ui/dialog"
+import { getFilename } from "@codewright-ai/core/util/path"
+import { Session } from "@codewright-ai/sdk/v2/client"
 import { usePlatform } from "@/context/platform"
 import { useSettings } from "@/context/settings"
 import { createStore, produce, reconcile } from "solid-js/store"
@@ -40,8 +40,8 @@ import { clearWorkspaceTerminals } from "@/context/terminal"
 import { pickSessionCacheEvictions } from "@/context/global-sync/session-cache"
 import { useNotification } from "@/context/notification"
 import { usePermission } from "@/context/permission"
-import { Binary } from "@opencode-ai/core/util/binary"
-import { retry } from "@opencode-ai/core/util/retry"
+import { Binary } from "@codewright-ai/core/util/binary"
+import { retry } from "@codewright-ai/core/util/retry"
 import { playSoundById } from "@/utils/sound"
 import { createAim } from "@/utils/aim"
 import { Worktree as WorktreeState } from "@/utils/worktree"
@@ -49,8 +49,8 @@ import { setSessionHandoff } from "@/pages/session/handoff"
 import { SessionRouteKey, SessionStateKey } from "@/utils/server-scope"
 import { listAllSessions } from "@/utils/session"
 
-import { useDialog } from "@opencode-ai/ui/context/dialog"
-import { useTheme, type ColorScheme } from "@opencode-ai/ui/theme/context"
+import { useDialog } from "@codewright-ai/ui/context/dialog"
+import { useTheme, type ColorScheme } from "@codewright-ai/ui/theme/context"
 import { useCommand, type CommandOption } from "@/context/command"
 import { ConstrainDragXAxis, getDraggableId } from "@/utils/solid-dnd"
 import { DebugBar } from "@/components/debug-bar"
@@ -1186,11 +1186,14 @@ export default function LegacyLayout(props: ParentProps) {
     const refreshDirs = async (target?: string) => {
       if (!target || target === root || canOpen(target)) return canOpen(target)
       const listed = await Promise.resolve(
-        project?.id ?? serverSDK().api.project.current({ location: { directory: root } }),
+        project?.id ?? serverSDK().api.project.current({ directory: root }),
       )
-        .then((value) => (typeof value === "string" ? value : value.id))
-        .then((projectID) => serverSDK().api.project.directories({ projectID, location: { directory: root } }))
-        .then((items) => items.map((item) => item.directory).filter((item) => pathKey(item) !== pathKey(root)))
+        .then((value) => (typeof value === "string" ? value : (value as { id: string }).id))
+        .then(async (projectID) => {
+          const items = await serverSDK().api.project.directories({ projectID, directory: root })
+          return Array.isArray(items) ? items.map((item) => item.directory) : []
+        })
+        .then((items) => items.filter((directory) => pathKey(directory) !== pathKey(root)))
         .catch(() => [] as string[])
       dirs = effectiveWorkspaceOrder(root, [root, ...listed], store.workspaceOrder[root])
       return canOpen(target)
@@ -1234,7 +1237,7 @@ export default function LegacyLayout(props: ParentProps) {
       await Promise.all(
         dirs.map(async (item) => ({
           path: { directory: item },
-          session: await listAllSessions(serverSDK().api.session, {
+          session: await listAllSessions(serverSDK().api.session as unknown as Parameters<typeof listAllSessions>[0], {
             directory: item,
             parentID: null,
             order: "desc",
@@ -1458,7 +1461,7 @@ export default function LegacyLayout(props: ParentProps) {
     })
     const dismiss = () => dismissToast(progress)
 
-    const sessions = await listAllSessions(serverSDK().api.session, { directory, order: "desc" }).catch(() => [])
+    const sessions = await listAllSessions(serverSDK().api.session as unknown as Parameters<typeof listAllSessions>[0], { directory, order: "desc" }).catch(() => [])
 
     clearWorkspaceTerminals(
       directory,
@@ -1534,9 +1537,9 @@ export default function LegacyLayout(props: ParentProps) {
 
     onMount(() => {
       serverSDK()
-        .api.vcs.status({ location: { directory: props.directory } })
+        .api.vcs.status({ directory: props.directory })
         .then((result) => {
-          const files = result.data
+          const files = result.data ?? []
           const dirty = files.length > 0
           setData({ status: "ready", dirty })
         })
@@ -1592,7 +1595,7 @@ export default function LegacyLayout(props: ParentProps) {
     })
 
     const refresh = async () => {
-      const sessions = await listAllSessions(serverSDK().api.session, {
+      const sessions = await listAllSessions(serverSDK().api.session as unknown as Parameters<typeof listAllSessions>[0], {
         directory: props.directory,
         order: "desc",
       }).catch(() => [])
@@ -1602,9 +1605,9 @@ export default function LegacyLayout(props: ParentProps) {
 
     onMount(() => {
       serverSDK()
-        .api.vcs.status({ location: { directory: props.directory } })
+        .api.vcs.status({ directory: props.directory })
         .then((result) => {
-          const files = result.data
+          const files = result.data ?? []
           const dirty = files.length > 0
           setState({ status: "ready", dirty })
           void refresh()

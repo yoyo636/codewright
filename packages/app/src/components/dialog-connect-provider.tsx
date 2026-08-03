@@ -1,17 +1,18 @@
-import type { IntegrationMethod, IntegrationOauthConnectOutput } from "@opencode-ai/client/promise"
-import { Button } from "@opencode-ai/ui/button"
-import { useDialog } from "@opencode-ai/ui/context/dialog"
-import { Dialog } from "@opencode-ai/ui/dialog"
-import { Icon } from "@opencode-ai/ui/icon"
-import { IconButton } from "@opencode-ai/ui/icon-button"
-import { List, type ListRef } from "@opencode-ai/ui/list"
-import { ProviderIcon } from "@opencode-ai/ui/provider-icon"
-import { Spinner } from "@opencode-ai/ui/spinner"
-import { Tag } from "@opencode-ai/ui/tag"
-import { TextField } from "@opencode-ai/ui/text-field"
-import { ButtonV2 } from "@opencode-ai/ui/v2/button-v2"
-import { DialogBody, DialogHeader, DialogTitle, DialogV2 } from "@opencode-ai/ui/v2/dialog-v2"
-import { TextInputV2 } from "@opencode-ai/ui/v2/text-input-v2"
+import type { IntegrationMethod, IntegrationOauthConnectOutput } from "@codewright-ai/client/promise"
+import type { IntegrationInfo, OAuthAttempt } from "@/utils/server-compat"
+import { Button } from "@codewright-ai/ui/button"
+import { useDialog } from "@codewright-ai/ui/context/dialog"
+import { Dialog } from "@codewright-ai/ui/dialog"
+import { Icon } from "@codewright-ai/ui/icon"
+import { IconButton } from "@codewright-ai/ui/icon-button"
+import { List, type ListRef } from "@codewright-ai/ui/list"
+import { ProviderIcon } from "@codewright-ai/ui/provider-icon"
+import { Spinner } from "@codewright-ai/ui/spinner"
+import { Tag } from "@codewright-ai/ui/tag"
+import { TextField } from "@codewright-ai/ui/text-field"
+import { ButtonV2 } from "@codewright-ai/ui/v2/button-v2"
+import { DialogBody, DialogHeader, DialogTitle, DialogV2 } from "@codewright-ai/ui/v2/dialog-v2"
+import { TextInputV2 } from "@codewright-ai/ui/v2/text-input-v2"
 import { showToast } from "@/utils/toast"
 import {
   type Accessor,
@@ -166,7 +167,7 @@ function ProviderPicker(props: {
     if (id === "anthropic") return language.t("dialog.provider.anthropic.note")
     if (id === "openai") return language.t("dialog.provider.openai.note")
     if (id.startsWith("github-copilot")) return language.t("dialog.provider.copilot.note")
-    if (id === "opencode-go") return language.t("dialog.provider.opencodeGo.tagline")
+    if (id === "codewright-go") return language.t("dialog.provider.opencodeGo.tagline")
     return undefined
   }
 
@@ -205,17 +206,17 @@ function ProviderPicker(props: {
         <div class="px-1.25 w-full flex items-center gap-x-3">
           <ProviderIcon data-slot="list-item-extra-icon" id={i.id} />
           <span>{i.name}</span>
-          <Show when={i.id === "opencode"}>
-            <div class="text-14-regular text-text-weak">{language.t("dialog.provider.opencode.tagline")}</div>
+          <Show when={i.id === "codewright"}>
+            <div class="text-14-regular text-text-weak">{language.t("dialog.provider.codewright.tagline")}</div>
           </Show>
           <Show when={i.id === CUSTOM_ID}>
             <Tag>{language.t("settings.providers.tag.custom")}</Tag>
           </Show>
-          <Show when={i.id === "opencode"}>
+          <Show when={i.id === "codewright"}>
             <Tag>{language.t("dialog.provider.tag.recommended")}</Tag>
           </Show>
           <Show when={note(i.id)}>{(value) => <div class="text-14-regular text-text-weak">{value()}</div>}</Show>
-          <Show when={i.id === "opencode-go"}>
+          <Show when={i.id === "codewright-go"}>
             <Tag>{language.t("dialog.provider.tag.recommended")}</Tag>
           </Show>
         </div>
@@ -236,7 +237,7 @@ function ProviderPickerV2(props: {
     active: undefined as string | undefined,
     connecting: undefined as string | undefined,
   })
-  const featured = ["opencode", "opencode-go", "anthropic", "openai", "google", "openrouter", "vercel"]
+  const featured = ["codewright", "codewright-go", "anthropic", "openai", "google", "openrouter", "vercel"]
   const custom = () => ({ id: CUSTOM_ID, name: language.t("dialog.provider.custom.label") })
   const all = createMemo(() => {
     language.locale()
@@ -333,11 +334,11 @@ function ProviderPickerV2(props: {
                       >
                         <ProviderIcon id={provider.id} class="size-4 shrink-0 text-v2-icon-icon-base" />
                         <span class="min-w-0 truncate font-[530] text-v2-text-text-base">{provider.name}</span>
-                        <Show when={provider.id === "opencode" || provider.id === "opencode-go"}>
+                        <Show when={provider.id === "codewright" || provider.id === "codewright-go"}>
                           <span class="min-w-0 truncate font-[440] text-v2-text-text-muted">
                             {language.t(
-                              provider.id === "opencode"
-                                ? "dialog.provider.opencode.tagline"
+                              provider.id === "codewright"
+                                ? "dialog.provider.codewright.tagline"
                                 : "dialog.provider.opencodeGo.tagline",
                             )}
                           </span>
@@ -422,12 +423,12 @@ function ProviderConnection(props: {
           integrationID: input.provider,
           location: input.directory ? { directory: input.directory } : undefined,
         })
-        .then((result) => result.data),
+        .then((result: { data: IntegrationInfo }) => result.data),
   )
   const loading = createMemo(() => integration.loading)
   const methods = createMemo<ConnectMethod[]>(() => {
     const values = integration.latest?.methods.filter(
-      (method): method is ConnectMethod => method.type === "key" || method.type === "oauth",
+      (method: { type: string }): method is ConnectMethod => method.type === "key" || method.type === "oauth",
     )
     return values?.length ? values : fallback()
   })
@@ -553,11 +554,11 @@ function ProviderConnection(props: {
           inputs: inputs ?? {},
           location: location(),
         })
-        .then((x) => {
+        .then((x: { data: OAuthAttempt }) => {
           if (!alive.value) return
           dispatch({ type: "auth.complete", authorization: x.data })
         })
-        .catch((e) => {
+        .catch((e: unknown) => {
           if (!alive.value) return
           dispatch({ type: "auth.error", error: formatError(e, language.t("common.requestFailed")) })
         })
@@ -828,7 +829,7 @@ function ProviderConnection(props: {
       return (
         <div class="flex flex-col gap-5 px-3 text-[13px] font-[440] leading-5 tracking-[-0.04px] text-v2-text-text-muted">
           <Show
-            when={provider().id === "opencode"}
+            when={provider().id === "codewright"}
             fallback={language.t("provider.connect.apiKey.description", { provider: provider().name })}
           >
             <div class="flex flex-col gap-5">
@@ -880,7 +881,7 @@ function ProviderConnection(props: {
     return (
       <div class="flex flex-col gap-6">
         <Switch>
-          <Match when={provider().id === "opencode"}>
+          <Match when={provider().id === "codewright"}>
             <div class="flex flex-col gap-4">
               <div class="text-14-regular text-text-base">{language.t("provider.connect.opencodeZen.line1")}</div>
               <div class="text-14-regular text-text-base">{language.t("provider.connect.opencodeZen.line2")}</div>
@@ -954,7 +955,7 @@ function ProviderConnection(props: {
           code,
         })
         .then(() => ({ ok: true as const }))
-        .catch((error) => ({ ok: false as const, error }))
+        .catch((error: unknown) => ({ ok: false as const, error }))
       if (result.ok) {
         await complete()
         return
@@ -1051,8 +1052,11 @@ function ProviderConnection(props: {
             attemptID: authorization.attemptID,
             location: location(),
           })
-          .then((value) => ({ ok: true as const, status: value.data }))
-          .catch((error) => ({ ok: false as const, error }))
+          .then((value: { data: { status: string; message?: string } }) => ({
+            ok: true as const,
+            status: value.data,
+          }))
+          .catch((error: unknown) => ({ ok: false as const, error }))
         if (!alive.value) return
         if (!result.ok) {
           dispatch({ type: "auth.error", error: formatError(result.error, language.t("common.requestFailed")) })
@@ -1063,7 +1067,7 @@ function ProviderConnection(props: {
           return
         }
         if (result.status.status === "failed") {
-          dispatch({ type: "auth.error", error: result.status.message })
+          dispatch({ type: "auth.error", error: result.status.message ?? language.t("common.requestFailed") })
           return
         }
         if (result.status.status === "expired") {

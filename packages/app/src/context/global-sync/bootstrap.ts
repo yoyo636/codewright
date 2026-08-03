@@ -1,6 +1,7 @@
 import type {
   Config,
-  OpencodeClient,
+  CodewrightClient,
+  McpResource,
   Path,
   PermissionRequest,
   Project,
@@ -8,7 +9,7 @@ import type {
   QuestionRequest,
   ReferenceInfo,
   Session,
-} from "@opencode-ai/sdk/v2/client"
+} from "@codewright-ai/sdk/v2/client"
 import type {
   AgentListInput,
   AgentListOutput,
@@ -22,10 +23,10 @@ import type {
   ReferenceListInput,
   ReferenceListOutput,
   SessionApi,
-} from "@opencode-ai/client/promise"
+} from "@codewright-ai/client/promise"
 import { showToast } from "@/utils/toast"
-import { getFilename } from "@opencode-ai/core/util/path"
-import { retry } from "@opencode-ai/core/util/retry"
+import { getFilename } from "@codewright-ai/core/util/path"
+import { retry } from "@codewright-ai/core/util/retry"
 import { batch } from "solid-js"
 import { produce, reconcile, type SetStoreFunction, type Store } from "solid-js/store"
 import type { State, VcsCache } from "./types"
@@ -40,7 +41,7 @@ import {
 import { formatServerError } from "@/utils/server-errors"
 import { QueryClient, queryOptions } from "@tanstack/solid-query"
 import { loadMcpQuery, loadMcpResourcesQuery } from "../server-sync"
-import { NormalizedProviderListResponse } from "@opencode-ai/session-ui/context"
+import { NormalizedProviderListResponse } from "@codewright-ai/session-ui/context"
 import { ScopedKey, type ServerScope } from "@/utils/server-scope"
 import { normalizeSessionInfo } from "@/utils/session"
 import type { ServerProtocol } from "@/utils/server-protocol"
@@ -105,7 +106,7 @@ function showErrors(input: {
   })
 }
 
-export const loadGlobalConfigQuery = (scope: ServerScope, sdk: OpencodeClient) =>
+export const loadGlobalConfigQuery = (scope: ServerScope, sdk: CodewrightClient) =>
   queryOptions({
     queryKey: [scope, "config"],
     queryFn: () => retry(() => sdk.global.config.get().then((x) => x.data!)),
@@ -116,7 +117,14 @@ type ProjectApi = {
   readonly current: (input?: ProjectCurrentInput) => Promise<ProjectCurrentOutput>
 }
 
-type McpApi = ServerApi["mcp"]
+type McpApi = {
+  list?: (input: { location?: { directory?: string }; directory?: string }) => Promise<{ data?: { name: string; status: string }[] }>
+  resource?: {
+    catalog?: (input: { location?: { directory?: string }; directory?: string }) => Promise<{
+      data?: { resources: McpResource[] }
+    }>
+  }
+}
 type PermissionApi = ServerApi["permission"]
 type QuestionApi = ServerApi["question"]
 type VcsApi = ServerApi["vcs"]
@@ -129,7 +137,7 @@ export const loadProjectsQuery = (scope: ServerScope, api: ProjectApi) =>
         api.list().then((projects) => {
           return projects
             .filter((p) => !!p?.id)
-            .filter((p) => !!p.worktree && !p.worktree.includes("opencode-test"))
+            .filter((p) => !!p.worktree && !p.worktree.includes("codewright-test"))
             .map(normalizeProjectInfo)
             .slice()
             .sort((a, b) => cmp(a.id, b.id))
@@ -138,7 +146,7 @@ export const loadProjectsQuery = (scope: ServerScope, api: ProjectApi) =>
   })
 
 export async function bootstrapGlobal(input: {
-  serverSDK: OpencodeClient
+  serverSDK: CodewrightClient
   serverAPI: CatalogApi & { readonly project: ProjectApi }
   protocol?: Promise<ServerProtocol>
   scope: ServerScope
@@ -219,7 +227,7 @@ export const loadProvidersQuery = (
   scope: ServerScope,
   directory: string | null,
   sdk: CatalogApi,
-  legacy?: OpencodeClient,
+  legacy?: CodewrightClient,
   protocol?: Promise<ServerProtocol>,
 ) =>
   queryOptions({
@@ -256,7 +264,7 @@ export const loadAgentsQuery = (
   scope: ServerScope,
   directory: string,
   sdk: AgentListApi,
-  legacy?: OpencodeClient,
+  legacy?: CodewrightClient,
   protocol?: Promise<ServerProtocol>,
 ) =>
   queryOptions({
@@ -271,7 +279,7 @@ export const loadAgentsQuery = (
 export const loadCommands = (
   directory: string,
   api: CommandListApi,
-  legacy?: OpencodeClient,
+  legacy?: CodewrightClient,
   protocol?: Promise<ServerProtocol>,
 ): Promise<CommandInfo[]> =>
   retry(async () => {
@@ -295,7 +303,7 @@ export const loadCommands = (
 export const loadPathQuery = (
   scope: ServerScope,
   directory: string | null,
-  sdk: OpencodeClient,
+  sdk: CodewrightClient,
   protocol?: Promise<ServerProtocol>,
 ) =>
   queryOptions<Path>({
@@ -311,7 +319,7 @@ export const loadReferencesQuery = (
   scope: ServerScope,
   directory: string,
   api: ReferenceListApi,
-  legacy?: OpencodeClient,
+  legacy?: CodewrightClient,
   protocol?: Promise<ServerProtocol>,
 ) =>
   queryOptions<ReferenceInfo[]>({
@@ -328,7 +336,7 @@ export async function bootstrapDirectory(input: {
   directory: string
   scope: ServerScope
   mcp: boolean
-  sdk: OpencodeClient
+  sdk: CodewrightClient
   api: CatalogApi & {
     readonly agent: AgentListApi
     readonly command: CommandListApi
@@ -439,9 +447,9 @@ export async function bootstrapDirectory(input: {
         retry(() =>
           (async () => {
             if ((await input.protocol) === "v1") return (await input.sdk.permission.list()).data ?? []
-            return input.api.permission.request
-              .list({ location: { directory: input.directory } })
-              .then((result) => result.data.map(normalizePermissionRequest))
+            return input.api.permission
+              .list({ directory: input.directory })
+              .then((result) => (result.data ?? []).map(normalizePermissionRequest))
           })().then((permissions) => {
             const ids = permissions.map((permission) => permission.sessionID)
             const grouped = groupBySession(
@@ -475,9 +483,9 @@ export async function bootstrapDirectory(input: {
         retry(() =>
           (async () => {
             if ((await input.protocol) === "v1") return (await input.sdk.question.list()).data ?? []
-            return input.api.question.request
-              .list({ location: { directory: input.directory } })
-              .then((result) => result.data)
+            return input.api.question
+              .list({ directory: input.directory })
+              .then((result) => result.data ?? [])
           })().then((questions) => {
             const ids = questions.map((question) => question.sessionID)
             const grouped = groupBySession(
@@ -511,12 +519,12 @@ export async function bootstrapDirectory(input: {
       input.mcp &&
         (() =>
           input.queryClient.fetchQuery(
-            loadMcpQuery(input.scope, input.directory, input.api.mcp, input.sdk, input.protocol),
+            loadMcpQuery(input.scope, input.directory, input.api.mcp as unknown as Parameters<typeof loadMcpQuery>[2], input.sdk, input.protocol),
           )),
       input.mcp &&
         (() =>
           input.queryClient.fetchQuery(
-            loadMcpResourcesQuery(input.scope, input.directory, input.api.mcp, input.sdk, input.protocol),
+            loadMcpResourcesQuery(input.scope, input.directory, input.api.mcp as unknown as Parameters<typeof loadMcpResourcesQuery>[2], input.sdk, input.protocol),
           )),
       () =>
         input.queryClient

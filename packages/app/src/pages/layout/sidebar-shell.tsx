@@ -8,9 +8,10 @@ import {
   type DragEvent,
 } from "@thisbeyond/solid-dnd"
 import { ConstrainDragXAxis } from "@/utils/solid-dnd"
-import { IconButton } from "@opencode-ai/ui/icon-button"
-import { Tooltip, TooltipKeybind } from "@opencode-ai/ui/tooltip"
+import { IconButton } from "@codewright-ai/ui/icon-button"
+import { Tooltip, TooltipKeybind } from "@codewright-ai/ui/tooltip"
 import { type LocalProject } from "@/context/layout"
+import "./sidebar.css"
 
 export const SidebarContent = (props: {
   mobile?: boolean

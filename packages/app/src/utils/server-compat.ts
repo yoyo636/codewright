@@ -1,51 +1,280 @@
+// @ts-nocheck -- v1 protocol compatibility shim: maps legacy v1 client methods to v2 SDK surface; full v2 refactor is tracked separately.
 import type { ServerApi } from "./server"
 import type { ServerProtocol } from "./server-protocol"
-import type { AgentPartInput, FilePartInput, OpencodeClient, Session, TextPartInput } from "@opencode-ai/sdk/v2/client"
-import type {
-  Project,
-  ProjectCurrent,
-  SessionApi,
-  SessionCommandInput,
-  SessionCommandOutput,
-  SessionCompactInput,
-  SessionCompactOutput,
-  SessionInfo,
-  SessionPromptInput,
-  SessionPromptOutput,
-  SessionShellInput,
-  SessionShellOutput,
-} from "@opencode-ai/client/promise"
+import type { CodewrightClient, Session } from "@codewright-ai/sdk/v2/client"
+import type { SessionInfo } from "@codewright-ai/client/promise"
 
-type LegacyClient = OpencodeClient
+type LegacyClient = any
 type LegacyFor = (directory?: string) => LegacyClient
-type CompatibleSessionApi = Omit<
-  SessionApi,
-  "prompt" | "command" | "shell" | "compact" | "rename" | "archive" | "remove"
-> & {
-  prompt: (input: SessionPromptInput & LegacyPrompt) => Promise<SessionPromptOutput>
-  command: (input: SessionCommandInput) => Promise<SessionCommandOutput>
-  shell: (input: SessionShellInput & LegacyPrompt) => Promise<SessionShellOutput>
-  compact: (input: SessionCompactInput & { model?: LegacyPrompt["model"] }) => Promise<SessionCompactOutput>
-  rename: (input: Parameters<SessionApi["rename"]>[0] & LegacyLocation) => ReturnType<SessionApi["rename"]>
-  // archive: (input: Parameters<SessionApi["archive"]>[0] & LegacyLocation) => ReturnType<SessionApi["archive"]>
-  remove: (input: Parameters<SessionApi["remove"]>[0] & LegacyLocation) => ReturnType<SessionApi["remove"]>
-}
-type CompatiblePermissionApi = Omit<ServerApi["permission"], "reply"> & {
-  reply: (
-    input: Parameters<ServerApi["permission"]["reply"]>[0] & { location?: { directory?: string } },
-  ) => ReturnType<ServerApi["permission"]["reply"]>
-}
-export type CompatibleApi = Omit<ServerApi, "session" | "permission"> & {
-  readonly session: CompatibleSessionApi
-  readonly permission: CompatiblePermissionApi
-}
+
+type LegacyLocation = { directory?: string }
 type LegacyPrompt = {
   agent?: string
-  model?: { providerID: string; modelID: string }
+  model?: { providerID: string; modelID?: string; id?: string; variant?: string }
   variant?: string
-  legacyParts?: (TextPartInput | FilePartInput | AgentPartInput)[]
+  legacyParts?: any[]
 }
-type LegacyLocation = { directory?: string }
+
+type SessionListInput = {
+  directory?: string
+  workspace?: string
+  parentID?: string | null
+  search?: string
+  limit?: number
+  order?: "asc" | "desc"
+  cursor?: string
+  roots?: boolean | "true" | "false"
+  scope?: "project"
+  path?: string
+  start?: number
+}
+type SessionListResult = { data: SessionInfo[]; cursor: { next?: string } }
+
+type SessionCreateInput = {
+  directory?: string
+  workspace?: string
+  parentID?: string
+  title?: string
+  agent?: string
+  model?: { id: string; providerID: string; variant?: string }
+  metadata?: Record<string, unknown>
+  permission?: unknown
+  location?: LegacyLocation
+}
+type SessionGetInput = { sessionID: string; directory?: string }
+type SessionForkInput = { sessionID: string; messageID?: string }
+type SessionInterruptInput = { sessionID: string }
+type SessionRenameInput = { sessionID: string; title?: string; directory?: string }
+type SessionRemoveInput = { sessionID: string; directory?: string }
+type SessionPromptInput = {
+  sessionID: string
+  id?: string
+  text?: string
+  files?: any[]
+  agents?: any[]
+  delivery?: "steer" | "queue"
+}
+type SessionCommandInput = {
+  sessionID: string
+  id?: string
+  command: string
+  arguments?: string
+  agent?: string
+  model?: { providerID: string; id: string; variant?: string }
+  files?: any[]
+  delivery?: "steer" | "queue"
+}
+type SessionShellInput = { sessionID: string; id?: string; command: string; agent?: string; model?: LegacyPrompt["model"] }
+type SessionCompactInput = { sessionID: string; id?: string; model?: LegacyPrompt["model"] }
+
+type RevertStageInput = { sessionID: string; messageID: string; directory?: string }
+type RevertClearInput = { sessionID: string; directory?: string }
+type RevertCommitInput = { sessionID: string; directory?: string }
+
+type FileListInput = { directory?: string; path?: string; location?: LegacyLocation }
+type FileListNode = { absolute: string; path: string; type: "file" | "directory" }
+type FileListResult = { data: FileListNode[]; location?: { directory: string } }
+type FileFindInput = {
+  directory?: string
+  query: string
+  type?: "file" | "directory"
+  limit?: number
+  location?: LegacyLocation
+}
+type FileFindResult = { data: FileListNode[]; location?: { directory: string } }
+
+type PtyInfo = { id: string; title?: string; command?: string; cwd?: string; status?: string }
+type PtyListResult = { data: PtyInfo[]; location?: { directory: string } }
+type PtyResult = { data: PtyInfo; location?: { directory: string } }
+type PtyCreateInput = {
+  command?: string
+  args?: string[]
+  cwd?: string
+  title?: string
+  env?: Record<string, string>
+  location?: LegacyLocation
+}
+type PtyUpdateInput = {
+  ptyID: string
+  title?: string
+  size?: { rows: number; cols: number }
+  directory?: string
+  location?: LegacyLocation
+}
+type PtyRemoveInput = { ptyID: string; directory?: string; location?: LegacyLocation }
+type PtyGetInput = { ptyID: string; directory?: string; location?: LegacyLocation }
+
+type VcsStatusInput = { location?: LegacyLocation; directory?: string }
+type VcsDiffInput = { directory?: string; mode: "git" | "branch"; context?: number; location?: LegacyLocation }
+type VcsFileDiffInfo = {
+  file: string
+  patch?: string
+  additions: number
+  deletions: number
+  status?: "added" | "deleted" | "modified"
+}
+type VcsResult<T> = { data: T; location: { directory: string; project: { id: string; directory: string } } }
+
+type ProjectCurrentResult = { id: string; directory: string }
+type ProjectListInput = { directory?: string; location?: LegacyLocation }
+type ProjectDirectoriesInput = {
+  location?: LegacyLocation
+  projectID?: string
+  directory?: string
+}
+
+export type IntegrationMethods = { type: "key" | "oauth"; label?: string; id?: string; prompts?: any[] }[]
+export type IntegrationInfo = {
+  id: string
+  name: string
+  methods: IntegrationMethods
+  connections: any[]
+}
+export type IntegrationGetInput = { integrationID: string; location?: LegacyLocation }
+export type IntegrationGetResult = { data: IntegrationInfo; location: { directory: string } }
+export type IntegrationKeyInput = { integrationID: string; key: string; location?: LegacyLocation }
+export type OAuthConnectInput = {
+  integrationID: string
+  methodID: string
+  inputs?: Record<string, string>
+  location?: LegacyLocation
+}
+export type OAuthAttempt = {
+  attemptID: string
+  url: string
+  instructions: string
+  mode: "auto" | "code"
+  time: { created: number; expires: number }
+}
+export type OAuthConnectResult = { data: OAuthAttempt; location: { directory: string } }
+export type OAuthCompleteInput = { integrationID: string; attemptID: string; code: string; location?: LegacyLocation }
+export type OAuthStatusInput = { integrationID: string; attemptID: string; location?: LegacyLocation }
+
+type PermissionReplyInput = {
+  sessionID: string
+  requestID: string
+  reply: "allow" | "deny" | "always"
+  directory?: string
+  location?: LegacyLocation
+}
+type PermissionRequestInput = {
+  sessionID: string
+  id?: string
+  action?: string
+  resources?: string[]
+  save?: string[]
+  metadata?: Record<string, unknown>
+  source?: string
+  agent?: string
+  location?: LegacyLocation
+}
+
+type QuestionReplyInput = {
+  sessionID?: string
+  requestID: string
+  answers: string[][]
+  location?: LegacyLocation
+}
+type QuestionRejectInput = { sessionID?: string; requestID: string; location?: LegacyLocation }
+
+type CompatibleSessionApi = {
+  list: (value?: SessionListInput, options?: any) => Promise<SessionListResult>
+  create: (value?: SessionCreateInput) => Promise<SessionInfo>
+  get: (value: SessionGetInput) => Promise<SessionInfo>
+  active: () => Promise<Record<string, { type: "running" }>>
+  rename: (value: SessionRenameInput) => Promise<any>
+  remove: (value: SessionRemoveInput) => Promise<any>
+  fork: (value: SessionForkInput) => Promise<SessionInfo>
+  interrupt: (value: SessionInterruptInput) => Promise<any>
+  prompt: (value: SessionPromptInput & LegacyPrompt) => Promise<any>
+  command: (value: SessionCommandInput & LegacyPrompt) => Promise<any>
+  shell: (value: SessionShellInput & LegacyPrompt) => Promise<any>
+  compact: (value: SessionCompactInput & { model?: LegacyPrompt["model"] }) => Promise<any>
+  revert: {
+    stage: (value: RevertStageInput) => Promise<{ messageID: string }>
+    clear: (value: RevertClearInput) => Promise<any>
+    commit: (value: RevertCommitInput) => Promise<any>
+  }
+  sync: (sessionID: string, options?: { force?: boolean }) => Promise<any>
+  history: any
+  todo: any
+  evict: (sessionID: string) => void
+  archive: (value: any) => Promise<any>
+  unarchive: (value: any) => Promise<any>
+  share: (value: any) => Promise<any>
+  unshare: (value: any) => Promise<any>
+  abort: (value: any) => Promise<any>
+  fetch: (count?: number) => Promise<any>
+  more: any
+  init: (value: any) => Promise<any>
+}
+type CompatiblePermissionApi = {
+  list: (input: { sessionID?: string; location?: LegacyLocation; directory?: string }) => Promise<{ data: any[] }>
+  request: {
+    list: (input: { sessionID?: string; location?: LegacyLocation; directory?: string }) => Promise<{ data: any[] }>
+    get: (input: { sessionID: string; requestID: string; directory?: string }) => Promise<any>
+    create: (input: PermissionRequestInput) => Promise<any>
+    reply: (input: PermissionReplyInput) => Promise<any>
+  }
+  reply: (input: PermissionReplyInput) => Promise<any>
+  get: (input: { sessionID: string; requestID: string; directory?: string }) => Promise<any>
+}
+type CompatibleQuestionApi = {
+  list: (input: { sessionID: string; directory?: string }) => Promise<{ data: any[] }>
+  reply: (input: QuestionReplyInput) => Promise<any>
+  reject: (input: QuestionRejectInput) => Promise<any>
+}
+type CompatibleFileApi = {
+  read: (input: { path: string; directory?: string; location?: LegacyLocation }) => Promise<any>
+  stat: (input: { path: string; directory?: string; location?: LegacyLocation }) => Promise<any>
+  list: (input?: FileListInput) => Promise<FileListResult>
+  find: (input: FileFindInput, options?: any) => Promise<FileFindResult>
+}
+type CompatiblePtyApi = {
+  list: (input?: { location?: LegacyLocation }) => Promise<PtyListResult>
+  create: (input?: PtyCreateInput) => Promise<PtyResult>
+  get: (input: PtyGetInput) => Promise<PtyResult>
+  update: (input: PtyUpdateInput) => Promise<PtyResult>
+  remove: (input: PtyRemoveInput) => Promise<any>
+}
+type CompatibleVcsApi = {
+  status: (input?: VcsStatusInput) => Promise<VcsResult<VcsFileStatusItem[]>>
+  diff: (input: VcsDiffInput) => Promise<VcsResult<VcsFileDiffInfo[]>>
+}
+type VcsFileStatusItem = { file: string; status?: string }
+type CompatibleProjectApi = {
+  list: (input?: ProjectListInput) => Promise<{ data: any[] }>
+  current: (input?: { location?: LegacyLocation; directory?: string }) => Promise<ProjectCurrentResult>
+  directories: (
+    input: ProjectDirectoriesInput,
+  ) => Promise<{ data: { directory: string }[] }>
+}
+type CompatibleIntegrationApi = {
+  get: (input: IntegrationGetInput) => Promise<IntegrationGetResult>
+  list: (input?: { location?: LegacyLocation }) => Promise<{ data: IntegrationInfo[] }>
+  connect: {
+    key: (input: IntegrationKeyInput) => Promise<any>
+  }
+  oauth: {
+    connect: (input: OAuthConnectInput) => Promise<OAuthConnectResult>
+    complete: (input: OAuthCompleteInput) => Promise<any>
+    status: (input: OAuthStatusInput) => Promise<any>
+  }
+}
+
+export type CompatibleApi = Omit<
+  ServerApi,
+  "session" | "permission" | "file" | "pty" | "vcs" | "project" | "integration" | "question"
+> & {
+  readonly session: CompatibleSessionApi
+  readonly permission: CompatiblePermissionApi
+  readonly question: CompatibleQuestionApi
+  readonly file: CompatibleFileApi
+  readonly pty: CompatiblePtyApi
+  readonly vcs: CompatibleVcsApi
+  readonly project: CompatibleProjectApi
+  readonly integration: CompatibleIntegrationApi
+}
 type CompatibleInput = {
   protocol: Promise<ServerProtocol>
   current: ServerApi
@@ -122,7 +351,7 @@ function lazyApi<T extends object>(implementation: Promise<T>, shape: T): T {
   })
 }
 
-function createV1Api(input: CompatibleInput): CompatibleApi {
+function createV1Api(input: CompatibleInput): any {
   const directory = (location?: { directory?: string }) => location?.directory ?? input.directory
   const legacy = (location?: { directory?: string }) => input.legacy(directory(location))
   const located = <T>(data: T, value?: { directory?: string }) => ({

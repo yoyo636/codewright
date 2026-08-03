@@ -1,4 +1,4 @@
-import { NamedError } from "@opencode-ai/core/util/error"
+import { NamedError } from "@codewright-ai/core/util/error"
 import { errorFormat } from "@/util/error"
 import { isRecord } from "@/util/record"
 
@@ -47,7 +47,7 @@ export function FormatError(input: unknown): string | undefined {
   // MCPFailed: { name: string }
   if (NamedError.hasName(input, "MCPFailed")) {
     const data = isRecord(input) && isRecord(input.data) ? stringField(input.data, "name") : undefined
-    return `MCP server "${data}" failed. Run \`opencode mcp login ${data}\` if it requires authentication.`
+    return `MCP server "${data}" failed. Run \`codewright mcp login ${data}\` if it requires authentication.`
   }
 
   // AccountServiceError, AccountTransportError: TaggedErrorClass
@@ -64,8 +64,8 @@ export function FormatError(input: unknown): string | undefined {
     return [
       `Model not found: ${stringField(providerModelNotFound, "providerID")}/${stringField(providerModelNotFound, "modelID")}`,
       ...(suggestions.length ? ["Did you mean: " + suggestions.join(", ")] : []),
-      `Try: \`opencode models\` to list available models`,
-      `Or check your config (opencode.json) provider/model names`,
+      `Try: \`codewright models\` to list available models`,
+      `Or check your config (codewright.json) provider/model names`,
     ].join("\n")
   }
 
@@ -75,7 +75,7 @@ export function FormatError(input: unknown): string | undefined {
     const providerID = stringField(providerInit, "providerID")
     return [
       `Failed to initialize provider "${providerID}".`,
-      `Run \`opencode auth login\` to set up credentials, or check the provider block in your \`opencode.json\`.`,
+      `Run \`codewright auth login\` to set up credentials, or check the provider block in your \`codewright.json\`.`,
     ].join("\n")
   }
 
@@ -83,9 +83,9 @@ export function FormatError(input: unknown): string | undefined {
   if (configData(input, "ProviderNoProvidersError")) {
     return [
       `No AI providers are configured.`,
-      `Run \`opencode auth login\` to connect a provider (Anthropic, OpenAI, OpenRouter, and more),`,
+      `Run \`codewright auth login\` to connect a provider (Anthropic, OpenAI, OpenRouter, and more),`,
       `or set an API key environment variable such as \`ANTHROPIC_API_KEY\`.`,
-      `List available providers and models with \`opencode models\`.`,
+      `List available providers and models with \`codewright models\`.`,
     ].join("\n")
   }
 
@@ -95,7 +95,7 @@ export function FormatError(input: unknown): string | undefined {
     const providerID = stringField(noModels, "providerID")
     return [
       `No models are available${providerID ? ` for provider "${providerID}"` : ""}.`,
-      `Run \`opencode models\` to see available models, or check your \`opencode.json\` provider/model configuration.`,
+      `Run \`codewright models\` to see available models, or check your \`codewright.json\` provider/model configuration.`,
     ].join("\n")
   }
 
@@ -126,7 +126,7 @@ export function FormatError(input: unknown): string | undefined {
     return [
       `Failed to load remote config${remote ? ` from ${remote}` : ""}: the server returned a login page instead of JSON.`,
       `Authentication is missing or has expired (the endpoint is likely behind an SSO or identity-aware proxy).`,
-      ...(url ? [`Run \`opencode auth login ${url}\` to re-authenticate.`] : []),
+      ...(url ? [`Run \`codewright auth login ${url}\` to re-authenticate.`] : []),
     ].join("\n")
   }
 

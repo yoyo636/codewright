@@ -1,6 +1,6 @@
-import type { OpenCodeEvent } from "@opencode-ai/client/promise"
-import type { Event } from "@opencode-ai/sdk/v2/client"
-import { createSimpleContext } from "@opencode-ai/ui/context"
+import type { OpenCodeEvent as CodewrightEvent } from "@codewright-ai/client/promise"
+import type { Event } from "@codewright-ai/sdk/v2/client"
+import { createSimpleContext } from "@codewright-ai/ui/context"
 import { createGlobalEmitter } from "@solid-primitives/event-bus"
 import { makeEventListener } from "@solid-primitives/event-listener"
 import { type Accessor, batch, createMemo, createResource, onCleanup, onMount } from "solid-js"
@@ -18,14 +18,14 @@ const isAbortError = (error: unknown) =>
   error !== null && typeof error === "object" && "name" in error && error.name === "AbortError"
 
 const isStreamClosed = (error: unknown, signal?: AbortSignal) => isAbortError(error) || signal?.aborted === true
-export type ServerEvent = Event & { current?: OpenCodeEvent }
+export type ServerEvent = Event & { current?: CodewrightEvent }
 type QueuedServerEvent = { directory: string; payload: ServerEvent }
 type CurrentDelta = Extract<
-  OpenCodeEvent,
+  CodewrightEvent,
   { type: "session.text.delta" | "session.reasoning.delta" | "session.tool.input.delta" | "session.compaction.delta" }
 >
 
-export function adaptServerEvent(event: OpenCodeEvent): ServerEvent {
+export function adaptServerEvent(event: CodewrightEvent): ServerEvent {
   if (event.type === "permission.v2.asked") {
     return {
       id: event.id,
@@ -138,7 +138,7 @@ export function coalesceServerEvents(events: QueuedServerEvent[]) {
   return output
 }
 
-function currentDelta(event: OpenCodeEvent | undefined): CurrentDelta | undefined {
+function currentDelta(event: CodewrightEvent | undefined): CurrentDelta | undefined {
   if (
     event?.type === "session.text.delta" ||
     event?.type === "session.reasoning.delta" ||
@@ -276,14 +276,18 @@ function createServerSdkContextBase(server: ServerConnection.Any, scope: ServerS
           const events =
             kind === "v1"
               ? (await eventSdk.global.event({ signal: attempt.signal })).stream
-              : eventApi.event.subscribe({ signal: attempt.signal })
+              : (await eventApi.event.subscribe({}, { signal: attempt.signal })).stream
           let yielded = Date.now()
           for await (const event of events) {
             streamErrorLogged = false
             const legacy = "payload" in event
             if (legacy && event.payload.type === "sync") continue
-            const directory = legacy ? (event.directory ?? "global") : (event.location?.directory ?? "global")
-            const payload = legacy ? (event.payload as Event) : adaptServerEvent(event)
+            const directory = legacy
+              ? (event.directory ?? "global")
+              : (event as unknown as { location?: { directory?: string } }).location?.directory ?? "global"
+            const payload = legacy
+              ? (event.payload as Event)
+              : adaptServerEvent(event as unknown as CodewrightEvent)
             if (enqueueServerEvent(queue, { directory, payload })) schedule()
 
             if (Date.now() - yielded < STREAM_YIELD_MS) continue

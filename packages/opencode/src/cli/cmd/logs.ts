@@ -1,7 +1,7 @@
-// CLI entry point for `opencode logs`.
+// CLI entry point for `codewright logs`.
 //
-// Surfaces the opencode log file (written by the file logger in
-// `@opencode-ai/core/observability/logging`) so users can debug problems without
+// Surfaces the codewright log file (written by the file logger in
+// `@codewright-ai/core/observability/logging`) so users can debug problems without
 // having to know where the logs live. `--path` prints the file location; `--tail`
 // prints the last N lines (default 50).
 import type { Argv } from "yargs"
@@ -9,7 +9,7 @@ import fs from "fs/promises"
 import path from "path"
 import { EOL } from "os"
 import { UI } from "../ui"
-import { Global } from "@opencode-ai/core/global"
+import { Global } from "@codewright-ai/core/global"
 
 interface LogsArgs {
   path: boolean
@@ -17,12 +17,12 @@ interface LogsArgs {
 }
 
 function logFile() {
-  return path.join(Global.Path.log, "opencode.log")
+  return path.join(Global.Path.log, "codewright.log")
 }
 
 export const LogsCommand = {
   command: "logs",
-  describe: "view the opencode log file",
+  describe: "view the codewright log file",
   builder: (yargs: Argv) =>
     yargs
       .option("path", {
@@ -50,7 +50,7 @@ export const LogsCommand = {
       .then(() => true)
       .catch(() => false)
     if (!exists) {
-      UI.error(`No log file found at ${file}. Run opencode once first to create it.`)
+      UI.error(`No log file found at ${file}. Run codewright once first to create it.`)
       process.exitCode = 1
       return
     }

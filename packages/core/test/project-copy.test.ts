@@ -4,16 +4,16 @@ import fs from "fs/promises"
 import path from "path"
 import { eq } from "drizzle-orm"
 import { Effect, Fiber, Stream } from "effect"
-import { AppNodeBuilder } from "@opencode-ai/core/effect/app-node-builder"
-import { LayerNode } from "@opencode-ai/core/effect/layer-node"
-import { AbsolutePath } from "@opencode-ai/core/schema"
-import { Git } from "@opencode-ai/core/git"
-import { Database } from "@opencode-ai/core/database/database"
-import { EventV2 } from "@opencode-ai/core/event"
-import { Project } from "@opencode-ai/core/project"
-import { ProjectDirectoryTable, ProjectTable } from "@opencode-ai/core/project/sql"
-import { ProjectCopy } from "@opencode-ai/core/project/copy"
-import { ProjectDirectories } from "@opencode-ai/core/project/directories"
+import { AppNodeBuilder } from "@codewright-ai/core/effect/app-node-builder"
+import { LayerNode } from "@codewright-ai/core/effect/layer-node"
+import { AbsolutePath } from "@codewright-ai/core/schema"
+import { Git } from "@codewright-ai/core/git"
+import { Database } from "@codewright-ai/core/database/database"
+import { EventV2 } from "@codewright-ai/core/event"
+import { Project } from "@codewright-ai/core/project"
+import { ProjectDirectoryTable, ProjectTable } from "@codewright-ai/core/project/sql"
+import { ProjectCopy } from "@codewright-ai/core/project/copy"
+import { ProjectDirectories } from "@codewright-ai/core/project/directories"
 import { tmpdir } from "./fixture/tmpdir"
 import { testEffect } from "./lib/effect"
 
@@ -31,7 +31,7 @@ async function initRepo(directory: string) {
   await $`git init`.cwd(directory).quiet()
   await $`git config core.fsmonitor false`.cwd(directory).quiet()
   await $`git config commit.gpgsign false`.cwd(directory).quiet()
-  await $`git config user.email test@opencode.test`.cwd(directory).quiet()
+  await $`git config user.email test@codewright.test`.cwd(directory).quiet()
   await $`git config user.name Test`.cwd(directory).quiet()
   await $`git commit --allow-empty -m root`.cwd(directory).quiet()
 }

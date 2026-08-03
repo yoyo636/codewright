@@ -221,8 +221,17 @@
 
       &:has([data-selected]) {
         color: var(--text-strong);
-        background-color: var(--surface-base-active);
-        border-color: var(--border-weak-base);
+        background: linear-gradient(
+          135deg,
+          rgba(125, 211, 255, 0.16) 0%,
+          rgba(162, 128, 255, 0.1) 100%
+        );
+        backdrop-filter: blur(var(--glass-blur-sm, 12px)) saturate(180%);
+        -webkit-backdrop-filter: blur(var(--glass-blur-sm, 12px)) saturate(180%);
+        border: 1px solid rgba(125, 211, 255, 0.32);
+        box-shadow:
+          inset 0 0 0 0.5px var(--v2-border-border-muted),
+          0 0 12px rgba(125, 211, 255, 0.12);
 
         &::after {
           opacity: 1;

@@ -9,7 +9,7 @@ import { UpgradeCommand } from "./cli/cmd/upgrade"
 import { UninstallCommand } from "./cli/cmd/uninstall"
 import { ModelsCommand } from "./cli/cmd/models"
 import { UI } from "./cli/ui"
-import { InstallationVersion } from "@opencode-ai/core/installation/version"
+import { InstallationVersion } from "@codewright-ai/core/installation/version"
 import { FormatError } from "./cli/error"
 import { ServeCommand } from "./cli/cmd/serve"
 import { DebugCommand } from "./cli/cmd/debug"
@@ -41,7 +41,7 @@ function show(out: string) {
 
 const cli = yargs(args)
   .parserConfiguration({ "populate--": true })
-  .scriptName("opencode")
+  .scriptName("yoyocode")
   .wrap(100)
   .help("help", "show help")
   .alias("help", "h")
@@ -61,21 +61,21 @@ const cli = yargs(args)
     type: "boolean",
   })
   .middleware(async (opts) => {
-    if (opts.printLogs) process.env.OPENCODE_PRINT_LOGS = "1"
-    if (opts.logLevel) process.env.OPENCODE_LOG_LEVEL = opts.logLevel
+    if (opts.printLogs) process.env.CODEWRIGHT_PRINT_LOGS = "1"
+    if (opts.logLevel) process.env.CODEWRIGHT_LOG_LEVEL = opts.logLevel
     if (opts.pure) {
-      process.env.OPENCODE_PURE = "1"
+      process.env.CODEWRIGHT_PURE = "1"
     }
 
     Heap.start()
 
     process.env.AGENT = "1"
-    process.env.OPENCODE = "1"
-    process.env.OPENCODE_PID = String(process.pid)
+    process.env.CODEWRIGHT = "1"
+    process.env.CODEWRIGHT_PID = String(process.pid)
   })
-  .usage("opencode [project] [options]")
+  .usage("codewright [project] [options]")
   .epilogue(
-    "Run bare `opencode` to start the interactive UI. Quick start: `opencode auth login` (connect a provider), `opencode models` (list models), `opencode logs` (view logs).",
+    "Run bare `codewright` to start the interactive UI. Quick start: `codewright auth login` (connect a provider), `codewright models` (list models), `codewright logs` (view logs).",
   )
   .completion("completion", "generate shell completion script")
   .command(TuiThreadCommand)

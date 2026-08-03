@@ -1,6 +1,6 @@
 {
-  "name": "@opencode-ai/console-support",
-  "version": "1.18.11",
+  "name": "@codewright-ai/console-support",
+  "version": "1.1.0",
   "type": "module",
   "license": "MIT",
   "scripts": {
@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "1.15.2",
-    "@opencode-ai/console-core": "workspace:*",
+    "@codewright-ai/console-core": "workspace:*",
     "@solidjs/meta": "catalog:",
     "@solidjs/router": "catalog:",
     "@solidjs/start": "catalog:",

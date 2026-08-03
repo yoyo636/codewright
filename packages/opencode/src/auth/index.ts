@@ -1,11 +1,11 @@
-import { LayerNode } from "@opencode-ai/core/effect/layer-node"
+import { LayerNode } from "@codewright-ai/core/effect/layer-node"
 import path from "path"
 import { Effect, Layer, Record, Result, Schema, Context } from "effect"
-import { NonNegativeInt } from "@opencode-ai/core/schema"
-import { Global } from "@opencode-ai/core/global"
-import { FSUtil } from "@opencode-ai/core/fs-util"
+import { NonNegativeInt } from "@codewright-ai/core/schema"
+import { Global } from "@codewright-ai/core/global"
+import { FSUtil } from "@codewright-ai/core/fs-util"
 
-export const OAUTH_DUMMY_KEY = "opencode-oauth-dummy-key"
+export const OAUTH_DUMMY_KEY = "codewright-oauth-dummy-key"
 
 const file = path.join(Global.Path.data, "auth.json")
 
@@ -47,7 +47,7 @@ export interface Interface {
   readonly remove: (key: string) => Effect.Effect<void, AuthError>
 }
 
-export class Service extends Context.Service<Service, Interface>()("@opencode/Auth") {}
+export class Service extends Context.Service<Service, Interface>()("@codewright/Auth") {}
 
 const layer = Layer.effect(
   Service,
@@ -56,19 +56,19 @@ const layer = Layer.effect(
     const decode = Schema.decodeUnknownOption(Info)
 
     const all = Effect.fn("Auth.all")(function* () {
-      if (process.env.OPENCODE_AUTH_CONTENT) {
+      if (process.env.CODEWRIGHT_AUTH_CONTENT) {
         let parsed: unknown
         try {
-          parsed = JSON.parse(process.env.OPENCODE_AUTH_CONTENT)
+          parsed = JSON.parse(process.env.CODEWRIGHT_AUTH_CONTENT)
         } catch (err) {
           return yield* new AuthError({
-            message: `OPENCODE_AUTH_CONTENT is set but is not valid JSON: ${err instanceof Error ? err.message : String(err)}`,
+            message: `CODEWRIGHT_AUTH_CONTENT is set but is not valid JSON: ${err instanceof Error ? err.message : String(err)}`,
             cause: err,
           })
         }
         if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
           return yield* new AuthError({
-            message: `OPENCODE_AUTH_CONTENT must be a JSON object of provider credentials.`,
+            message: `CODEWRIGHT_AUTH_CONTENT must be a JSON object of provider credentials.`,
           })
         }
         const data = parsed as Record<string, unknown>

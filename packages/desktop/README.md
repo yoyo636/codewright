@@ -1,6 +1,6 @@
-# OpenCode Desktop
+# Codewright Desktop
 
-The OpenCode Desktop app, built with Electron.
+The Codewright Desktop app, built with Electron.
 
 ## Development
 

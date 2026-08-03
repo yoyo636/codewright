@@ -1,6 +1,6 @@
 // Entry and exit splash banners for direct interactive mode scrollback.
 //
-// Renders the full opencode entry logo and a compact [O] exit badge, plus
+// Renders the full codewright entry logo and a compact [O] exit badge, plus
 // session metadata and the resume command. These are scrollback snapshots, so
 // they become immutable terminal history once committed.
 //
@@ -178,6 +178,9 @@ function build(input: SplashWriterInput, kind: "entry" | "exit", ctx: Scrollback
   const left = input.theme.left
   const right = input.theme.right
   const leftShadow = input.theme.leftShadow
+  const rightShadow = input.theme.rightShadow
+  const aurora = input.theme.aurora
+  const auroraShadow = input.theme.auroraShadow
   let height = 1
 
   if (kind === "entry") {
@@ -194,7 +197,7 @@ function build(input: SplashWriterInput, kind: "entry" | "exit", ctx: Scrollback
       })
     }
 
-    push(lines, body_left, top, "OpenCode", right, undefined, TextAttributes.BOLD)
+    push(lines, body_left, top, "Codewright", right, undefined, TextAttributes.BOLD)
     if (input.detail) {
       push(
         lines,
@@ -205,7 +208,30 @@ function build(input: SplashWriterInput, kind: "entry" | "exit", ctx: Scrollback
         undefined,
       )
     }
-    height = top + mark.length
+
+    const flowTop = top + mark.length + 1
+    const sequence: Array<{ ch: string; palette: "left" | "right" | "aurora" }> = [
+      { ch: "·", palette: "left" },
+      { ch: "·", palette: "aurora" },
+      { ch: "•", palette: "aurora" },
+      { ch: "·", palette: "right" },
+      { ch: "·", palette: "aurora" },
+      { ch: "✦", palette: "right" },
+      { ch: "·", palette: "aurora" },
+      { ch: "•", palette: "right" },
+      { ch: "·", palette: "left" },
+      { ch: "·", palette: "aurora" },
+      { ch: "·", palette: "right" },
+      { ch: "·", palette: "aurora" },
+    ]
+    let cursor = 0
+    for (const item of sequence) {
+      const palette = item.palette === "aurora" ? { fg: aurora, shadow: auroraShadow } : { fg: right, shadow: rightShadow }
+      push(lines, cursor, flowTop, item.ch, palette.fg, undefined, TextAttributes.DIM)
+      cursor += 2
+      if (cursor >= width) break
+    }
+    height = flowTop + 1
   }
 
   if (kind === "exit") {
@@ -234,12 +260,21 @@ function build(input: SplashWriterInput, kind: "entry" | "exit", ctx: Scrollback
       lines,
       body_left + label.length,
       top + 1,
-      `opencode --mini -s ${meta.session_id}`,
+      `codewright --mini -s ${meta.session_id}`,
       right,
       undefined,
       TextAttributes.BOLD,
     )
-    height = top + mark.length
+
+    const flowTop = top + mark.length + 1
+    const sequence = ["·", "·", "•", "·", "✦", "·", "•", "·", "·", "·"]
+    let cursor = 0
+    for (const ch of sequence) {
+      push(lines, cursor, flowTop, ch, aurora, undefined, TextAttributes.DIM)
+      cursor += 2
+      if (cursor >= width) break
+    }
+    height = flowTop + 1
   }
 
   const root = new BoxRenderable(ctx.renderContext, {
