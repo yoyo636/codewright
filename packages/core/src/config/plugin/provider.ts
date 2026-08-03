@@ -1,7 +1,7 @@
 export * as ConfigProviderPlugin from "./provider"
 
 import { define } from "../../plugin/internal"
-import { Effect } from "effect"
+import { Effect, Option } from "effect"
 import { Config } from "../../config"
 import { ModelV2 } from "../../model"
 import { ProviderV2 } from "../../provider"
@@ -45,7 +45,13 @@ export const Plugin = define({
         const configuredDefault = Config.latest(entries, "model")
         if (configuredDefault !== undefined) {
           const model = ModelV2.parse(configuredDefault)
-          catalog.model.default.set(model.providerID, model.modelID)
+          if (Option.isNone(model)) {
+            yield* Effect.logWarning(
+              `Ignoring invalid default model "${configuredDefault}": expected "provider/model" (e.g. "anthropic/claude-sonnet-4-5").`,
+            )
+          } else {
+            catalog.model.default.set(model.value.providerID, model.value.modelID)
+          }
         }
         for (const file of files) {
           for (const [id, item] of Object.entries(file.info.providers ?? {})) {

@@ -33,15 +33,22 @@ function dir(input: ParseSource) {
 /** Apply {env:VAR} and {file:path} substitutions to config text. */
 export async function substitute(input: SubstituteInput) {
   const missing = input.missing ?? "error"
+  const configSource = source(input)
+
   let text = input.text.replace(/\{env:([^}]+)\}/g, (_, varName) => {
-    return (input.env?.[varName] ?? process.env[varName]) || ""
+    const value = input.env?.[varName] ?? process.env[varName]
+    if (value) return value
+    if (missing === "empty") return ""
+    throw new InvalidError({
+      path: configSource,
+      message: `environment variable "${varName}" is not set (referenced via {env:${varName}})`,
+    })
   })
 
   const fileMatches = Array.from(text.matchAll(/\{file:[^}]+\}/g))
   if (!fileMatches.length) return text
 
   const configDir = dir(input)
-  const configSource = source(input)
   let out = ""
   let cursor = 0
 

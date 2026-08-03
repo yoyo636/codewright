@@ -22,6 +22,7 @@ import { UI } from "../ui"
 import { effectCmd } from "../effect-cmd"
 import { EOL } from "os"
 import { Filesystem } from "@/util/filesystem"
+import { errorMessage } from "@/util/error"
 import { createOpencodeClient, type OpencodeClient, type ToolPart } from "@opencode-ai/sdk/v2"
 import { FormatError, FormatUnknownError } from "../error"
 import { INTERACTIVE_INPUT_ERROR, resolveInteractiveStdin } from "./run/runtime.stdin"
@@ -84,7 +85,12 @@ function block(info: Inline, output?: string) {
 }
 
 function formatRunError(error: unknown) {
-  return FormatError(error) ?? FormatUnknownError(error)
+  const friendly = FormatError(error)
+  if (friendly) return friendly
+  // Avoid leaking raw stack traces by default. Show the message + a hint, and gate
+  // the full stack behind --print-logs for debugging.
+  const detail = process.env.OPENCODE_PRINT_LOGS === "1" ? FormatUnknownError(error) : errorMessage(error)
+  return `${detail}\n\nFor more detail, run again with --print-logs, or view the log file with \`opencode logs\`.`
 }
 
 async function tool(part: ToolPart) {

@@ -30,8 +30,33 @@ export function cliErrorMessage(input: unknown): string | undefined {
   }
 
   const provider = configData(input, "ProviderInitError")
-  if (provider)
-    return `Failed to initialize provider "${field(provider, "providerID")}". Check credentials and configuration.`
+  if (provider) {
+    const providerID = field(provider, "providerID")
+    return [
+      `Failed to initialize provider "${providerID}".`,
+      `Run \`opencode auth login\` to set up credentials, or check the provider block in your \`opencode.json\`.`,
+    ].join("\n")
+  }
+
+  // ProviderNoProvidersError: {} - first-run dead end when no provider is configured
+  if (configData(input, "ProviderNoProvidersError")) {
+    return [
+      `No AI providers are configured.`,
+      `Run \`opencode auth login\` to connect a provider (Anthropic, OpenAI, OpenRouter, and more),`,
+      `or set an API key environment variable such as \`ANTHROPIC_API_KEY\`.`,
+      `List available providers and models with \`opencode models\`.`,
+    ].join("\n")
+  }
+
+  // ProviderNoModelsError: { providerID: string }
+  const noModels = configData(input, "ProviderNoModelsError")
+  if (noModels) {
+    const providerID = field(noModels, "providerID")
+    return [
+      `No models are available${providerID ? ` for provider "${providerID}"` : ""}.`,
+      `Run \`opencode models\` to see available models, or check your \`opencode.json\` provider/model configuration.`,
+    ].join("\n")
+  }
 
   const json = configData(input, "ConfigJsonError")
   if (json) {
@@ -70,7 +95,7 @@ export function cliErrorMessage(input: unknown): string | undefined {
   if (tagged(input, "UICancelledError") || named(input, "UICancelledError")) return ""
   if (isRecord(input) && named(input, "MCPFailed")) {
     const name = isRecord(input.data) ? field(input.data, "name") : undefined
-    return `MCP server "${name}" failed. Note, opencode does not support MCP authentication yet.`
+    return `MCP server "${name}" failed. Run \`opencode mcp login ${name}\` if it requires authentication.`
   }
   return undefined
 }

@@ -76,14 +76,14 @@ const ListAllInput = Schema.Struct(ListInputBase)
 export const ListInput = Schema.Union([ListDirectoryInput, ListProjectInput, ListAllInput])
 export type ListInput = typeof ListInput.Type
 
-type CreateInput = {
+export type CreateInput = {
   id?: SessionSchema.ID
   agent?: AgentV2.ID
   model?: ModelV2.Ref
   location: Location.Ref
 }
 
-type CompactInput = {
+export type CompactInput = {
   sessionID: SessionSchema.ID
   prompt?: Prompt
 }

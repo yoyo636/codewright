@@ -142,10 +142,10 @@ function replacementNode(source: AnyNode, replacement: AnyNode | Layer.Any) {
         tag: source.tag,
       })
   if (source.name !== replacementNode.name) {
-    throw new Error(`Cannot replace ${source.name} with ${replacementNode.name}`)
+    throw new Error(`Cannot replace layer node "${source.name}" with "${replacementNode.name}": the replacement must keep the same name. Pass a replacement whose name matches "${source.name}".`)
   }
   if (source.tag !== replacementNode.tag) {
-    throw new Error(`Cannot replace ${source.name} across tags`)
+    throw new Error(`Cannot replace layer node "${source.name}" across tags: the replacement must use the same tag (the node was likely built for a different service).`)
   }
   return replacementNode
 }
@@ -228,7 +228,7 @@ export function hoist<A, E, T extends Tag, const Items extends Replacements = re
       if (node.tag === tag) {
         const existing = hoisted.get(node.name)
         if (existing && existing !== node) {
-          throw new Error(`Tag ${tag} has conflicting implementations for ${node.name}`)
+          throw new Error(`Tag "${tag}" has conflicting implementations for layer node "${node.name}": the node is provided more than once. Remove the duplicate provider or supply a single replacement.`)
         }
         hoisted.set(node.name, rewriteReplacementDependencies(node, replacementMap))
         return group([])
@@ -257,7 +257,10 @@ export function compile<A, E, const Items extends Replacements = readonly []>(
     walk<RuntimeLayer>(
       node,
       (node, context) => {
-        if (node.kind === "unbound") throw new Error(`Unbound layer node: ${node.name}`)
+        if (node.kind === "unbound")
+          throw new Error(
+            `Unbound layer node: "${node.name}": a required dependency was not provided. Supply a replacement for "${node.name}" when building the layer, or add a layer that satisfies it.`,
+          )
         const dependencies = node.dependencies.flatMap(flatten).map(context.visit)
         const implementation = node.implementation! as RuntimeLayer
         return dependencies.length === 0

@@ -86,11 +86,17 @@ export const Plugin = define({
             }
 
             const exists = draft.get(agentID) !== undefined
+            const model: Option.Option<ModelV2.Parsed> =
+              item.model !== undefined ? ModelV2.parse(item.model) : Option.none()
+            if (item.model !== undefined && Option.isNone(model)) {
+              yield* Effect.logWarning(
+                `Ignoring invalid model "${item.model}" for agent "${id}": expected "provider/model" (e.g. "anthropic/claude-sonnet-4-5").`,
+              )
+            }
             draft.update(agentID, (agent) => {
               if (!exists) agent.permissions.push(...permissions)
-              if (item.model !== undefined) {
-                const model = ModelV2.parse(item.model)
-                agent.model = { id: model.modelID, providerID: model.providerID, variant: agent.model?.variant }
+              if (Option.isSome(model)) {
+                agent.model = { id: model.value.modelID, providerID: model.value.providerID, variant: agent.model?.variant }
               }
               if (item.variant !== undefined && agent.model !== undefined) {
                 agent.model.variant = ModelV2.VariantID.make(item.variant)

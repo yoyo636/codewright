@@ -47,7 +47,7 @@ export function FormatError(input: unknown): string | undefined {
   // MCPFailed: { name: string }
   if (NamedError.hasName(input, "MCPFailed")) {
     const data = isRecord(input) && isRecord(input.data) ? stringField(input.data, "name") : undefined
-    return `MCP server "${data}" failed. Note, opencode does not support MCP authentication yet.`
+    return `MCP server "${data}" failed. Run \`opencode mcp login ${data}\` if it requires authentication.`
   }
 
   // AccountServiceError, AccountTransportError: TaggedErrorClass
@@ -72,7 +72,31 @@ export function FormatError(input: unknown): string | undefined {
   // ProviderInitError: { providerID: string }
   const providerInit = configData(input, "ProviderInitError")
   if (providerInit) {
-    return `Failed to initialize provider "${stringField(providerInit, "providerID")}". Check credentials and configuration.`
+    const providerID = stringField(providerInit, "providerID")
+    return [
+      `Failed to initialize provider "${providerID}".`,
+      `Run \`opencode auth login\` to set up credentials, or check the provider block in your \`opencode.json\`.`,
+    ].join("\n")
+  }
+
+  // ProviderNoProvidersError: {} - first-run dead end when no provider is configured
+  if (configData(input, "ProviderNoProvidersError")) {
+    return [
+      `No AI providers are configured.`,
+      `Run \`opencode auth login\` to connect a provider (Anthropic, OpenAI, OpenRouter, and more),`,
+      `or set an API key environment variable such as \`ANTHROPIC_API_KEY\`.`,
+      `List available providers and models with \`opencode models\`.`,
+    ].join("\n")
+  }
+
+  // ProviderNoModelsError: { providerID: string }
+  const noModels = configData(input, "ProviderNoModelsError")
+  if (noModels) {
+    const providerID = stringField(noModels, "providerID")
+    return [
+      `No models are available${providerID ? ` for provider "${providerID}"` : ""}.`,
+      `Run \`opencode models\` to see available models, or check your \`opencode.json\` provider/model configuration.`,
+    ].join("\n")
   }
 
   // ConfigJsonError: { path: string, message?: string }

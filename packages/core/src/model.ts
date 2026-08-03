@@ -1,4 +1,4 @@
-import { Types } from "effect"
+import { Option, Types } from "effect"
 import { Model } from "@opencode-ai/schema/model"
 import { ProviderV2 } from "./provider"
 
@@ -30,12 +30,22 @@ export type MutableInfo = Omit<Types.DeepMutable<Info>, "api"> & {
   api: ProviderV2.MutableApi<Api>
 }
 
-export function parse(input: string): { providerID: ProviderV2.ID; modelID: ID } {
-  const [providerID, ...modelID] = input.split("/")
-  return {
-    providerID: ProviderV2.ID.make(providerID),
-    modelID: ID.make(modelID.join("/")),
+export type Parsed = { providerID: ProviderV2.ID; modelID: ID }
+
+export function parse(input: string): Option.Option<Parsed> {
+  // A model reference must be "provider/model": a "/" with a non-empty provider
+  // before it and a non-empty model after it. The model part may itself contain
+  // further "/" characters. Naively splitting silently produces garbage (e.g.
+  // "gpt-4" -> provider "gpt-4", model ""), which surfaces much later as a
+  // confusing lookup failure. Return None so callers can skip the invalid entry.
+  const idx = input.indexOf("/")
+  if (idx <= 0 || idx === input.length - 1) {
+    return Option.none()
   }
+  return Option.some({
+    providerID: ProviderV2.ID.make(input.slice(0, idx)),
+    modelID: ID.make(input.slice(idx + 1)),
+  })
 }
 
 export * as ModelV2 from "./model"

@@ -26,6 +26,7 @@ import { WebCommand } from "./cli/cmd/web"
 import { PrCommand } from "./cli/cmd/pr"
 import { SessionCommand } from "./cli/cmd/session"
 import { DbCommand } from "./cli/cmd/db"
+import { LogsCommand } from "./cli/cmd/logs"
 import { errorMessage } from "./util/error"
 import { PluginCommand } from "./cli/cmd/plug"
 import { Heap } from "./cli/heap"
@@ -34,12 +35,8 @@ const args = hideBin(process.argv)
 
 function show(out: string) {
   const text = out.trimStart()
-  if (!text.startsWith("opencode ")) {
-    process.stderr.write(UI.logo() + EOL + EOL)
-    process.stderr.write(text + EOL)
-    return
-  }
-  process.stderr.write(out)
+  process.stderr.write(UI.logo() + EOL + EOL)
+  process.stderr.write(text + EOL)
 }
 
 const cli = yargs(args)
@@ -76,39 +73,44 @@ const cli = yargs(args)
     process.env.OPENCODE = "1"
     process.env.OPENCODE_PID = String(process.pid)
   })
-  .usage("")
+  .usage("opencode [project] [options]")
+  .epilogue(
+    "Run bare `opencode` to start the interactive UI. Quick start: `opencode auth login` (connect a provider), `opencode models` (list models), `opencode logs` (view logs).",
+  )
   .completion("completion", "generate shell completion script")
-  .command(AcpCommand)
-  .command(McpCommand)
   .command(TuiThreadCommand)
-  .command(AttachCommand)
   .command(RunCommand)
-  .command(GenerateCommand)
-  .command(DebugCommand)
-  .command(ConsoleCommand)
-  .command(ProvidersCommand)
-  .command(AgentCommand)
-  .command(UpgradeCommand)
-  .command(UninstallCommand)
-  .command(ServeCommand)
-  .command(WebCommand)
   .command(ModelsCommand)
-  .command(StatsCommand)
+  .command(ProvidersCommand)
+  .command(LogsCommand)
+  .command(AgentCommand)
+  .command(McpCommand)
+  .command(PluginCommand)
+  .command(SessionCommand)
   .command(ExportCommand)
   .command(ImportCommand)
+  .command(AttachCommand)
+  .command(ServeCommand)
+  .command(WebCommand)
   .command(GithubCommand)
   .command(PrCommand)
-  .command(SessionCommand)
-  .command(PluginCommand)
+  .command(StatsCommand)
+  .command(ConsoleCommand)
+  .command(UpgradeCommand)
+  .command(UninstallCommand)
+  .command(GenerateCommand)
+  .command(DebugCommand)
   .command(DbCommand)
+  .command(AcpCommand)
   .fail((msg, err) => {
     if (
       msg?.startsWith("Unknown argument") ||
       msg?.startsWith("Not enough non-option arguments") ||
       msg?.startsWith("Invalid values:")
     ) {
-      if (err) throw err
+      if (msg) UI.error(msg)
       cli.showHelp(show)
+      process.exit(1)
     }
     if (err) throw err
     process.exit(1)

@@ -53,6 +53,8 @@ export function fileLogger(file = path.join(Global.Path.log, "opencode.log"), id
 
 const stderrLogger = Logger.make((options) => process.stderr.write(formatter().log(options) + "\n"))
 
+let warnedInvalidLogLevel = false
+
 export function minimumLogLevel() {
   const value = process.env.OPENCODE_LOG_LEVEL?.toUpperCase()
   const levels = {
@@ -61,7 +63,15 @@ export function minimumLogLevel() {
     WARN: "Warn",
     ERROR: "Error",
   } as const satisfies Record<string, LogLevel.LogLevel>
-  return value && value in levels ? levels[value as keyof typeof levels] : levels.INFO
+  if (value && value in levels) return levels[value as keyof typeof levels]
+  if (value && !warnedInvalidLogLevel) {
+    warnedInvalidLogLevel = true
+    process.stderr.write(
+      `opencode: OPENCODE_LOG_LEVEL="${process.env.OPENCODE_LOG_LEVEL}" is not valid. ` +
+        `Expected one of: DEBUG, INFO, WARN, ERROR. Falling back to INFO.\n`,
+    )
+  }
+  return levels.INFO
 }
 
 export function loggers() {

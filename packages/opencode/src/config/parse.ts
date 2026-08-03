@@ -4,6 +4,7 @@ import { type ParseError as JsoncParseError, parse as parseJsoncImpl, printParse
 import { Cause, Exit, Schema as EffectSchema, SchemaIssue } from "effect"
 import type { DeepMutable } from "@opencode-ai/core/schema"
 import { InvalidError, JsonError } from "@opencode-ai/core/v1/config/error"
+import fuzzysort from "fuzzysort"
 
 export function jsonc(text: string, filepath: string): unknown {
   const errors: JsoncParseError[] = []
@@ -25,7 +26,7 @@ export function jsonc(text: string, filepath: string): unknown {
       .join("\n")
     throw new JsonError({
       path: filepath,
-      message: `\n--- JSONC Input ---\n${text}\n--- Errors ---\n${issues}\n--- End ---`,
+      message: issues,
     })
   }
 
@@ -46,7 +47,7 @@ export function schema<S extends EffectSchema.Decoder<unknown, never>>(
           code: "unrecognized_keys",
           keys: extra,
           path: [],
-          message: `Unrecognized key${extra.length === 1 ? "" : "s"}: ${extra.join(", ")}`,
+          message: unrecognizedKeysMessage(extra, topLevelKnownKeys(schema)),
         },
       ],
     })
@@ -71,9 +72,22 @@ export function schema<S extends EffectSchema.Decoder<unknown, never>>(
   )
 }
 
+function topLevelKnownKeys(schema: EffectSchema.Top): string[] {
+  if (schema.ast._tag !== "Objects" || schema.ast.indexSignatures.length > 0) return []
+  return schema.ast.propertySignatures.map((item) => String(item.name))
+}
+
 function topLevelExtraKeys(schema: EffectSchema.Top, data: unknown) {
   if (typeof data !== "object" || data === null || Array.isArray(data)) return []
-  if (schema.ast._tag !== "Objects" || schema.ast.indexSignatures.length > 0) return []
-  const known = new Set(schema.ast.propertySignatures.map((item) => String(item.name)))
+  const known = new Set(topLevelKnownKeys(schema))
   return Object.keys(data).filter((key) => !known.has(key))
+}
+
+function unrecognizedKeysMessage(extra: string[], known: string[]): string {
+  const parts = extra.map((key) => {
+    if (!known.length) return key
+    const best = fuzzysort.go(key, known, { limit: 1, threshold: -2000 })[0]
+    return best && best.target !== key ? `${key} (did you mean \`${best.target}\`?)` : key
+  })
+  return `Unrecognized key${extra.length === 1 ? "" : "s"}: ${parts.join(", ")}`
 }

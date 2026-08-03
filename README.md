@@ -43,6 +43,16 @@
 
 ---
 
+### Features
+
+- **Two built-in agents** — switch with `Tab`: `build` (default, full-access) for development, `plan` (read-only) for analysis and exploration.
+- **Subagents** — delegate complex searches and multi-step tasks with `@general`.
+- **Tools & extensibility** — built-in file, shell, and web tools; extend with **MCP servers** (OAuth supported) and **plugins**.
+- **Sessions** — persistent and resumable. Continue (`--continue`), resume by ID (`--session`), or fork (`--fork`) any conversation.
+- **Permissions** — fine-grained control over which tools and commands may run.
+- **Runs everywhere** — terminal TUI, desktop app (macOS/Windows/Linux), web, and headless `opencode run` for scripts and CI.
+- **Provider-agnostic** — Anthropic, OpenAI, OpenRouter, and many more; bring your own API key.
+
 ### Installation
 
 ```bash
@@ -97,6 +107,55 @@ OPENCODE_INSTALL_DIR=/usr/local/bin curl -fsSL https://opencode.ai/install | bas
 XDG_BIN_DIR=$HOME/.local/bin curl -fsSL https://opencode.ai/install | bash
 ```
 
+### Quick Start
+
+After installing, connect a provider and start coding:
+
+```bash
+# Connect a provider interactively (Anthropic, OpenAI, OpenRouter, ...)
+opencode auth login
+
+# Start the interactive UI
+opencode
+```
+
+Prefer an environment variable? Skip the login flow:
+
+```bash
+export ANTHROPIC_API_KEY="sk-..."
+opencode
+```
+
+List what's available:
+
+```bash
+opencode models      # list available models
+```
+
+### Configuration
+
+OpenCode loads configuration from several sources:
+
+- Global: `~/.config/opencode/opencode.json`
+- The `OPENCODE_CONFIG` env var (path to a config file)
+- Project: `opencode.json` or `opencode.jsonc` in your project (walked up to the worktree root)
+
+A minimal config:
+
+```jsonc
+{
+  "model": "anthropic/claude-sonnet-4-5",
+  "provider": {
+    "anthropic": { "env": ["ANTHROPIC_API_KEY"] }
+  }
+}
+```
+
+- **Model references** use the `provider/model` format (e.g. `anthropic/claude-sonnet-4-5`).
+- **Secrets** - use `{env:VAR}` to inline an environment variable, or `{file:path}` to read from a file, e.g. `"apiKey": "{env:ANTHROPIC_API_KEY}"`. A missing `{env:}` variable is an error by default.
+
+See the [docs](https://opencode.ai/docs) for the full schema.
+
 ### Agents
 
 OpenCode includes two built-in agents you can switch between with the `Tab` key.
@@ -115,6 +174,40 @@ Learn more about [agents](https://opencode.ai/docs/agents).
 ### Documentation
 
 For more info on how to configure OpenCode, [**head over to our docs**](https://opencode.ai/docs).
+
+### Troubleshooting & Diagnostics
+
+**View logs:**
+
+```bash
+opencode logs            # tail the last 50 log lines
+opencode logs -n 200     # tail 200 lines
+opencode logs --path     # print the log file path
+```
+
+The log file lives at `~/.local/share/opencode/log/opencode.log`.
+
+**Common issues:**
+
+| Symptom | Fix |
+| --- | --- |
+| `No AI providers are configured` | Run `opencode auth login`, or set an API key env var such as `ANTHROPIC_API_KEY`. |
+| `Model not found: ...` | Run `opencode models` and check the `provider/model` spelling in your config. |
+| `Config file at ... is not valid JSON(C)` | The error points to the line and column; fix the syntax in your `opencode.json`. |
+| `environment variable "..." is not set` | A `{env:VAR}` reference in config could not be resolved; export the variable. |
+
+**Diagnostic environment variables:**
+
+| Variable | Purpose |
+| --- | --- |
+| `OPENCODE_LOG_LEVEL` | Log level: `DEBUG`, `INFO` (default), `WARN`, `ERROR`. |
+| `OPENCODE_PRINT_LOGS` | Set to `1` to also stream logs to stderr (and print full stack traces from `opencode run`). |
+| `OPENCODE_CONFIG` | Path to a config file to load. |
+| `OPENCODE_CONFIG_DIR` | Directory to load config from. |
+| `OPENCODE_CONFIG_CONTENT` | Inline config content (overrides file-based config). |
+| `OPENCODE_AUTH_CONTENT` | Inline auth JSON (e.g. for CI). |
+| `OPENCODE_DISABLE_PROJECT_CONFIG` | Set to `1` to ignore project-level config. |
+| `OPENCODE_PURE` | Set to `1` to run without external plugins. |
 
 ### Contributing
 

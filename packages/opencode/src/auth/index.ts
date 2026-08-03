@@ -57,9 +57,22 @@ const layer = Layer.effect(
 
     const all = Effect.fn("Auth.all")(function* () {
       if (process.env.OPENCODE_AUTH_CONTENT) {
+        let parsed: unknown
         try {
-          return JSON.parse(process.env.OPENCODE_AUTH_CONTENT)
-        } catch (err) {}
+          parsed = JSON.parse(process.env.OPENCODE_AUTH_CONTENT)
+        } catch (err) {
+          return yield* new AuthError({
+            message: `OPENCODE_AUTH_CONTENT is set but is not valid JSON: ${err instanceof Error ? err.message : String(err)}`,
+            cause: err,
+          })
+        }
+        if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+          return yield* new AuthError({
+            message: `OPENCODE_AUTH_CONTENT must be a JSON object of provider credentials.`,
+          })
+        }
+        const data = parsed as Record<string, unknown>
+        return Record.filterMap(data, (value) => Result.fromOption(decode(value), () => undefined))
       }
 
       const data = (yield* fsys.readJson(file).pipe(Effect.orElseSucceed(() => ({})))) as Record<string, unknown>

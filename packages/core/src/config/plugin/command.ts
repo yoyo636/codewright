@@ -29,13 +29,19 @@ export const Plugin = define({
         }).pipe(Effect.map((documents) => documents.flat()))
         for (const document of documents) {
           for (const [name, command] of Object.entries(document.commands ?? {})) {
+            const model: Option.Option<ModelV2.Parsed> =
+              command.model !== undefined ? ModelV2.parse(command.model) : Option.none()
+            if (command.model !== undefined && Option.isNone(model)) {
+              yield* Effect.logWarning(
+                `Ignoring invalid model "${command.model}" for command "${name}": expected "provider/model" (e.g. "anthropic/claude-sonnet-4-5").`,
+              )
+            }
             draft.update(name, (item) => {
               item.template = command.template
               if (command.description !== undefined) item.description = command.description
               if (command.agent !== undefined) item.agent = command.agent
-              if (command.model !== undefined) {
-                const model = ModelV2.parse(command.model)
-                item.model = { id: model.modelID, providerID: model.providerID, variant: item.model?.variant }
+              if (Option.isSome(model)) {
+                item.model = { id: model.value.modelID, providerID: model.value.providerID, variant: item.model?.variant }
               }
               if (command.variant !== undefined && item.model !== undefined) {
                 item.model.variant = ModelV2.VariantID.make(command.variant)
