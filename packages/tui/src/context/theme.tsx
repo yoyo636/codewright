@@ -81,6 +81,8 @@ export {
 
 const THEME_REFRESH_DELAYS = [250, 1000] as const
 
+const DEFAULT_THEME = "macos"
+
 type State = {
   themes: Record<string, ThemeJson>
   mode: "dark" | "light"
@@ -93,7 +95,7 @@ const [store, setStore] = createStore<State>({
   themes: allThemes(),
   mode: "dark",
   lock: undefined,
-  active: "opencode",
+  active: DEFAULT_THEME,
   ready: false,
 })
 
@@ -118,8 +120,8 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
         if (!lock && pick(kv.get("theme_mode")) !== undefined) kv.set("theme_mode", undefined)
         draft.mode = mode
         draft.lock = lock
-        const active = config.theme ?? kv.get("theme", "opencode")
-        draft.active = typeof active === "string" ? active : "opencode"
+        const active = config.theme ?? kv.get("theme", DEFAULT_THEME)
+        draft.active = typeof active === "string" ? active : DEFAULT_THEME
         draft.ready = false
       }),
     )
@@ -140,7 +142,7 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
             }, {}),
           )
         })
-        .catch(() => setStore("active", "opencode"))
+        .catch(() => setStore("active", DEFAULT_THEME))
     }
 
     onMount(() => {
@@ -159,7 +161,7 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
           if (!colors.palette[0]) {
             if (hasResolvedSystemTheme) return
             setSystemTheme(undefined)
-            if (store.active === "system") setStore("active", "opencode")
+            if (store.active === "system") setStore("active", DEFAULT_THEME)
             return
           }
           const next = store.lock ?? terminalMode(colors) ?? mode
@@ -174,7 +176,7 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
         .catch(() => {
           if (hasResolvedSystemTheme) return
           setSystemTheme(undefined)
-          if (store.active === "system") setStore("active", "opencode")
+          if (store.active === "system") setStore("active", DEFAULT_THEME)
         })
     }
 
@@ -263,7 +265,7 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
         if (theme) return resolveTheme(theme, store.mode)
       }
 
-      return resolveTheme(store.themes.opencode, store.mode)
+      return resolveTheme(store.themes[DEFAULT_THEME] ?? store.themes.opencode, store.mode)
     })
 
     createEffect(() => renderer.setBackgroundColor(values().background))

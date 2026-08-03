@@ -1676,22 +1676,82 @@ function ReasoningHeader(props: {
   )
 }
 
+// Some providers (e.g. MiniMax through OpenAI-compatible endpoints) stream
+// chain-of-thought as literal "<think>...</think>" text instead of reasoning
+// parts. Split those segments out so they render as dimmed thought blocks
+// rather than raw tags inside the markdown body.
+function splitThink(text: string) {
+  const segments: Array<{ type: "think" | "text"; content: string }> = []
+  let last = 0
+  for (const match of text.matchAll(/<think>([\s\S]*?)(<\/think>|$)/g)) {
+    const index = match.index ?? 0
+    if (index > last) segments.push({ type: "text", content: text.slice(last, index) })
+    segments.push({ type: "think", content: match[1] ?? "" })
+    last = index + match[0].length
+  }
+  if (last < text.length) segments.push({ type: "text", content: text.slice(last) })
+  return segments
+}
+
 function TextPart(props: { last: boolean; part: TextPart; message: AssistantMessage }) {
   const ctx = use()
   const { theme, syntax } = useTheme()
+  const subtleSyntax = createSyntaxStyleMemo(() => generateSubtleSyntax(theme))
+  const segments = createMemo(() => splitThink(props.part.text.trim()))
   return (
     <Show when={props.part.text.trim()}>
-      <box ref={(el: BoxRenderable) => alwaysSeparate.add(el)} paddingLeft={3} marginTop={1} flexShrink={0}>
-        <markdown
-          syntaxStyle={syntax()}
-          streaming={true}
-          internalBlockMode="top-level"
-          content={props.part.text.trim()}
-          tableOptions={{ style: "grid" }}
-          conceal={ctx.conceal()}
-          fg={theme.markdownText}
-          bg={theme.background}
-        />
+      <box
+        ref={(el: BoxRenderable) => alwaysSeparate.add(el)}
+        paddingLeft={3}
+        marginTop={1}
+        flexShrink={0}
+        flexDirection="column"
+      >
+        <For each={segments()}>
+          {(segment) => (
+            <Switch>
+              <Match when={segment.type === "think"}>
+                <Show when={segment.content.trim()}>
+                  <box flexDirection="column" marginBottom={1}>
+                    <ReasoningHeader
+                      toggleable={false}
+                      open={true}
+                      done={true}
+                      title={reasoningSummary(segment.content.trim()).title}
+                    />
+                    <Show when={reasoningSummary(segment.content.trim()).body}>
+                      <box marginTop={1}>
+                        <code
+                          filetype="markdown"
+                          drawUnstyledText={false}
+                          streaming={true}
+                          syntaxStyle={subtleSyntax()}
+                          content={reasoningSummary(segment.content.trim()).body}
+                          conceal={ctx.conceal()}
+                          fg={theme.textMuted}
+                        />
+                      </box>
+                    </Show>
+                  </box>
+                </Show>
+              </Match>
+              <Match when={true}>
+                <Show when={segment.content.trim()}>
+                  <markdown
+                    syntaxStyle={syntax()}
+                    streaming={true}
+                    internalBlockMode="top-level"
+                    content={segment.content.trim()}
+                    tableOptions={{ style: "grid" }}
+                    conceal={ctx.conceal()}
+                    fg={theme.markdownText}
+                    bg={theme.background}
+                  />
+                </Show>
+              </Match>
+            </Switch>
+          )}
+        </For>
       </box>
     </Show>
   )
