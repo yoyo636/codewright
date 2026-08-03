@@ -103,16 +103,16 @@ const cli = yargs(args)
   .command(DbCommand)
   .command(AcpCommand)
   .fail((msg, err) => {
-    if (
-      msg?.startsWith("Unknown argument") ||
-      msg?.startsWith("Not enough non-option arguments") ||
-      msg?.startsWith("Invalid values:")
-    ) {
-      if (msg) UI.error(msg)
-      cli.showHelp(show)
-      process.exit(1)
-    }
+    // yargs localizes validation messages (e.g. "Unknown argument" becomes
+    // "无法识别的选项" on a Chinese-locale system), so match on the presence of a
+    // message rather than an English prefix. Real errors are thrown to the catch
+    // (FormatError); parse/validation messages are printed with help so the user
+    // sees what went wrong instead of a silent exit.
     if (err) throw err
+    if (msg) {
+      UI.error(msg)
+      cli.showHelp(show)
+    }
     process.exit(1)
   })
   .strict()
