@@ -18,6 +18,8 @@
   "exports": {
     "./effect/layer-node": "./src/effect/layer-node.ts",
     "./effect/app-node": "./src/effect/app-node.ts",
+    "./feature": "./src/feature/index.ts",
+    "./feature/*": "./src/feature/*.ts",
     "./session/runner": "./src/session/runner/index.ts",
     "./system-context": "./src/system-context/index.ts",
     "./*": "./src/*.ts"
