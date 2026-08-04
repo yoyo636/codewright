@@ -354,10 +354,10 @@ export const ErrorPage: Component<ErrorPageProps> = (props) => {
             <button
               type="button"
               class="flex items-center text-text-interactive-base gap-1"
-              onClick={() => platform.openExternal("https://opencode.ai/desktop-feedback")}
+              onClick={() => platform.openExternal("mailto:13520123772@163.com")}
             >
-              <div>{language.t("error.page.report.discord")}</div>
-              <Icon name="discord" class="text-text-interactive-base" />
+              <div>{language.t("error.page.report.email")}</div>
+              <Icon name="mail" class="text-text-interactive-base" />
             </button>
           </div>
           <Show when={platform.version}>

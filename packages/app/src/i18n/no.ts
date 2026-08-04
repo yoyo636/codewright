@@ -469,7 +469,7 @@ export const dict = {
   "error.page.action.checkUpdates": "Se etter oppdateringer",
   "error.page.action.updateTo": "Oppdater til {{version}}",
   "error.page.report.prefix": "Vennligst rapporter denne feilen til Codewright-teamet",
-  "error.page.report.discord": "på Discord",
+  "error.page.report.email": "per e-post",
   "error.page.version": "Versjon: {{version}}",
 
   "error.dev.rootNotFound":

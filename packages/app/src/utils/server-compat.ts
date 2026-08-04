@@ -605,7 +605,7 @@ function createV1Api(input: CompatibleInput): any {
       },
     },
     integration: {
-      ...input.current.integration,
+      ...(input.current.integration ?? {}),
       async get(value: Parameters<ServerApi["integration"]["get"]>[0]) {
         const methods = ((await legacy(value.location).provider.auth()).data?.[value.integrationID] ?? []).map(
           (method, index) =>
@@ -624,7 +624,7 @@ function createV1Api(input: CompatibleInput): any {
         )
       },
       connect: {
-        ...input.current.integration.connect,
+        ...(input.current.integration?.connect ?? {}),
         key: async (value: Parameters<ServerApi["integration"]["connect"]["key"]>[0]) => {
           await legacy(value.location).auth.set({
             providerID: value.integrationID,
@@ -635,7 +635,7 @@ function createV1Api(input: CompatibleInput): any {
         },
       },
       oauth: {
-        ...input.current.integration.oauth,
+        ...(input.current.integration?.oauth ?? {}),
         connect: async (value: Parameters<ServerApi["integration"]["oauth"]["connect"]>[0]) => {
           const method = Number(value.methodID)
           const result = await legacy(value.location).provider.oauth.authorize(

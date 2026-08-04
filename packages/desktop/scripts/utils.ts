@@ -1,7 +1,8 @@
 import { $ } from "bun"
-import { chmod, copyFile, mkdtemp, rm } from "node:fs/promises"
+import { chmod, copyFile, mkdtemp, rm, writeFile } from "node:fs/promises"
+import { existsSync } from "node:fs"
 import { tmpdir } from "node:os"
-import { join } from "node:path"
+import { join, resolve } from "node:path"
 
 const CLI_VERSION = "0.0.0-next-16350"
 
@@ -69,10 +70,36 @@ export function getCurrentCli(target = RUST_TARGET ?? nativeTarget()) {
   return binaryConfig
 }
 
+async function writeDevWrapper(dest: string) {
+  const repoRoot = resolve(process.cwd(), "..", "opencode")
+  const wrapper = process.platform === "win32"
+    ? `@echo off\r\ncd /d "${repoRoot}"\r\nbun run --conditions=browser src\\index.ts %*\r\n`
+    : `#!/usr/bin/env bash
+set -e
+cd "${repoRoot}"
+exec bun run --conditions=browser src/index.ts "$@"
+`
+  await writeFile(dest, wrapper, "utf8")
+  if (process.platform !== "win32") await chmod(dest, 0o755)
+  console.log(`Wrote dev CLI wrapper to ${dest} (cwd: ${repoRoot})`)
+}
+
 export async function downloadCliToResources() {
   const cli = getCurrentCli()
-  const directory = await mkdtemp(join(tmpdir(), "codewright-cli-"))
   const dest = windowsify("resources/codewright-cli")
+  const channel = resolveChannel()
+  if (channel === "dev" && !Bun.env.CODEWRIGHT_FORCE_DOWNLOAD) {
+    const localWrapper = resolve(process.cwd(), "..", "opencode", "bin", "yoyocode")
+    if (existsSync(localWrapper)) {
+      await copyFile(localWrapper, dest)
+      if (process.platform !== "win32") await chmod(dest, 0o755)
+      console.log(`Copied local dev CLI wrapper from ${localWrapper} to ${dest}`)
+      return
+    }
+    await writeDevWrapper(dest)
+    return
+  }
+  const directory = await mkdtemp(join(tmpdir(), "codewright-cli-"))
   try {
     await $`bun install --no-save --cwd ${directory} ${`${cli.package}@${CLI_VERSION}`} ${`--os=${cli.os}`} ${`--cpu=${cli.cpu}`}`
     await copyFile(

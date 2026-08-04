@@ -3,7 +3,7 @@ import { defineConfig } from "electron-vite"
 import appPlugin from "@codewright-ai/app/vite"
 import * as fs from "node:fs/promises"
 
-const CODEWRIGHT_SERVER_DIST = "../codewright/dist/node"
+const CODEWRIGHT_SERVER_DIST = "../opencode/dist/node"
 
 const channel = (() => {
   const raw = process.env.CODEWRIGHT_CHANNEL
