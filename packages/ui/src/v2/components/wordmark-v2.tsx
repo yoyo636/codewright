@@ -7,7 +7,7 @@ export function WordmarkV2(props: Pick<ComponentProps<"svg">, "class">) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 720 129"
+      viewBox="0 0 588 84"
       fill="none"
       classList={{ [props.class ?? ""]: !!props.class }}
     >
@@ -16,52 +16,72 @@ export function WordmarkV2(props: Pick<ComponentProps<"svg">, "class">) {
           <g opacity="0.16">
             <path
               opacity="0.7"
-              d="M55.3846 36.4286H18.4615V91.7143H55.3846V36.4286ZM73.8462 110.143H0V18H73.8462V110.143Z"
+              d="M36 60H12V36H36V60ZM48 72H0V12H48V72Z"
               fill="currentColor"
             />
             <path
               opacity="0.7"
-              d="M110.462 91.7143H147.385V36.4286H110.462V91.7143ZM165.846 110.143H110.462V128.571H92V18H165.846V110.143Z"
+              d="M96 60H72V36H96V60ZM108 72H72V84H60V12H108V72Z"
               fill="currentColor"
             />
             <path
               opacity="0.7"
-              d="M258.846 73.2857H203.462V91.7143H258.846V110.143H185V18H258.846V73.2857ZM203.462 54.8571H240.385V36.4286H203.462V54.8571Z"
+              d="M168 48V60H132V48H168ZM168 48H132V60H168V72H120V12H168V48ZM132 36H156V24H132V36Z"
               fill="currentColor"
             />
             <path
               opacity="0.7"
-              d="M332.385 36.4286H295.462V110.143H277V18H332.385V36.4286ZM350.846 110.143H332.385V36.4286H350.846V110.143Z"
+              d="M216 72H192V36H216V72ZM216 24H192V72H180V12H216V24ZM228 72H216V24H228V72Z"
               fill="currentColor"
             />
             <path
               opacity="0.7"
-              d="M442.846 36.4286H387.462V91.7143H442.846V110.143H369V18H442.846V36.4286Z"
+              d="M288 60H252V36H288V60ZM288 24H252V60H288V72H240V12H288V24Z"
               fill="currentColor"
             />
             <path
               opacity="0.7"
-              d="M517.385 36.4286H480.462V91.7143H517.385V36.4286ZM535.846 110.143H462V18H535.846V110.143Z"
+              d="M336 60H312V36H336V60ZM336 24H312V60H336V24ZM348 72H300V12H348V72Z"
               fill="currentColor"
             />
             <path
               opacity="0.7"
-              d="M609.385 36.8571H572.462V92.1429H609.385V36.8571ZM627.846 110.571H554V18.4286H609.385V0H627.846V110.571Z"
+              d="M396 60H372V36H396V60ZM396 24H372V60H396V24ZM408 72H360V12H396V0H408V72Z"
               fill="currentColor"
             />
             <path
               opacity="0.7"
-              d="M664.462 36.4286V54.8571H701.385V36.4286H664.462ZM719.846 73.2857H664.462V91.7143H719.846V110.143H646V18H719.846V73.2857Z"
+              d="M468 48V60H432V48H468ZM432 24V36H456V24H432ZM468 48H432V60H468V72H420V12H468V48Z"
+              fill="currentColor"
+            />
+            <path
+              opacity="0.7"
+              d="M516 60H504V36H516V60ZM540 60H528V36H540V60ZM540 48H504V36H540V48Z"
+              fill="currentColor"
+            />
+            <path
+              opacity="0.7"
+              d="M540 72H480V12H540V72Z"
+              fill="currentColor"
+            />
+            <path
+              opacity="0.7"
+              d="M588 48H552V36H588V48ZM576 72H564V36H576V72Z"
+              fill="currentColor"
+            />
+            <path
+              opacity="0.7"
+              d="M588 72H540V12H588V72Z"
               fill="currentColor"
             />
           </g>
         </g>
       </g>
       <defs>
-        <mask id={mask} style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="720" height="129">
-          <rect width="720" height="129" fill={`url(#${maskGradient})`} />
+        <mask id={mask} style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="588" height="84">
+          <rect width="588" height="84" fill={`url(#${maskGradient})`} />
         </mask>
-        <linearGradient id={maskGradient} x1="360" y1="68" x2="360" y2="129" gradientUnits="userSpaceOnUse">
+        <linearGradient id={maskGradient} x1="294" y1="44" x2="294" y2="84" gradientUnits="userSpaceOnUse">
           <stop stop-color="white" stop-opacity="0.7" />
           <stop offset="1" stop-color="white" stop-opacity="0" />
         </linearGradient>
