@@ -35,9 +35,8 @@ export const Logo = (props: { class?: string }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 234 42"
+      viewBox="0 0 294 42"
       fill="none"
-      classList={{ [props.class ?? ""]: !!props.class }}
     >
       <g>
         <path d="M18 30H6V18H18V30Z" fill="var(--icon-weak-base)" />
@@ -56,6 +55,10 @@ export const Logo = (props: { class?: string }) => {
         <path d="M198 12H186V30H198V12ZM204 36H180V6H198V0H204V36Z" fill="var(--icon-strong-base)" />
         <path d="M234 24V30H216V24H234Z" fill="var(--icon-weak-base)" />
         <path d="M216 12V18H228V12H216ZM234 24H216V30H234V36H210V6H234V24Z" fill="var(--icon-strong-base)" />
+        <path d="M258 30H252V18H258V30ZM270 30H264V18H270V30ZM270 24H252V18H270V24Z" fill="var(--icon-weak-base)" />
+        <path d="M270 36H240V6H270V36Z" fill="var(--icon-strong-base)" />
+        <path d="M294 24H276V18H294V24ZM288 36H282V18H288V36Z" fill="var(--icon-weak-base)" />
+        <path d="M294 36H270V6H294V36Z" fill="var(--icon-strong-base)" />
       </g>
     </svg>
   )
