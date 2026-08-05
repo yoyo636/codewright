@@ -1,7 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512"><svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="512" height="512" fill="#131010"></rect>
-<path d="M320 224V352H192V224H320Z" fill="#5A5858"></path>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M384 416H128V96H384V416ZM320 160H192V352H320V160Z" fill="white"></path>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="512" height="512"><svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="512" height="512" fill="#0A0A0F"/>
+<path d="M256 80C150 80 80 150 80 256C80 300 95 340 120 372L120 420L160 390L200 420L240 390L280 420L320 390L360 420L392 390L392 372C417 340 432 300 432 256C432 150 362 80 256 80Z" fill="#4A90E2"/>
+<path d="M160 390L140 450L180 420L220 450L260 420L300 450L340 420L380 450L352 390L320 420L280 390L240 420L200 390Z" fill="#5BA3F0"/>
+<circle cx="220" cy="240" r="18" fill="#0A0A0F"/>
+<circle cx="292" cy="240" r="18" fill="#0A0A0F"/>
+<circle cx="214" cy="234" r="5" fill="white"/>
+<circle cx="286" cy="234" r="5" fill="white"/>
+<path d="M232 290C232 306 244 318 256 318C268 318 280 306 280 290" stroke="#0A0A0F" stroke-width="10" stroke-linecap="round" fill="none"/>
+<path d="M200 180L180 150" stroke="#2D5FA0" stroke-width="14" stroke-linecap="round"/>
+<path d="M312 180L332 150" stroke="#2D5FA0" stroke-width="14" stroke-linecap="round"/>
 </svg><style>@media (prefers-color-scheme: light) { :root { filter: none; } }
 @media (prefers-color-scheme: dark) { :root { filter: none; } }
 </style></svg>

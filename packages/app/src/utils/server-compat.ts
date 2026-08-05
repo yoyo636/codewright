@@ -324,6 +324,8 @@ function lazyApi<T extends object>(implementation: Promise<T>, shape: T): T {
   const cache = new Map<PropertyKey, unknown>()
   return new Proxy(shape, {
     get(target, property, receiver) {
+      const key = String(property)
+      if (key.startsWith("_")) return Reflect.get(target, property, receiver)
       const sample = Reflect.get(target, property, receiver)
       if (typeof sample === "function") {
         return (...args: unknown[]) =>
@@ -351,6 +353,14 @@ function lazyApi<T extends object>(implementation: Promise<T>, shape: T): T {
   })
 }
 
+function pickPublic(source: Record<string, unknown>) {
+  const result: Record<string, unknown> = {}
+  for (const key of Object.keys(source)) {
+    if (!key.startsWith("_")) result[key] = source[key]
+  }
+  return result
+}
+
 function createV1Api(input: CompatibleInput): any {
   const directory = (location?: { directory?: string }) => location?.directory ?? input.directory
   const legacy = (location?: { directory?: string }) => input.legacy(directory(location))
@@ -363,9 +373,9 @@ function createV1Api(input: CompatibleInput): any {
   })
 
   return {
-    ...input.current,
+    ...pickPublic(input.current as Record<string, unknown>),
     session: {
-      ...input.current.session,
+      ...pickPublic(input.current.session as Record<string, unknown>),
       async list(
         value?: Parameters<ServerApi["session"]["list"]>[0],
         options?: Parameters<ServerApi["session"]["list"]>[1],
@@ -528,7 +538,7 @@ function createV1Api(input: CompatibleInput): any {
       },
     },
     project: {
-      ...input.current.project,
+      ...pickPublic(input.current.project as Record<string, unknown>),
       async list() {
         return ((await legacy().project.list()).data ?? []) as Project[]
       },
@@ -560,7 +570,7 @@ function createV1Api(input: CompatibleInput): any {
     //   },
     // },
     vcs: {
-      ...input.current.vcs,
+      ...pickPublic(input.current.vcs as Record<string, unknown>),
       // async get(value?: Parameters<ServerApi["vcs"]["get"]>[0]) {
       //   const result = await legacy(value?.location).vcs.get()
       //   return located({ branch: result.data?.branch, defaultBranch: result.data?.default_branch }, value?.location)
@@ -587,7 +597,7 @@ function createV1Api(input: CompatibleInput): any {
       },
     },
     file: {
-      ...input.current.file,
+      ...pickPublic(input.current.file as Record<string, unknown>),
       async list(value?: Parameters<ServerApi["file"]["list"]>[0]) {
         const result = await legacy(value?.location).file.list({ path: value?.path ?? "" })
         return located(result.data ?? [], value?.location)
@@ -605,7 +615,7 @@ function createV1Api(input: CompatibleInput): any {
       },
     },
     integration: {
-      ...(input.current.integration ?? {}),
+      ...pickPublic((input.current.integration ?? {}) as Record<string, unknown>),
       async get(value: Parameters<ServerApi["integration"]["get"]>[0]) {
         const methods = ((await legacy(value.location).provider.auth()).data?.[value.integrationID] ?? []).map(
           (method, index) =>
@@ -624,7 +634,7 @@ function createV1Api(input: CompatibleInput): any {
         )
       },
       connect: {
-        ...(input.current.integration?.connect ?? {}),
+        ...pickPublic((input.current.integration?.connect ?? {}) as Record<string, unknown>),
         key: async (value: Parameters<ServerApi["integration"]["connect"]["key"]>[0]) => {
           await legacy(value.location).auth.set({
             providerID: value.integrationID,
@@ -635,7 +645,7 @@ function createV1Api(input: CompatibleInput): any {
         },
       },
       oauth: {
-        ...(input.current.integration?.oauth ?? {}),
+        ...pickPublic((input.current.integration?.oauth ?? {}) as Record<string, unknown>),
         connect: async (value: Parameters<ServerApi["integration"]["oauth"]["connect"]>[0]) => {
           const method = Number(value.methodID)
           const result = await legacy(value.location).provider.oauth.authorize(
@@ -679,7 +689,7 @@ function createV1Api(input: CompatibleInput): any {
       },
     },
     pty: {
-      ...input.current.pty,
+      ...pickPublic(input.current.pty as Record<string, unknown>),
       // async shells(value?: Parameters<ServerApi["pty"]["shells"]>[0]) {
       //   return located((await legacy(value?.location).pty.shells()).data ?? [], value?.location)
       // },
@@ -721,7 +731,7 @@ function createV1Api(input: CompatibleInput): any {
       // },
     },
     permission: {
-      ...input.current.permission,
+      ...pickPublic(input.current.permission as Record<string, unknown>),
       async reply(value: Parameters<ServerApi["permission"]["reply"]>[0] & { location?: { directory?: string } }) {
         await legacy(value.location).permission.respond({
           sessionID: value.sessionID,
@@ -732,7 +742,7 @@ function createV1Api(input: CompatibleInput): any {
       },
     },
     question: {
-      ...input.current.question,
+      ...pickPublic(input.current.question as Record<string, unknown>),
       async reply(value: Parameters<ServerApi["question"]["reply"]>[0]) {
         await legacy().question.reply({
           requestID: value.requestID,
