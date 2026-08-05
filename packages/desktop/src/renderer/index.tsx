@@ -376,7 +376,7 @@ function DesktopRoot(props: { windowState: DesktopWindowState }) {
       const list: ServerConnection.Any[] = []
       if (data) {
         list.push({
-          displayName: "Local Server",
+          displayName: "Codewright Local",
           type: "sidecar",
           variant: "base",
           http: {

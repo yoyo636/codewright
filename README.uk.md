@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://opencode.ai">
+  <a href="https://github.com/yoyo636/opencode">
     <picture>
       <source srcset="packages/console/app/src/asset/logo-ornate-dark.svg" media="(prefers-color-scheme: dark)">
       <source srcset="packages/console/app/src/asset/logo-ornate-light.svg" media="(prefers-color-scheme: light)">
@@ -8,10 +8,7 @@
   </a>
 </p>
 <p align="center">AI-агент для програмування з відкритим кодом.</p>
-<p align="center">
-  <a href="https://opencode.ai/discord"><img alt="Discord" src="https://img.shields.io/discord/1391832426048651334?style=flat-square&label=discord" /></a>
-  <a href="https://www.npmjs.com/package/codewright-ai"><img alt="npm" src="https://img.shields.io/npm/v/codewright-ai?style=flat-square" /></a>
-  <a href="https://github.com/anomalyco/codewright/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/anomalyco/codewright/publish.yml?style=flat-square&branch=dev" /></a>
+<p align="center"><a href="https://github.com/yoyo636/opencode/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/yoyo636/opencode/publish.yml?style=flat-square&branch=dev" /></a>
 </p>
 
 <p align="center">
@@ -39,26 +36,29 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
-[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
+[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://github.com/yoyo636/opencode)
 
 ---
 
 ### Встановлення
 
 ```bash
-# YOLO
-curl -fsSL https://opencode.ai/install | bash
+# From source
+git clone https://github.com/yoyo636/opencode.git
+cd opencode
+npm install
+npm run build
 
 # Менеджери пакетів
-npm i -g codewright-ai@latest        # або bun/pnpm/yarn
+
 scoop install codewright             # Windows
 choco install codewright             # Windows
-brew install anomalyco/tap/codewright # macOS і Linux (рекомендовано, завжди актуально)
+# Build from source (see above)
 brew install codewright              # macOS і Linux (офіційна формула Homebrew, оновлюється рідше)
 sudo pacman -S codewright            # Arch Linux (Stable)
 paru -S codewright-bin               # Arch Linux (Latest from AUR)
 mise use -g codewright               # Будь-яка ОС
-nix run nixpkgs#codewright           # або github:anomalyco/codewright для найновішої dev-гілки
+nix run nixpkgs#codewright           # або github:yoyo636/opencode для найновішої dev-гілки
 ```
 
 > [!TIP]
@@ -66,7 +66,7 @@ nix run nixpkgs#codewright           # або github:anomalyco/codewright для
 
 ### Десктопний застосунок (BETA)
 
-Codewright також доступний як десктопний застосунок. Завантажуйте напряму зі [сторінки релізів](https://github.com/anomalyco/codewright/releases) або [opencode.ai/download](https://opencode.ai/download).
+Codewright також доступний як десктопний застосунок. Завантажуйте напряму зі [сторінки релізів](https://github.com/yoyo636/opencode/releases) або [opencode.ai/download](https://github.com/yoyo636/opencode/download).
 
 | Платформа             | Завантаження                       |
 | --------------------- | ---------------------------------- |
@@ -93,8 +93,8 @@ scoop bucket add extras; scoop install extras/codewright-desktop
 
 ```bash
 # Приклади
-CODEWRIGHT_INSTALL_DIR=/usr/local/bin curl -fsSL https://opencode.ai/install | bash
-XDG_BIN_DIR=$HOME/.local/bin curl -fsSL https://opencode.ai/install | bash
+# Build from source first (see above), then set CODEWRIGHT_INSTALL_DIR
+# Build from source first (see above), then set XDG_BIN_DIR
 ```
 
 ### Агенти
@@ -110,11 +110,11 @@ Codewright містить два вбудовані агенти, між яки�
 Також доступний допоміжний агент **general** для складного пошуку та багатокрокових завдань.
 Він використовується всередині системи й може бути викликаний у повідомленнях через `@general`.
 
-Дізнайтеся більше про [agents](https://opencode.ai/docs/agents).
+Дізнайтеся більше про [agents](https://github.com/yoyo636/opencode/docs/agents).
 
 ### Документація
 
-Щоб дізнатися більше про налаштування Codewright, [**перейдіть до нашої документації**](https://opencode.ai/docs).
+Щоб дізнатися більше про налаштування Codewright, [**перейдіть до нашої документації**](https://github.com/yoyo636/opencode/docs).
 
 ### Внесок
 
@@ -127,4 +127,4 @@ Codewright містить два вбудовані агенти, між яки�
 
 ---
 
-**Приєднуйтеся до нашої спільноти** [Discord](https://discord.gg/codewright) | [X.com](https://x.com/codewright)
+**GitHub** [https://github.com/yoyo636/opencode](https://github.com/yoyo636/opencode)

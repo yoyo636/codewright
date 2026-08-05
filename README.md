@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://opencode.ai">
+  <a href="https://github.com/yoyo636/opencode">
     <picture>
       <source srcset="packages/console/app/src/asset/logo-ornate-dark.svg" media="(prefers-color-scheme: dark)">
       <source srcset="packages/console/app/src/asset/logo-ornate-light.svg" media="(prefers-color-scheme: light)">
@@ -9,9 +9,8 @@
 </p>
 <p align="center">The open source AI coding agent.</p>
 <p align="center">
-  <a href="https://opencode.ai/discord"><img alt="Discord" src="https://img.shields.io/discord/1391832426048651334?style=flat-square&label=discord" /></a>
-  <a href="https://www.npmjs.com/package/codewright-ai"><img alt="npm" src="https://img.shields.io/npm/v/codewright-ai?style=flat-square" /></a>
-  <a href="https://github.com/anomalyco/codewright/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/anomalyco/codewright/publish.yml?style=flat-square&branch=dev" /></a>
+  <a href="https://github.com/yoyo636/opencode/releases"><img alt="GitHub Releases" src="https://img.shields.io/github/v/release/yoyo636/opencode?style=flat-square" /></a>
+  <a href="https://github.com/yoyo636/opencode/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/yoyo636/opencode/publish.yml?style=flat-square&branch=dev" /></a>
 </p>
 
 <p align="center">
@@ -39,10 +38,6 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
-[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
-
----
-
 ### Features
 
 - **Two built-in agents** — switch with `Tab`: `build` (default, full-access) for development, `plan` (read-only) for analysis and exploration.
@@ -55,28 +50,28 @@
 
 ### Installation
 
-```bash
-# YOLO
-curl -fsSL https://opencode.ai/install | bash
+#### From Source
 
-# Package managers
-npm i -g codewright-ai@latest        # or bun/pnpm/yarn
-scoop install codewright             # Windows
-choco install codewright             # Windows
-brew install anomalyco/tap/codewright # macOS and Linux (recommended, always up to date)
-brew install codewright              # macOS and Linux (official brew formula, updated less)
-sudo pacman -S codewright            # Arch Linux (Stable)
-paru -S codewright-bin               # Arch Linux (Latest from AUR)
-mise use -g codewright               # Any OS
-nix run nixpkgs#codewright           # or github:anomalyco/codewright for latest dev branch
+```bash
+# Clone the repository
+git clone https://github.com/yoyo636/opencode.git
+cd opencode
+
+# Install dependencies
+bun install
+
+# Build and run
+bun run --cwd packages/opencode build
+./packages/opencode/dist/yoyocode
 ```
 
-> [!TIP]
-> Remove versions older than 0.1.x before installing.
+#### Requirements
+
+- **Bun** 1.3+ - [Install Bun](https://bun.sh)
 
 ### Desktop App (BETA)
 
-Codewright is also available as a desktop application. Download directly from the [releases page](https://github.com/anomalyco/codewright/releases) or [opencode.ai/download](https://opencode.ai/download).
+Codewright is also available as a desktop application. Download directly from the [releases page](https://github.com/yoyo636/opencode/releases).
 
 | Platform              | Download                           |
 | --------------------- | ---------------------------------- |
@@ -85,41 +80,16 @@ Codewright is also available as a desktop application. Download directly from th
 | Windows               | `codewright-desktop-windows-x64.exe` |
 | Linux                 | `.deb`, `.rpm`, or `.AppImage`     |
 
-```bash
-# macOS (Homebrew)
-brew install --cask codewright-desktop
-# Windows (Scoop)
-scoop bucket add extras; scoop install extras/codewright-desktop
-```
-
-#### Installation Directory
-
-The install script respects the following priority order for the installation path:
-
-1. `$CODEWRIGHT_INSTALL_DIR` - Custom installation directory
-2. `$XDG_BIN_DIR` - XDG Base Directory Specification compliant path
-3. `$HOME/bin` - Standard user binary directory (if it exists or can be created)
-4. `$HOME/.codewright/bin` - Default fallback
-
-```bash
-# Examples
-CODEWRIGHT_INSTALL_DIR=/usr/local/bin curl -fsSL https://opencode.ai/install | bash
-XDG_BIN_DIR=$HOME/.local/bin curl -fsSL https://opencode.ai/install | bash
-```
-
 ### Quick Start
 
-After installing, connect a provider and start coding:
+After installing, configure your provider and start coding:
 
 ```bash
-# Connect a provider interactively (Anthropic, OpenAI, OpenRouter, ...)
-codewright auth login
-
 # Start the interactive UI
 codewright
 ```
 
-Prefer an environment variable? Skip the login flow:
+Set your API key via environment variable:
 
 ```bash
 export ANTHROPIC_API_KEY="sk-..."
@@ -154,8 +124,6 @@ A minimal config:
 - **Model references** use the `provider/model` format (e.g. `anthropic/claude-sonnet-4-5`).
 - **Secrets** - use `{env:VAR}` to inline an environment variable, or `{file:path}` to read from a file, e.g. `"apiKey": "{env:ANTHROPIC_API_KEY}"`. A missing `{env:}` variable is an error by default.
 
-See the [docs](https://opencode.ai/docs) for the full schema.
-
 ### Agents
 
 Codewright includes two built-in agents you can switch between with the `Tab` key.
@@ -168,12 +136,6 @@ Codewright includes two built-in agents you can switch between with the `Tab` ke
 
 Also included is a **general** subagent for complex searches and multistep tasks.
 This is used internally and can be invoked using `@general` in messages.
-
-Learn more about [agents](https://opencode.ai/docs/agents).
-
-### Documentation
-
-For more info on how to configure Codewright, [**head over to our docs**](https://opencode.ai/docs).
 
 ### Troubleshooting & Diagnostics
 
@@ -191,7 +153,7 @@ The log file lives at `~/.local/share/codewright/log/codewright.log`.
 
 | Symptom | Fix |
 | --- | --- |
-| `No AI providers are configured` | Run `codewright auth login`, or set an API key env var such as `ANTHROPIC_API_KEY`. |
+| `No AI providers are configured` | Set an API key env var such as `ANTHROPIC_API_KEY`. |
 | `Model not found: ...` | Run `codewright models` and check the `provider/model` spelling in your config. |
 | `Config file at ... is not valid JSON(C)` | The error points to the line and column; fix the syntax in your `codewright.json`. |
 | `environment variable "..." is not set` | A `{env:VAR}` reference in config could not be resolved; export the variable. |
@@ -219,4 +181,4 @@ If you are working on a project that's related to Codewright and is using "codew
 
 ---
 
-**Join our community** [Discord](https://discord.gg/codewright) | [X.com](https://x.com/codewright)
+**Project Link** [GitHub](https://github.com/yoyo636/opencode)

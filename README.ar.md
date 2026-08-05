@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://opencode.ai">
+  <a href="https://github.com/yoyo636/opencode">
     <picture>
       <source srcset="packages/console/app/src/asset/logo-ornate-dark.svg" media="(prefers-color-scheme: dark)">
       <source srcset="packages/console/app/src/asset/logo-ornate-light.svg" media="(prefers-color-scheme: light)">
@@ -8,10 +8,7 @@
   </a>
 </p>
 <p align="center">وكيل برمجة بالذكاء الاصطناعي مفتوح المصدر.</p>
-<p align="center">
-  <a href="https://opencode.ai/discord"><img alt="Discord" src="https://img.shields.io/discord/1391832426048651334?style=flat-square&label=discord" /></a>
-  <a href="https://www.npmjs.com/package/codewright-ai"><img alt="npm" src="https://img.shields.io/npm/v/codewright-ai?style=flat-square" /></a>
-  <a href="https://github.com/anomalyco/codewright/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/anomalyco/codewright/publish.yml?style=flat-square&branch=dev" /></a>
+<p align="center"><a href="https://github.com/yoyo636/opencode/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/yoyo636/opencode/publish.yml?style=flat-square&branch=dev" /></a>
 </p>
 
 <p align="center">
@@ -39,26 +36,29 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
-[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
+[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://github.com/yoyo636/opencode)
 
 ---
 
 ### التثبيت
 
 ```bash
-# YOLO
-curl -fsSL https://opencode.ai/install | bash
+# From source
+git clone https://github.com/yoyo636/opencode.git
+cd opencode
+npm install
+npm run build
 
 # مديري الحزم
-npm i -g codewright-ai@latest        # او bun/pnpm/yarn
+
 scoop install codewright             # Windows
 choco install codewright             # Windows
-brew install anomalyco/tap/codewright # macOS و Linux (موصى به، دائما محدث)
+# Build from source (see above)
 brew install codewright              # macOS و Linux (صيغة brew الرسمية، تحديث اقل)
 sudo pacman -S codewright            # Arch Linux (Stable)
 paru -S codewright-bin               # Arch Linux (Latest from AUR)
 mise use -g codewright               # اي نظام
-nix run nixpkgs#codewright           # او github:anomalyco/codewright لاحدث فرع dev
+nix run nixpkgs#codewright           # او github:yoyo636/opencode لاحدث فرع dev
 ```
 
 > [!TIP]
@@ -66,7 +66,7 @@ nix run nixpkgs#codewright           # او github:anomalyco/codewright لاحد
 
 ### تطبيق سطح المكتب (BETA)
 
-يتوفر Codewright ايضا كتطبيق سطح مكتب. قم بالتنزيل مباشرة من [صفحة الاصدارات](https://github.com/anomalyco/codewright/releases) او من [opencode.ai/download](https://opencode.ai/download).
+يتوفر Codewright ايضا كتطبيق سطح مكتب. قم بالتنزيل مباشرة من [صفحة الاصدارات](https://github.com/yoyo636/opencode/releases) او من [opencode.ai/download](https://github.com/yoyo636/opencode/download).
 
 | المنصة                | التنزيل                            |
 | --------------------- | ---------------------------------- |
@@ -93,8 +93,8 @@ scoop bucket add extras; scoop install extras/codewright-desktop
 
 ```bash
 # امثلة
-CODEWRIGHT_INSTALL_DIR=/usr/local/bin curl -fsSL https://opencode.ai/install | bash
-XDG_BIN_DIR=$HOME/.local/bin curl -fsSL https://opencode.ai/install | bash
+# Build from source first (see above), then set CODEWRIGHT_INSTALL_DIR
+# Build from source first (see above), then set XDG_BIN_DIR
 ```
 
 ### Agents
@@ -110,11 +110,11 @@ XDG_BIN_DIR=$HOME/.local/bin curl -fsSL https://opencode.ai/install | bash
 بالاضافة الى ذلك يوجد وكيل فرعي **general** للبحث المعقد والمهام متعددة الخطوات.
 يستخدم داخليا ويمكن استدعاؤه بكتابة `@general` في الرسائل.
 
-تعرف على المزيد حول [agents](https://opencode.ai/docs/agents).
+تعرف على المزيد حول [agents](https://github.com/yoyo636/opencode/docs/agents).
 
 ### التوثيق
 
-لمزيد من المعلومات حول كيفية ضبط Codewright، [**راجع التوثيق**](https://opencode.ai/docs).
+لمزيد من المعلومات حول كيفية ضبط Codewright، [**راجع التوثيق**](https://github.com/yoyo636/opencode/docs).
 
 ### المساهمة
 
@@ -126,4 +126,4 @@ XDG_BIN_DIR=$HOME/.local/bin curl -fsSL https://opencode.ai/install | bash
 
 ---
 
-**انضم الى مجتمعنا** [Discord](https://discord.gg/codewright) | [X.com](https://x.com/codewright)
+**GitHub** [https://github.com/yoyo636/opencode](https://github.com/yoyo636/opencode)

@@ -98,6 +98,8 @@ const client = Layer.succeed(
 )
 const model = Model.make({ id: "fake-model", provider: "fake", route: OpenAIChat.route })
 const replacementModel = Model.make({ id: "replacement", provider: "fake", route: OpenAIChat.route })
+const modelInfo = ModelV2.Info.empty(ProviderV2.ID.make("fake"), ModelV2.ID.make("fake-model"))
+const replacementModelInfo = ModelV2.Info.empty(ProviderV2.ID.make("fake"), ModelV2.ID.make("replacement"))
 const compactModel = Model.make({
   id: "compact",
   provider: "fake",
@@ -108,6 +110,8 @@ const recoveryModel = Model.make({
   provider: "fake",
   route: OpenAIChat.route.with({ limits: { context: 20_000, output: 1_000 } }),
 })
+const compactModelInfo = ModelV2.Info.empty(ProviderV2.ID.make("fake"), ModelV2.ID.make("compact"))
+const recoveryModelInfo = ModelV2.Info.empty(ProviderV2.ID.make("fake"), ModelV2.ID.make("recovery"))
 const authorizations: Tool.Context[] = []
 const executions: string[] = []
 const permission = Layer.succeed(
@@ -154,8 +158,15 @@ const echo = Layer.effectDiscard(
 const echoNode = makeLocationNode({ name: "test/session-runner-tools", layer: echo, deps: [ToolRegistry.node] })
 let modelResolveHook = Effect.void
 let currentModel = model
+let currentModelInfo = modelInfo
 const models = SessionRunnerModel.layerWith((session) =>
-  modelResolveHook.pipe(Effect.as(session.model?.id === "replacement" ? replacementModel : currentModel)),
+  modelResolveHook.pipe(
+    Effect.as(
+      session.model?.id === "replacement"
+        ? { model: replacementModel, info: replacementModelInfo }
+        : { model: currentModel, info: currentModelInfo },
+    ),
+  ),
 )
 const systemContextKey = SystemContext.Key.make("test/context")
 let systemBaseline = "Initial context"
@@ -318,6 +329,7 @@ const setup = Effect.gen(function* () {
   systemLoadHook = Effect.void
   modelResolveHook = Effect.void
   currentModel = model
+  currentModelInfo = modelInfo
   skillBaselines.clear()
   responses = undefined
   streamFailure = undefined
@@ -356,6 +368,7 @@ const setupOverflowRecovery = Effect.gen(function* () {
   })
   yield* session.resume(sessionID)
   currentModel = recoveryModel
+  currentModelInfo = recoveryModelInfo
   requests.length = 0
   return session
 })
@@ -1095,6 +1108,7 @@ describe("SessionRunnerLLM", () => {
       yield* session.resume(sessionID)
 
       currentModel = compactModel
+      currentModelInfo = compactModelInfo
       requests.length = 0
       responses = [
         fragmentFixture("text", "text-summary", ["## Objective\n- Preserve the task"]).completeEvents,

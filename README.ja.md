@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://opencode.ai">
+  <a href="https://github.com/yoyo636/opencode">
     <picture>
       <source srcset="packages/console/app/src/asset/logo-ornate-dark.svg" media="(prefers-color-scheme: dark)">
       <source srcset="packages/console/app/src/asset/logo-ornate-light.svg" media="(prefers-color-scheme: light)">
@@ -8,10 +8,7 @@
   </a>
 </p>
 <p align="center">オープンソースのAIコーディングエージェント。</p>
-<p align="center">
-  <a href="https://opencode.ai/discord"><img alt="Discord" src="https://img.shields.io/discord/1391832426048651334?style=flat-square&label=discord" /></a>
-  <a href="https://www.npmjs.com/package/codewright-ai"><img alt="npm" src="https://img.shields.io/npm/v/codewright-ai?style=flat-square" /></a>
-  <a href="https://github.com/anomalyco/codewright/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/anomalyco/codewright/publish.yml?style=flat-square&branch=dev" /></a>
+<p align="center"><a href="https://github.com/yoyo636/opencode/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/yoyo636/opencode/publish.yml?style=flat-square&branch=dev" /></a>
 </p>
 
 <p align="center">
@@ -39,26 +36,29 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
-[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
+[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://github.com/yoyo636/opencode)
 
 ---
 
 ### インストール
 
 ```bash
-# YOLO
-curl -fsSL https://opencode.ai/install | bash
+# From source
+git clone https://github.com/yoyo636/opencode.git
+cd opencode
+npm install
+npm run build
 
 # パッケージマネージャー
-npm i -g codewright-ai@latest        # bun/pnpm/yarn でもOK
+
 scoop install codewright             # Windows
 choco install codewright             # Windows
-brew install anomalyco/tap/codewright # macOS と Linux（推奨。常に最新）
+# Build from source (see above)
 brew install codewright              # macOS と Linux（公式 brew formula。更新頻度は低め）
 sudo pacman -S codewright            # Arch Linux (Stable)
 paru -S codewright-bin               # Arch Linux (Latest from AUR)
 mise use -g codewright               # どのOSでも
-nix run nixpkgs#codewright           # または github:anomalyco/codewright で最新 dev ブランチ
+nix run nixpkgs#codewright           # または github:yoyo636/opencode で最新 dev ブランチ
 ```
 
 > [!TIP]
@@ -66,7 +66,7 @@ nix run nixpkgs#codewright           # または github:anomalyco/codewright で
 
 ### デスクトップアプリ (BETA)
 
-Codewright はデスクトップアプリとしても利用できます。[releases page](https://github.com/anomalyco/codewright/releases) から直接ダウンロードするか、[opencode.ai/download](https://opencode.ai/download) を利用してください。
+Codewright はデスクトップアプリとしても利用できます。[releases page](https://github.com/yoyo636/opencode/releases) から直接ダウンロードするか、[opencode.ai/download](https://github.com/yoyo636/opencode/download) を利用してください。
 
 | プラットフォーム      | ダウンロード                       |
 | --------------------- | ---------------------------------- |
@@ -93,8 +93,8 @@ scoop bucket add extras; scoop install extras/codewright-desktop
 
 ```bash
 # 例
-CODEWRIGHT_INSTALL_DIR=/usr/local/bin curl -fsSL https://opencode.ai/install | bash
-XDG_BIN_DIR=$HOME/.local/bin curl -fsSL https://opencode.ai/install | bash
+# Build from source first (see above), then set CODEWRIGHT_INSTALL_DIR
+# Build from source first (see above), then set XDG_BIN_DIR
 ```
 
 ### Agents
@@ -110,11 +110,11 @@ Codewright には組み込みの Agent が2つあり、`Tab` キーで切り替�
 また、複雑な検索やマルチステップのタスク向けに **general** サブ Agent も含まれています。
 内部的に使用されており、メッセージで `@general` と入力して呼び出せます。
 
-[agents](https://opencode.ai/docs/agents) の詳細はこちら。
+[agents](https://github.com/yoyo636/opencode/docs/agents) の詳細はこちら。
 
 ### ドキュメント
 
-Codewright の設定については [**ドキュメント**](https://opencode.ai/docs) を参照してください。
+Codewright の設定については [**ドキュメント**](https://github.com/yoyo636/opencode/docs) を参照してください。
 
 ### コントリビュート
 
@@ -126,4 +126,4 @@ Codewright に関連するプロジェクトで、名前に "codewright"（例: 
 
 ---
 
-**コミュニティに参加** [Discord](https://discord.gg/codewright) | [X.com](https://x.com/codewright)
+**GitHub** [https://github.com/yoyo636/opencode](https://github.com/yoyo636/opencode)

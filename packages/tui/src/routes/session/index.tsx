@@ -23,7 +23,7 @@ import { useSync } from "../../context/sync"
 import { useEvent } from "../../context/event"
 import { SplitBorder } from "../../ui/border"
 import { useTuiPaths, useTuiTerminalEnvironment } from "../../context/runtime"
-import { Spinner } from "../../component/spinner"
+import { Spinner, ThinkingSpinner } from "../../component/spinner"
 import { createSyntaxStyleMemo, generateSubtleSyntax, selectedForeground, useTheme } from "../../context/theme"
 import { BoxRenderable, ScrollBoxRenderable, addDefaultParsers, TextAttributes, RGBA } from "@opentui/core"
 import { Prompt, type PromptRef } from "../../component/prompt"
@@ -1457,6 +1457,8 @@ function AssistantMessage(props: { message: AssistantMessage; parts: Part[]; las
   const local = useLocal()
   const { theme } = useTheme()
   const sync = useSync()
+  const clipboard = useClipboard()
+  const toast = useToast()
   const messages = createMemo(() => sync.data.message[props.message.sessionID] ?? [])
   const model = createMemo(() => Model.name(ctx.providers(), props.message.providerID, props.message.modelID))
 
@@ -1474,6 +1476,19 @@ function AssistantMessage(props: { message: AssistantMessage; parts: Part[]; las
 
   const childShortcut = useCommandShortcut("session.child.first")
   const backgroundShortcut = useCommandShortcut("session.background")
+
+  function copyMessage() {
+    const textParts = props.parts.filter((p) => p.type === "text") as Array<{ text: string }>
+    const text = textParts.map((p) => p.text).join("\n").trim()
+    if (!text) {
+      toast.show({ message: "No text content to copy", variant: "warning" })
+      return
+    }
+    void clipboard
+      .write?.(text)
+      .then(() => toast.show({ message: "Copied to clipboard", variant: "success" }))
+      .catch(() => toast.show({ message: "Failed to copy", variant: "error" }))
+  }
 
   return (
     <>
@@ -1533,7 +1548,7 @@ function AssistantMessage(props: { message: AssistantMessage; parts: Part[]; las
       </Show>
       <Switch>
         <Match when={props.last || final() || props.message.error?.name === "MessageAbortedError"}>
-          <box ref={(el: BoxRenderable) => alwaysSeparate.add(el)} paddingLeft={3}>
+          <box ref={(el: BoxRenderable) => alwaysSeparate.add(el)} paddingLeft={3} flexDirection="row" alignItems="flex-start">
             <text marginTop={1}>
               <span
                 style={{
@@ -1554,6 +1569,9 @@ function AssistantMessage(props: { message: AssistantMessage; parts: Part[]; las
                 <span style={{ fg: theme.textMuted }}> · interrupted</span>
               </Show>
             </text>
+            <box marginTop={1} marginLeft={2} onMouseUp={() => copyMessage()}>
+              <text fg={theme.primary}>[copy]</text>
+            </box>
           </box>
         </Match>
       </Switch>
@@ -1649,7 +1667,7 @@ function ReasoningHeader(props: {
     <Switch>
       <Match when={!props.done}>
         <box flexDirection="row">
-          <Spinner color={fg()}>{props.title ? "Thinking: " + props.title : "Thinking"}</Spinner>
+          <ThinkingSpinner color={fg()}>{props.title ? "Thinking: " + props.title : "Thinking"}</ThinkingSpinner>
         </box>
       </Match>
       <Match when={true}>

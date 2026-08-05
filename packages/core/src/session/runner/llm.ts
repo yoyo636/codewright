@@ -90,6 +90,24 @@ import { llmClient } from "../../effect/app-node-platform"
  * explicit loop starts the next provider turn after local settlement. Configured agent step limits bound the loop.
  */
 
+type StepTokens = {
+  input: number
+  output: number
+  reasoning: number
+  cache: { read: number; write: number }
+}
+
+function computeCost(info: ModelV2.Info, tokens: StepTokens): number {
+  const pricing = info.cost.find((c) => c.tier === undefined) ?? info.cost[0]
+  if (!pricing) return 0
+  const input = tokens.input * pricing.input
+  const output = tokens.output * pricing.output
+  const cacheRead = tokens.cache.read * pricing.cache.read
+  const cacheWrite = tokens.cache.write * pricing.cache.write
+  const reasoning = tokens.reasoning * pricing.output
+  return Math.round((input + output + cacheRead + cacheWrite + reasoning) * 1_000_000) / 1_000_000
+}
+
 const layer = Layer.effect(
   Service,
   Effect.gen(function* () {
@@ -196,7 +214,9 @@ const layer = Layer.effect(
       }
       const system =
         initialized ?? (yield* SessionContextEpoch.prepare(db, events, loadSystemContext(agent), session.id))
-      const model = yield* models.resolve(session)
+      const resolved = yield* models.resolve(session)
+      const model = resolved.model
+      const modelInfo = resolved.info
       const entries = yield* SessionHistory.entriesForRunner(db, session.id, system.baselineSeq)
       const context = entries.map((entry) => entry.message)
       const isLastStep = agent.info?.steps !== undefined && currentStep >= agent.info.steps
@@ -322,13 +342,14 @@ const layer = Layer.effect(
                     .files({ from: startSnapshot, to: endSnapshot })
                     .pipe(Effect.catch(() => Effect.succeed(undefined)))
                 : undefined
+            const stepCost = computeCost(modelInfo, stepSettlement.tokens)
             yield* withPublication(
               events.publish(SessionEvent.Step.Ended, {
                 sessionID: session.id,
                 timestamp: yield* DateTime.now,
                 assistantMessageID: yield* publisher.startAssistant(),
                 finish: stepSettlement.finish,
-                cost: 0,
+                cost: stepCost,
                 tokens: stepSettlement.tokens,
                 snapshot: endSnapshot,
                 files,

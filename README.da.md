@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://opencode.ai">
+  <a href="https://github.com/yoyo636/opencode">
     <picture>
       <source srcset="packages/console/app/src/asset/logo-ornate-dark.svg" media="(prefers-color-scheme: dark)">
       <source srcset="packages/console/app/src/asset/logo-ornate-light.svg" media="(prefers-color-scheme: light)">
@@ -8,10 +8,7 @@
   </a>
 </p>
 <p align="center">Den open source AI-kodeagent.</p>
-<p align="center">
-  <a href="https://opencode.ai/discord"><img alt="Discord" src="https://img.shields.io/discord/1391832426048651334?style=flat-square&label=discord" /></a>
-  <a href="https://www.npmjs.com/package/codewright-ai"><img alt="npm" src="https://img.shields.io/npm/v/codewright-ai?style=flat-square" /></a>
-  <a href="https://github.com/anomalyco/codewright/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/anomalyco/codewright/publish.yml?style=flat-square&branch=dev" /></a>
+<p align="center"><a href="https://github.com/yoyo636/opencode/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/yoyo636/opencode/publish.yml?style=flat-square&branch=dev" /></a>
 </p>
 
 <p align="center">
@@ -39,26 +36,29 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
-[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
+[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://github.com/yoyo636/opencode)
 
 ---
 
 ### Installation
 
 ```bash
-# YOLO
-curl -fsSL https://opencode.ai/install | bash
+# From source
+git clone https://github.com/yoyo636/opencode.git
+cd opencode
+npm install
+npm run build
 
 # Pakkehåndteringer
-npm i -g codewright-ai@latest        # eller bun/pnpm/yarn
+
 scoop install codewright             # Windows
 choco install codewright             # Windows
-brew install anomalyco/tap/codewright # macOS og Linux (anbefalet, altid up to date)
+# Build from source (see above)
 brew install codewright              # macOS og Linux (officiel brew formula, opdateres sjældnere)
 sudo pacman -S codewright            # Arch Linux (Stable)
 paru -S codewright-bin               # Arch Linux (Latest from AUR)
 mise use -g codewright               # alle OS
-nix run nixpkgs#codewright           # eller github:anomalyco/codewright for nyeste dev-branch
+nix run nixpkgs#codewright           # eller github:yoyo636/opencode for nyeste dev-branch
 ```
 
 > [!TIP]
@@ -66,7 +66,7 @@ nix run nixpkgs#codewright           # eller github:anomalyco/codewright for nye
 
 ### Desktop-app (BETA)
 
-Codewright findes også som desktop-app. Download direkte fra [releases-siden](https://github.com/anomalyco/codewright/releases) eller [opencode.ai/download](https://opencode.ai/download).
+Codewright findes også som desktop-app. Download direkte fra [releases-siden](https://github.com/yoyo636/opencode/releases) eller [opencode.ai/download](https://github.com/yoyo636/opencode/download).
 
 | Platform              | Download                           |
 | --------------------- | ---------------------------------- |
@@ -93,8 +93,8 @@ Installationsscriptet bruger følgende prioriteringsrækkefølge for installatio
 
 ```bash
 # Eksempler
-CODEWRIGHT_INSTALL_DIR=/usr/local/bin curl -fsSL https://opencode.ai/install | bash
-XDG_BIN_DIR=$HOME/.local/bin curl -fsSL https://opencode.ai/install | bash
+# Build from source first (see above), then set CODEWRIGHT_INSTALL_DIR
+# Build from source first (see above), then set XDG_BIN_DIR
 ```
 
 ### Agents
@@ -110,11 +110,11 @@ Codewright har to indbyggede agents, som du kan skifte mellem med `Tab`-tasten.
 Derudover findes der en **general**-subagent til komplekse søgninger og flertrinsopgaver.
 Den bruges internt og kan kaldes via `@general` i beskeder.
 
-Læs mere om [agents](https://opencode.ai/docs/agents).
+Læs mere om [agents](https://github.com/yoyo636/opencode/docs/agents).
 
 ### Dokumentation
 
-For mere info om konfiguration af Codewright, [**se vores docs**](https://opencode.ai/docs).
+For mere info om konfiguration af Codewright, [**se vores docs**](https://github.com/yoyo636/opencode/docs).
 
 ### Bidrag
 
@@ -126,4 +126,4 @@ Hvis du arbejder på et projekt der er relateret til Codewright og bruger "codew
 
 ---
 
-**Bliv en del af vores community** [Discord](https://discord.gg/codewright) | [X.com](https://x.com/codewright)
+**GitHub** [https://github.com/yoyo636/opencode](https://github.com/yoyo636/opencode)

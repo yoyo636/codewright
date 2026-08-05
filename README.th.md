@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://opencode.ai">
+  <a href="https://github.com/yoyo636/opencode">
     <picture>
       <source srcset="packages/console/app/src/asset/logo-ornate-dark.svg" media="(prefers-color-scheme: dark)">
       <source srcset="packages/console/app/src/asset/logo-ornate-light.svg" media="(prefers-color-scheme: light)">
@@ -8,10 +8,7 @@
   </a>
 </p>
 <p align="center">เอเจนต์การเขียนโค้ดด้วย AI แบบโอเพนซอร์ส</p>
-<p align="center">
-  <a href="https://opencode.ai/discord"><img alt="Discord" src="https://img.shields.io/discord/1391832426048651334?style=flat-square&label=discord" /></a>
-  <a href="https://www.npmjs.com/package/codewright-ai"><img alt="npm" src="https://img.shields.io/npm/v/codewright-ai?style=flat-square" /></a>
-  <a href="https://github.com/anomalyco/codewright/actions/workflows/publish.yml"><img alt="สถานะการสร้าง" src="https://img.shields.io/github/actions/workflow/status/anomalyco/codewright/publish.yml?style=flat-square&branch=dev" /></a>
+<p align="center"><a href="https://github.com/yoyo636/opencode/actions/workflows/publish.yml"><img alt="สถานะการสร้าง" src="https://img.shields.io/github/actions/workflow/status/yoyo636/opencode/publish.yml?style=flat-square&branch=dev" /></a>
 </p>
 
 <p align="center">
@@ -39,26 +36,29 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
-[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
+[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://github.com/yoyo636/opencode)
 
 ---
 
 ### การติดตั้ง
 
 ```bash
-# YOLO
-curl -fsSL https://opencode.ai/install | bash
+# From source
+git clone https://github.com/yoyo636/opencode.git
+cd opencode
+npm install
+npm run build
 
 # ตัวจัดการแพ็กเกจ
-npm i -g codewright-ai@latest        # หรือ bun/pnpm/yarn
+
 scoop install codewright             # Windows
 choco install codewright             # Windows
-brew install anomalyco/tap/codewright # macOS และ Linux (แนะนำ อัปเดตเสมอ)
+# Build from source (see above)
 brew install codewright              # macOS และ Linux (brew formula อย่างเป็นทางการ อัปเดตน้อยกว่า)
 sudo pacman -S codewright            # Arch Linux (Stable)
 paru -S codewright-bin               # Arch Linux (Latest from AUR)
 mise use -g codewright               # ระบบปฏิบัติการใดก็ได้
-nix run nixpkgs#codewright           # หรือ github:anomalyco/codewright สำหรับสาขาพัฒนาล่าสุด
+nix run nixpkgs#codewright           # หรือ github:yoyo636/opencode สำหรับสาขาพัฒนาล่าสุด
 ```
 
 > [!TIP]
@@ -66,7 +66,7 @@ nix run nixpkgs#codewright           # หรือ github:anomalyco/codewright 
 
 ### แอปพลิเคชันเดสก์ท็อป (เบต้า)
 
-Codewright มีให้ใช้งานเป็นแอปพลิเคชันเดสก์ท็อป ดาวน์โหลดโดยตรงจาก [หน้ารุ่น](https://github.com/anomalyco/codewright/releases) หรือ [opencode.ai/download](https://opencode.ai/download)
+Codewright มีให้ใช้งานเป็นแอปพลิเคชันเดสก์ท็อป ดาวน์โหลดโดยตรงจาก [หน้ารุ่น](https://github.com/yoyo636/opencode/releases) หรือ [opencode.ai/download](https://github.com/yoyo636/opencode/download)
 
 | แพลตฟอร์ม             | ดาวน์โหลด                          |
 | --------------------- | ---------------------------------- |
@@ -93,8 +93,8 @@ scoop bucket add extras; scoop install extras/codewright-desktop
 
 ```bash
 # ตัวอย่าง
-CODEWRIGHT_INSTALL_DIR=/usr/local/bin curl -fsSL https://opencode.ai/install | bash
-XDG_BIN_DIR=$HOME/.local/bin curl -fsSL https://opencode.ai/install | bash
+# Build from source first (see above), then set CODEWRIGHT_INSTALL_DIR
+# Build from source first (see above), then set XDG_BIN_DIR
 ```
 
 ### เอเจนต์
@@ -110,11 +110,11 @@ Codewright รวมเอเจนต์ในตัวสองตัวที
 นอกจากนี้ยังมีเอเจนต์ย่อย **general** สำหรับการค้นหาที่ซับซ้อนและงานหลายขั้นตอน
 ใช้ภายในและสามารถเรียกใช้ได้โดยใช้ `@general` ในข้อความ
 
-เรียนรู้เพิ่มเติมเกี่ยวกับ [เอเจนต์](https://opencode.ai/docs/agents)
+เรียนรู้เพิ่มเติมเกี่ยวกับ [เอเจนต์](https://github.com/yoyo636/opencode/docs/agents)
 
 ### เอกสารประกอบ
 
-สำหรับข้อมูลเพิ่มเติมเกี่ยวกับวิธีกำหนดค่า Codewright [**ไปที่เอกสารของเรา**](https://opencode.ai/docs)
+สำหรับข้อมูลเพิ่มเติมเกี่ยวกับวิธีกำหนดค่า Codewright [**ไปที่เอกสารของเรา**](https://github.com/yoyo636/opencode/docs)
 
 ### การมีส่วนร่วม
 
@@ -126,4 +126,4 @@ Codewright รวมเอเจนต์ในตัวสองตัวที
 
 ---
 
-**ร่วมชุมชนของเรา** [Discord](https://discord.gg/codewright) | [X.com](https://x.com/codewright)
+**GitHub** [https://github.com/yoyo636/opencode](https://github.com/yoyo636/opencode)

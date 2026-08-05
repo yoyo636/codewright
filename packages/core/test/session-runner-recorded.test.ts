@@ -23,6 +23,8 @@ import { SessionRunCoordinator } from "@codewright-ai/core/session/run-coordinat
 import { SessionRunner } from "@codewright-ai/core/session/runner"
 import * as SessionRunnerLLM from "@codewright-ai/core/session/runner/llm"
 import { SessionRunnerModel } from "@codewright-ai/core/session/runner/model"
+import { ModelV2 } from "@codewright-ai/core/model"
+import { ProviderV2 } from "@codewright-ai/core/provider"
 import { ToolRegistry } from "@codewright-ai/core/tool/registry"
 import { ToolOutputStore } from "@codewright-ai/core/tool-output-store"
 import { SessionTable } from "@codewright-ai/core/session/sql"
@@ -67,7 +69,12 @@ const model = OpenAIChat.route
     generation: { maxTokens: 20, temperature: 0 },
   })
   .model({ id: "gpt-4o-mini" })
-const models = SessionRunnerModel.layerWith(() => Effect.succeed(model))
+const models = SessionRunnerModel.layerWith(() =>
+  Effect.succeed({
+    model,
+    info: ModelV2.Info.empty(ProviderV2.ID.make("openai"), ModelV2.ID.make("gpt-4o-mini")),
+  }),
+)
 const systemContext = AppNodeBuilder.build(SystemContextRegistry.node)
 const skillGuidance = Layer.mock(SkillGuidance.Service, { load: () => Effect.succeed(SystemContext.empty) })
 const referenceGuidance = Layer.mock(ReferenceGuidance.Service, { load: () => Effect.succeed(SystemContext.empty) })

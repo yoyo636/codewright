@@ -48,7 +48,9 @@ import { DialogAlert } from "../../ui/dialog-alert"
 import { useToast } from "../../ui/toast"
 import { useKV } from "../../context/kv"
 import { createFadeIn } from "../../util/signal"
+import { recordAndTranscribe, polishText, getOpenAIKey } from "../../util/voice"
 import { DialogSkill } from "../dialog-skill"
+import { DialogVoiceInput } from "../dialog-voice-input"
 import { DialogWorkspaceUnavailable } from "../dialog-workspace-unavailable"
 import { useArgs } from "../../context/args"
 import { CODEWRIGHT_BASE_MODE, useBindings, useCommandShortcut, useLeaderActive, useCodewrightKeymap } from "../../keymap"
@@ -267,15 +269,16 @@ export function Prompt(props: PromptProps) {
     const last = msg.findLast((item): item is AssistantMessage => item.role === "assistant" && item.tokens.output > 0)
     if (!last) return
 
-    const tokens =
+    const contextTokens = last.tokens.input + last.tokens.cache.read + last.tokens.cache.write
+    const totalTokens =
       last.tokens.input + last.tokens.output + last.tokens.reasoning + last.tokens.cache.read + last.tokens.cache.write
-    if (tokens <= 0) return
+    if (totalTokens <= 0) return
 
     const model = sync.data.provider.find((item) => item.id === last.providerID)?.models[last.modelID]
-    const pct = model?.limit.context ? `${Math.round((tokens / model.limit.context) * 100)}%` : undefined
+    const pct = model?.limit.context ? `${Math.round((contextTokens / model.limit.context) * 100)}%` : undefined
     const cost = session?.cost ?? 0
     return {
-      context: pct ? `${Locale.number(tokens)} (${pct})` : Locale.number(tokens),
+      context: pct ? `${Locale.number(contextTokens)} (${pct})` : Locale.number(contextTokens),
       cost: cost > 0 ? money.format(cost) : undefined,
     }
   })
@@ -354,6 +357,16 @@ export function Prompt(props: PromptProps) {
           if (!handled) return
 
           dialog.clear()
+        },
+      },
+      {
+        title: "Voice input with AI polish",
+        name: "prompt.voice",
+        category: "Prompt",
+        hidden: true,
+        run: async () => {
+          if (!input.focused) input.focus()
+          await handleVoiceInput()
         },
       },
       {
@@ -566,6 +579,7 @@ export function Prompt(props: PromptProps) {
     mode: CODEWRIGHT_BASE_MODE,
     bindings: tuiConfig.keybinds.gather("prompt.palette", [
       "prompt.submit",
+      "prompt.voice",
       "prompt.editor",
       "prompt.editor_context.clear",
       "prompt.stash",
@@ -927,6 +941,46 @@ export function Prompt(props: PromptProps) {
   })
 
   let submitting = false
+
+  async function handleVoiceInput() {
+    const apiKey = process.env.OPENAI_API_KEY
+    if (!apiKey) {
+      toast.show({
+        variant: "error",
+        message: "OPENAI_API_KEY not set. Voice input requires it for transcription.",
+        duration: 4000,
+      })
+      return
+    }
+
+    dialog.replace(() => (
+      <DialogVoiceInput
+        state="recording"
+        onConfirm={(text: string) => {
+          setStore("prompt", "input", text)
+          input.setText(text)
+          input.gotoBufferEnd()
+          dialog.clear()
+          void submit()
+        }}
+        onCancel={() => dialog.clear()}
+        onRecord={async () => {
+          try {
+            const transcript = await recordAndTranscribe(5000, apiKey)
+            const selectedModel = local.model.current()
+            const modelId = selectedModel?.modelID ?? "gpt-4o-mini"
+            const polished = await polishText(transcript, { apiKey, model: modelId })
+            return { transcript, polished }
+          } catch (err) {
+            const message = err instanceof Error ? err.message : String(err)
+            toast.show({ variant: "error", message: `Voice input failed: ${message}`, duration: 5000 })
+            return null
+          }
+        }}
+      />
+    ))
+  }
+
   async function submit() {
     // Prevent overlapping invocations (e.g. a double-pressed Enter, or the
     // input's native onSubmit racing another dispatch). Without this guard,

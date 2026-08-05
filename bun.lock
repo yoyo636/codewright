@@ -29,7 +29,7 @@
     },
     "packages/app": {
       "name": "@codewright-ai/app",
-      "version": "1.18.11",
+      "version": "2.0.0-beta",
       "dependencies": {
         "@codewright-ai/client": "file:vendor/codewright-ai-client-1.17.13-v2.tgz",
         "@codewright-ai/core": "workspace:*",
@@ -96,7 +96,7 @@
     },
     "packages/cli": {
       "name": "@codewright-ai/cli",
-      "version": "1.18.11",
+      "version": "2.0.0-beta",
       "bin": {
         "lildax": "./bin/lildax.cjs",
       },
@@ -144,7 +144,7 @@
     },
     "packages/codemode": {
       "name": "@codewright-ai/codemode",
-      "version": "1.18.11",
+      "version": "1.1.2",
       "dependencies": {
         "acorn": "8.15.0",
         "effect": "catalog:",
@@ -158,7 +158,7 @@
     },
     "packages/console/app": {
       "name": "@codewright-ai/console-app",
-      "version": "1.18.11",
+      "version": "1.1.0",
       "dependencies": {
         "@cloudflare/vite-plugin": "1.15.2",
         "@codewright-ai/console-core": "workspace:*",
@@ -194,7 +194,7 @@
     },
     "packages/console/core": {
       "name": "@codewright-ai/console-core",
-      "version": "1.18.11",
+      "version": "1.1.0",
       "dependencies": {
         "@aws-sdk/client-sts": "3.782.0",
         "@codewright-ai/console-mail": "workspace:*",
@@ -221,7 +221,7 @@
     },
     "packages/console/function": {
       "name": "@codewright-ai/console-function",
-      "version": "1.18.11",
+      "version": "1.1.0",
       "dependencies": {
         "@ai-sdk/anthropic": "3.0.82",
         "@ai-sdk/openai": "3.0.48",
@@ -243,7 +243,7 @@
     },
     "packages/console/mail": {
       "name": "@codewright-ai/console-mail",
-      "version": "1.18.11",
+      "version": "1.1.0",
       "dependencies": {
         "@jsx-email/all": "2.2.3",
         "@jsx-email/cli": "1.4.3",
@@ -267,7 +267,7 @@
     },
     "packages/console/support": {
       "name": "@codewright-ai/console-support",
-      "version": "1.18.11",
+      "version": "1.1.0",
       "dependencies": {
         "@cloudflare/vite-plugin": "1.15.2",
         "@codewright-ai/console-core": "workspace:*",
@@ -287,7 +287,7 @@
     },
     "packages/core": {
       "name": "@codewright-ai/core",
-      "version": "1.18.11",
+      "version": "1.1.2",
       "bin": {
         "codewright": "./bin/codewright",
       },
@@ -381,7 +381,7 @@
     },
     "packages/desktop": {
       "name": "@codewright-ai/desktop",
-      "version": "1.18.11",
+      "version": "2.0.0-beta",
       "dependencies": {
         "@zip.js/zip.js": "2.7.62",
         "effect": "catalog:",
@@ -434,7 +434,7 @@
     },
     "packages/effect-drizzle-sqlite": {
       "name": "@codewright-ai/effect-drizzle-sqlite",
-      "version": "1.18.11",
+      "version": "1.1.2",
       "dependencies": {
         "drizzle-orm": "catalog:",
         "effect": "catalog:",
@@ -448,7 +448,7 @@
     },
     "packages/effect-sqlite-node": {
       "name": "@codewright-ai/effect-sqlite-node",
-      "version": "1.18.11",
+      "version": "1.1.2",
       "dependencies": {
         "effect": "catalog:",
       },
@@ -460,7 +460,7 @@
     },
     "packages/enterprise": {
       "name": "@codewright-ai/enterprise",
-      "version": "1.18.11",
+      "version": "1.1.2",
       "dependencies": {
         "@codewright-ai/core": "workspace:*",
         "@codewright-ai/session-ui": "workspace:*",
@@ -492,7 +492,7 @@
     },
     "packages/function": {
       "name": "@codewright-ai/function",
-      "version": "1.18.11",
+      "version": "1.1.2",
       "dependencies": {
         "@octokit/auth-app": "8.0.1",
         "@octokit/rest": "catalog:",
@@ -508,7 +508,7 @@
     },
     "packages/http-recorder": {
       "name": "@codewright-ai/http-recorder",
-      "version": "1.18.11",
+      "version": "1.1.2",
       "dependencies": {
         "@effect/platform-node": "4.0.0-beta.83",
         "@effect/platform-node-shared": "4.0.0-beta.83",
@@ -539,7 +539,7 @@
     },
     "packages/llm": {
       "name": "@codewright-ai/llm",
-      "version": "1.18.11",
+      "version": "1.1.2",
       "dependencies": {
         "@codewright-ai/schema": "workspace:*",
         "@smithy/eventstream-codec": "4.2.14",
@@ -558,7 +558,7 @@
     },
     "packages/opencode": {
       "name": "codewright",
-      "version": "1.18.11",
+      "version": "1.1.2",
       "bin": {
         "yoyocode": "./bin/yoyocode",
       },
@@ -689,7 +689,7 @@
     },
     "packages/plugin": {
       "name": "@codewright-ai/plugin",
-      "version": "1.18.11",
+      "version": "1.1.2",
       "dependencies": {
         "@ai-sdk/provider": "3.0.8",
         "@codewright-ai/sdk": "workspace:*",
@@ -765,7 +765,7 @@
     },
     "packages/sdk/js": {
       "name": "@codewright-ai/sdk",
-      "version": "1.18.11",
+      "version": "1.1.0",
       "dependencies": {
         "cross-spawn": "catalog:",
       },
@@ -780,7 +780,7 @@
     },
     "packages/server": {
       "name": "@codewright-ai/server",
-      "version": "1.18.11",
+      "version": "1.1.2",
       "dependencies": {
         "@codewright-ai/core": "workspace:*",
         "@codewright-ai/protocol": "workspace:*",
@@ -795,7 +795,7 @@
     },
     "packages/session-ui": {
       "name": "@codewright-ai/session-ui",
-      "version": "1.18.11",
+      "version": "1.1.2",
       "dependencies": {
         "@codewright-ai/client": "file:../app/vendor/codewright-ai-client-1.17.13-v2.tgz",
         "@codewright-ai/core": "workspace:*",
@@ -839,7 +839,7 @@
     },
     "packages/slack": {
       "name": "@codewright-ai/slack",
-      "version": "1.18.11",
+      "version": "1.1.2",
       "dependencies": {
         "@codewright-ai/sdk": "workspace:*",
         "@slack/bolt": "^3.17.1",
@@ -852,7 +852,7 @@
     },
     "packages/stats/app": {
       "name": "@codewright-ai/stats-app",
-      "version": "1.18.11",
+      "version": "1.1.0",
       "dependencies": {
         "@codewright-ai/stats-core": "workspace:*",
         "@codewright-ai/ui": "workspace:*",
@@ -886,7 +886,7 @@
     },
     "packages/stats/core": {
       "name": "@codewright-ai/stats-core",
-      "version": "1.18.11",
+      "version": "1.1.0",
       "dependencies": {
         "@aws-sdk/client-athena": "3.933.0",
         "@planetscale/database": "1.19.0",
@@ -905,7 +905,7 @@
     },
     "packages/stats/server": {
       "name": "@codewright-ai/stats-server",
-      "version": "1.18.11",
+      "version": "1.1.0",
       "dependencies": {
         "@aws-sdk/client-firehose": "3.933.0",
         "@codewright-ai/stats-core": "workspace:*",
@@ -947,7 +947,7 @@
     },
     "packages/tui": {
       "name": "@codewright-ai/tui",
-      "version": "1.18.11",
+      "version": "1.1.2",
       "dependencies": {
         "@codewright-ai/core": "workspace:*",
         "@codewright-ai/plugin": "workspace:*",
@@ -974,7 +974,7 @@
     },
     "packages/ui": {
       "name": "@codewright-ai/ui",
-      "version": "1.18.11",
+      "version": "1.1.2",
       "dependencies": {
         "@kobalte/core": "catalog:",
         "@pierre/diffs": "catalog:",
@@ -1026,7 +1026,7 @@
     },
     "packages/web": {
       "name": "@codewright-ai/web",
-      "version": "1.18.11",
+      "version": "1.1.2",
       "dependencies": {
         "@astrojs/cloudflare": "12.6.3",
         "@astrojs/markdown-remark": "6.3.1",
@@ -3513,7 +3513,7 @@
 
     "dns-packet": ["dns-packet@5.6.1", "https://registry.npmmirror.com/dns-packet/-/dns-packet-5.6.1.tgz", { "dependencies": { "@leichtgewicht/ip-codec": "^2.0.1" } }, "sha512-l4gcSouhcgIKRvyy99RNVOgxXiicE+2jZoNmaNmZ6JXiGajBOJAesk1OBlJuM5k2c+eudGdLxDqXuPCKIj6kpw=="],
 
-    "dom-accessibility-api": ["dom-accessibility-api@0.5.16", "https://registry.npmmirror.com/dom-accessibility-api/-/dom-accessibility-api-0.5.16.tgz", {}, "sha512-X7BJ2yElsnOJ30pZF4uIIDfBEVgF4XEBxL9Bxhy6dnrm5hkzqmsWHGTiHqRiITNhMyFLyAiWndIJP7Z1NTteDg=="],
+    "dom-accessibility-api": ["dom-accessibility-api@0.6.3", "https://registry.npmmirror.com/dom-accessibility-api/-/dom-accessibility-api-0.6.3.tgz", {}, "sha512-7ZgogeTnjuHbo+ct10G9Ffp0mif17idi0IyWNVA/wcwcm7NPOD/WEHVP3n7n3MhXqxoIYm8d6MuZohYWIZ4T3w=="],
 
     "dom-serializer": ["dom-serializer@2.0.0", "https://registry.npmmirror.com/dom-serializer/-/dom-serializer-2.0.0.tgz", { "dependencies": { "domelementtype": "^2.3.0", "domhandler": "^5.0.2", "entities": "^4.2.0" } }, "sha512-wIkAryiqt/nV5EQKqQpo3SToSOV9J0DnbJqwK7Wv/Trc92zIAYZ4FlMu+JPFW1DfGFt81ZTCGgDEabffXeLyJg=="],
 
@@ -6097,7 +6097,7 @@
 
     "@testing-library/dom/aria-query": ["aria-query@5.3.0", "https://registry.npmmirror.com/aria-query/-/aria-query-5.3.0.tgz", { "dependencies": { "dequal": "^2.0.3" } }, "sha512-b0P0sZPKtyu8HkeRAfCq0IfURZK+SuwMjY1UXGBU27wpAiTwQAIlq56IbIO+ytk/JjS1fMR14ee5WBBfKi5J6A=="],
 
-    "@testing-library/jest-dom/dom-accessibility-api": ["dom-accessibility-api@0.6.3", "https://registry.npmmirror.com/dom-accessibility-api/-/dom-accessibility-api-0.6.3.tgz", {}, "sha512-7ZgogeTnjuHbo+ct10G9Ffp0mif17idi0IyWNVA/wcwcm7NPOD/WEHVP3n7n3MhXqxoIYm8d6MuZohYWIZ4T3w=="],
+    "@testing-library/dom/dom-accessibility-api": ["dom-accessibility-api@0.5.16", "https://registry.npmmirror.com/dom-accessibility-api/-/dom-accessibility-api-0.5.16.tgz", {}, "sha512-X7BJ2yElsnOJ30pZF4uIIDfBEVgF4XEBxL9Bxhy6dnrm5hkzqmsWHGTiHqRiITNhMyFLyAiWndIJP7Z1NTteDg=="],
 
     "@types/serve-static/@types/send": ["@types/send@0.17.6", "https://registry.npmmirror.com/@types/send/-/send-0.17.6.tgz", { "dependencies": { "@types/mime": "^1", "@types/node": "*" } }, "sha512-Uqt8rPBE8SY0RK8JB1EzVOIZ32uqy8HwdxCnoCOsYrvnswqmFZ/k+9Ikidlk/ImhsdvBsloHbAlewb2IEBV/Og=="],
 
