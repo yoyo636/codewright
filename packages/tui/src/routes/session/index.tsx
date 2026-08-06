@@ -48,6 +48,7 @@ import { useDialog } from "../../ui/dialog"
 import { DialogAlert } from "../../ui/dialog-alert"
 import { TodoItem } from "../../component/todo-item"
 import { DialogMessage } from "./dialog-message"
+import { StatusPanel } from "./status-panel"
 import type { PromptInfo } from "../../component/prompt/history"
 import { DialogConfirm } from "../../ui/dialog-confirm"
 import { DialogTimeline } from "./dialog-timeline"
@@ -268,7 +269,8 @@ export function Session() {
     return false
   })
   const showTimestamps = createMemo(() => timestamps() === "show")
-  const contentWidth = createMemo(() => dimensions().width - (sidebarVisible() ? 42 : 0) - 4)
+  const hasUserMessage = createMemo(() => (sync.data.message[route.sessionID] ?? []).some((m) => m.role === "user"))
+  const contentWidth = createMemo(() => dimensions().width - (sidebarVisible() ? 42 : 0) - (hasUserMessage() ? 44 : 0) - 4)
   const providers = createMemo(() => Model.index(sync.data.provider))
 
   const scrollAcceleration = createMemo(() => getScrollAcceleration(tuiConfig))
@@ -1341,6 +1343,7 @@ export function Session() {
               </Match>
             </Switch>
           </Show>
+          <StatusPanel sessionID={route.sessionID} />
         </box>
       </context.Provider>
     </LocationProvider>

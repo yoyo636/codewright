@@ -167,6 +167,38 @@ export const {
         .then((x) => (x.data ?? []).toSorted((a, b) => a.id.localeCompare(b.id)))
     }
 
+    // Delta batching for smooth streaming rendering
+    const deltaBuffer = new Map<string, { messageID: string; field: string; delta: string }>()
+    let flushScheduled = false
+    function flushDeltas() {
+      if (deltaBuffer.size === 0) return
+      flushScheduled = false
+      const entries = [...deltaBuffer.values()]
+      deltaBuffer.clear()
+      batch(() => {
+        for (const { messageID, field, delta } of entries) {
+          const parts = store.part[messageID]
+          if (!parts) continue
+          setStore(
+            "part",
+            messageID,
+            produce((draft) => {
+              for (const part of draft) {
+                const existing = part[field] as string | undefined
+                ;(part[field] as string) = (existing ?? "") + delta
+              }
+            }),
+          )
+        }
+      })
+      scheduleFlush()
+    }
+    function scheduleFlush() {
+      if (flushScheduled || deltaBuffer.size === 0) return
+      flushScheduled = true
+      requestAnimationFrame(flushDeltas)
+    }
+
     event.subscribe((event, { directory, workspace }) => {
       switch (event.type) {
         case "server.instance.disposed":
@@ -390,21 +422,19 @@ export const {
         }
 
         case "message.part.delta": {
-          const parts = store.part[event.properties.messageID]
-          if (!parts) break
-          const result = search(parts, event.properties.partID, (p) => p.id)
-          if (!result.found) break
+          const key = `${event.properties.messageID}:${event.properties.partID}:${event.properties.field}`
+          const existing = deltaBuffer.get(key)
+          if (existing) {
+            existing.delta += event.properties.delta
+          } else {
+            deltaBuffer.set(key, {
+              messageID: event.properties.messageID,
+              field: event.properties.field,
+              delta: event.properties.delta,
+            })
+          }
           touchPart(event.properties.sessionID, event.properties.partID)
-          setStore(
-            "part",
-            event.properties.messageID,
-            produce((draft) => {
-              const part = draft[result.index]
-              const field = event.properties.field as keyof typeof part
-              const existing = part[field] as string | undefined
-              ;(part[field] as string) = (existing ?? "") + event.properties.delta
-            }),
-          )
+          scheduleFlush()
           break
         }
 
