@@ -1,0 +1,10 @@
+{
+  "name": "@codewright-ai/landing",
+  "version": "2.1.1",
+  "private": true,
+  "description": "Codewright marketing landing page",
+  "scripts": {
+    "dev": "bunx serve . -p 3002",
+    "start": "bunx serve . -p 3002"
+  }
+}

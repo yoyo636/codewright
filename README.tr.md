@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/yoyo636/opencode">
+  <a href="https://github.com/yoyo636/codewright">
     <picture>
       <source srcset="packages/console/app/src/asset/logo-ornate-dark.svg" media="(prefers-color-scheme: dark)">
       <source srcset="packages/console/app/src/asset/logo-ornate-light.svg" media="(prefers-color-scheme: light)">
@@ -8,7 +8,7 @@
   </a>
 </p>
 <p align="center">Açık kaynaklı yapay zeka kodlama asistanı.</p>
-<p align="center"><a href="https://github.com/yoyo636/opencode/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/yoyo636/opencode/publish.yml?style=flat-square&branch=dev" /></a>
+<p align="center"><a href="https://github.com/yoyo636/codewright/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/yoyo636/codewright/publish.yml?style=flat-square&branch=dev" /></a>
 </p>
 
 <p align="center">
@@ -36,7 +36,7 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
-[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://github.com/yoyo636/opencode)
+[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://github.com/yoyo636/codewright)
 
 ---
 
@@ -44,7 +44,7 @@
 
 ```bash
 # From source
-git clone https://github.com/yoyo636/opencode.git
+git clone https://github.com/yoyo636/codewright.git
 cd opencode
 npm install
 npm run build
@@ -58,7 +58,7 @@ brew install codewright              # macOS ve Linux (resmi brew formülü, dah
 sudo pacman -S codewright            # Arch Linux (Stable)
 paru -S codewright-bin               # Arch Linux (Latest from AUR)
 mise use -g codewright               # Tüm işletim sistemleri
-nix run nixpkgs#codewright           # veya en güncel geliştirme dalı için github:yoyo636/opencode
+nix run nixpkgs#codewright           # veya en güncel geliştirme dalı için github:yoyo636/codewright
 ```
 
 > [!TIP]
@@ -66,7 +66,7 @@ nix run nixpkgs#codewright           # veya en güncel geliştirme dalı için g
 
 ### Masaüstü Uygulaması (BETA)
 
-Codewright ayrıca masaüstü uygulaması olarak da mevcuttur. Doğrudan [sürüm sayfasından](https://github.com/yoyo636/opencode/releases) veya [opencode.ai/download](https://github.com/yoyo636/opencode/download) adresinden indirebilirsiniz.
+Codewright ayrıca masaüstü uygulaması olarak da mevcuttur. Doğrudan [sürüm sayfasından](https://github.com/yoyo636/codewright/releases) veya [opencode.ai/download](https://github.com/yoyo636/codewright/download) adresinden indirebilirsiniz.
 
 | Platform              | İndirme                            |
 | --------------------- | ---------------------------------- |
@@ -110,11 +110,11 @@ Codewright, `Tab` tuşuyla aralarında geçiş yapabileceğiniz iki yerleşik (b
 Ayrıca, karmaşık aramalar ve çok adımlı görevler için bir **genel** alt ajan bulunmaktadır.
 Bu dahili olarak kullanılır ve mesajlarda `@general` ile çağrılabilir.
 
-[Ajanlar](https://github.com/yoyo636/opencode/docs/agents) hakkında daha fazla bilgi edinin.
+[Ajanlar](https://github.com/yoyo636/codewright/docs/agents) hakkında daha fazla bilgi edinin.
 
 ### Dokümantasyon
 
-Codewright'u nasıl yapılandıracağınız hakkında daha fazla bilgi için [**dokümantasyonumuza göz atın**](https://github.com/yoyo636/opencode/docs).
+Codewright'u nasıl yapılandıracağınız hakkında daha fazla bilgi için [**dokümantasyonumuza göz atın**](https://github.com/yoyo636/codewright/docs).
 
 ### Katkıda Bulunma
 
@@ -126,4 +126,4 @@ Codewright ile ilgili bir proje üzerinde çalışıyorsanız ve projenizin adı
 
 ---
 
-**GitHub** [https://github.com/yoyo636/opencode](https://github.com/yoyo636/opencode)
+**GitHub** [https://github.com/yoyo636/codewright](https://github.com/yoyo636/codewright)

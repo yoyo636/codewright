@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Codewright — Open Source AI Coding Agent</title>
+  <meta name="description" content="Codewright is the open source AI coding agent that runs everywhere — terminal, desktop, web, and headless." />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2300d4ff'/%3E%3Cpath d='M10 12L6 16L10 20' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M22 12L26 16L22 20' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M19 9L13 23' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-primary: #06060c;
+      --bg-secondary: #0a0a14;
+      --bg-card: rgba(15, 15, 30, 0.6);
+      --border: rgba(255, 255, 255, 0.06);
+      --border-glow: rgba(0, 212, 255, 0.15);
+      --text-primary: #f0f0f5;
+      --text-secondary: #8888aa;
+      --text-muted: #555570;
+      --accent: #00d4ff;
+      --accent-warm: #a855f7;
+      --accent-glow: rgba(0, 212, 255, 0.4);
+      --gradient-1: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ff006e 100%);
+      --gradient-2: linear-gradient(135deg, #00d4ff 0%, #00ff88 100%);
+      --gradient-mesh: radial-gradient(ellipse at 20% 50%, rgba(0, 212, 255, 0.08) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 20%, rgba(168, 85, 247, 0.06) 0%, transparent 50%),
+                        radial-gradient(ellipse at 50% 80%, rgba(255, 0, 110, 0.04) 0%, transparent 50%);
+    }
+
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ─── Animated Background ─── */
+    .bg-mesh {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background: var(--gradient-mesh);
+      pointer-events: none;
+    }
+
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+    }
+
+    .bg-particles {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 50%;
+      opacity: 0;
+      animation: float-particle linear infinite;
+    }
+
+    @keyframes float-particle {
+      0% { opacity: 0; transform: translateY(100vh) scale(0); }
+      10% { opacity: 0.6; }
+      90% { opacity: 0.6; }
+      100% { opacity: 0; transform: translateY(-10vh) scale(1); }
+    }
+
+    /* ─── Navigation ─── */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1rem 2rem;
+      backdrop-filter: blur(20px);
+      background: rgba(6, 6, 12, 0.7);
+      border-bottom: 1px solid var(--border);
+      transition: all 0.3s ease;
+    }
+
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .nav-logo svg { width: 28px; height: 28px; }
+
+    .nav-logo span {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text-primary); }
+
+    .nav-cta {
+      padding: 0.5rem 1.25rem;
+      background: var(--gradient-1);
+      color: #fff !important;
+      border-radius: 8px;
+      font-weight: 600 !important;
+      font-size: 0.875rem;
+      transition: transform 0.2s, box-shadow 0.2s !important;
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+    }
+
+    .nav-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 30px rgba(0, 212, 255, 0.35);
+    }
+
+    /* ─── Hero ─── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8rem 2rem 4rem;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      background: rgba(0, 212, 255, 0.08);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--accent);
+      margin-bottom: 2rem;
+      animation: fadeInUp 0.8s ease;
+    }
+
+    .hero-badge .dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse-dot 2s ease infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.5); }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 7vw, 5.5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      margin-bottom: 1.5rem;
+      animation: fadeInUp 0.8s ease 0.1s both;
+    }
+
+    .hero h1 .gradient-text {
+      background: var(--gradient-1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin-bottom: 2.5rem;
+      font-weight: 400;
+      animation: fadeInUp 0.8s ease 0.2s both;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeInUp 0.8s ease 0.3s both;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 2rem;
+      background: var(--gradient-1);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 30px rgba(0, 212, 255, 0.25);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 50px rgba(0, 212, 255, 0.4);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 2rem;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .hero-terminal {
+      margin-top: 4rem;
+      width: 100%;
+      max-width: 700px;
+      animation: fadeInUp 1s ease 0.5s both;
+    }
+
+    /* ─── Terminal Window ─── */
+    .terminal {
+      background: rgba(10, 10, 20, 0.85);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.03),
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 0 80px rgba(0, 212, 255, 0.05);
+    }
+
+    .terminal-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .terminal-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+
+    .terminal-dot.red { background: #ff5f57; }
+    .terminal-dot.yellow { background: #febc2e; }
+    .terminal-dot.green { background: #28c840; }
+
+    .terminal-title {
+      flex: 1;
+      text-align: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .terminal-body {
+      padding: 1.25rem 1.5rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8rem;
+      line-height: 1.8;
+      min-height: 200px;
+    }
+
+    .terminal-line {
+      display: flex;
+      gap: 0.75rem;
+      opacity: 0;
+      animation: typeLine 0.5s ease forwards;
+    }
+
+    .terminal-line:nth-child(1) { animation-delay: 0.8s; }
+    .terminal-line:nth-child(2) { animation-delay: 1.2s; }
+    .terminal-line:nth-child(3) { animation-delay: 1.8s; }
+    .terminal-line:nth-child(4) { animation-delay: 2.2s; }
+    .terminal-line:nth-child(5) { animation-delay: 2.8s; }
+    .terminal-line:nth-child(6) { animation-delay: 3.2s; }
+
+    @keyframes typeLine {
+      from { opacity: 0; transform: translateX(-8px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .terminal-prompt { color: var(--accent); }
+    .terminal-output { color: var(--text-secondary); }
+    .terminal-highlight { color: #00ff88; }
+    .terminal-dim { color: var(--text-muted); }
+
+    .cursor-blink {
+      display: inline-block;
+      width: 8px;
+      height: 16px;
+      background: var(--accent);
+      animation: blink 1s step-end infinite;
+      vertical-align: middle;
+      margin-left: 2px;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* ─── Sections ─── */
+    .section {
+      position: relative;
+      z-index: 1;
+      padding: 6rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .section-label::before {
+      content: '';
+      width: 20px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+      line-height: 1.1;
+    }
+
+    .section-desc {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 550px;
+      margin-bottom: 3rem;
+    }
+
+    /* ─── Features Grid ─── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .feature-card {
+      position: relative;
+      padding: 2rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.03) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .feature-card:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 212, 255, 0.05);
+    }
+
+    .feature-card:hover::before { opacity: 1; }
+
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 212, 255, 0.08);
+      border: 1px solid rgba(0, 212, 255, 0.15);
+      border-radius: 12px;
+      margin-bottom: 1.25rem;
+      font-size: 1.25rem;
+    }
+
+    .feature-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .feature-card p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ─── Code Showcase ─── */
+    .code-showcase {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .code-block {
+      background: rgba(10, 10, 20, 0.8);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .code-tab {
+      padding: 0.3rem 0.75rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .code-tab.active {
+      background: rgba(0, 212, 255, 0.1);
+      color: var(--accent);
+    }
+
+    .code-body {
+      padding: 1.5rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8rem;
+      line-height: 2;
+      overflow-x: auto;
+    }
+
+    .code-line {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .code-number {
+      color: var(--text-muted);
+      user-select: none;
+      min-width: 2rem;
+      text-align: right;
+    }
+
+    .code-content { flex: 1; }
+    .code-keyword { color: #c792ea; }
+    .code-string { color: #c3e88d; }
+    .code-function { color: #82aaff; }
+    .code-comment { color: #546e7a; }
+    .code-variable { color: #f78c6c; }
+    .code-operator { color: #89ddff; }
+
+    .code-highlight {
+      background: rgba(0, 212, 255, 0.06);
+      border-left: 2px solid var(--accent);
+      margin: 0 -1.5rem;
+      padding: 0 1.5rem;
+    }
+
+    .showcase-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .showcase-item {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .showcase-icon {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(168, 85, 247, 0.1);
+      border: 1px solid rgba(168, 85, 247, 0.2);
+      border-radius: 10px;
+      flex-shrink: 0;
+      font-size: 1rem;
+    }
+
+    .showcase-item h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    .showcase-item p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    /* ─── Stats ─── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      text-align: center;
+    }
+
+    .stat-item {
+      padding: 2rem;
+    }
+
+    .stat-number {
+      font-size: 3rem;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      background: var(--gradient-1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* ─── Platforms ─── */
+    .platforms-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .platform-card {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.25rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: all 0.2s;
+    }
+
+    .platform-card:hover {
+      border-color: var(--border-glow);
+      background: rgba(0, 212, 255, 0.03);
+    }
+
+    .platform-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 10px;
+      font-size: 1.25rem;
+    }
+
+    .platform-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .platform-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* ─── CTA ─── */
+    .cta-section {
+      position: relative;
+      z-index: 1;
+      padding: 6rem 2rem;
+      text-align: center;
+    }
+
+    .cta-box {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 4rem 3rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-box::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gradient-mesh);
+      opacity: 0.5;
+    }
+
+    .cta-box > * { position: relative; z-index: 1; }
+
+    .cta-box h2 {
+      font-size: clamp(1.75rem, 3vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+    }
+
+    .cta-box p {
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      font-size: 1.05rem;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ─── Footer ─── */
+    .footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 3rem 2rem;
+    }
+
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    .footer-brand svg { width: 20px; height: 20px; opacity: 0.6; }
+
+    .footer-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--text-secondary); }
+
+    /* ─── Animations ─── */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .code-showcase { grid-template-columns: 1fr; }
+      .hero { padding: 6rem 1.5rem 3rem; }
+      .section { padding: 4rem 1.5rem; }
+      .cta-box { padding: 3rem 1.5rem; }
+      .features-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ─── Glow Effects ─── */
+    .glow-line {
+      width: 1px;
+      height: 120px;
+      background: linear-gradient(to bottom, transparent, var(--accent), transparent);
+      margin: 0 auto 3rem;
+      opacity: 0.4;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Effects -->
+  <div class="bg-mesh"></div>
+  <div class="bg-grid"></div>
+  <div class="bg-particles" id="particles"></div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="32" height="32" rx="8" fill="url(#nav-grad)"/>
+          <path d="M10 12L6 16L10 20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M22 12L26 16L22 20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M19 9L13 23" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <defs><linearGradient id="nav-grad" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#00d4ff"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs>
+        </svg>
+        <span>Codewright</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#code">Code</a></li>
+        <li><a href="#platforms">Platforms</a></li>
+        <li><a href="https://github.com/yoyo636/codewright" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="#cta" class="nav-cta">Get Started</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      v2.1.1 — Now Available
+    </div>
+    <h1>
+      Code at the speed<br />of <span class="gradient-text">thought</span>
+    </h1>
+    <p class="hero-subtitle">
+      Codewright is the open source AI coding agent that understands your codebase, executes complex tasks, and ships features — right from your terminal.
+    </p>
+    <div class="hero-actions">
+      <a href="https://github.com/yoyo636/codewright" class="btn-primary" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        View on GitHub
+      </a>
+      <a href="#features" class="btn-secondary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        See Features
+      </a>
+    </div>
+
+    <!-- Terminal -->
+    <div class="hero-terminal">
+      <div class="terminal">
+        <div class="terminal-header">
+          <span class="terminal-dot red"></span>
+          <span class="terminal-dot yellow"></span>
+          <span class="terminal-dot green"></span>
+          <span class="terminal-title">codewright — ~/project</span>
+        </div>
+        <div class="terminal-body">
+          <div class="terminal-line">
+            <span class="terminal-prompt">$</span>
+            <span class="terminal-output">codewright "Refactor auth to use JWT tokens"</span>
+          </div>
+          <div class="terminal-line">
+            <span class="terminal-output terminal-dim">Analyzing codebase...</span>
+          </div>
+          <div class="terminal-line">
+            <span class="terminal-output terminal-highlight">✓ Found 12 files referencing auth logic</span>
+          </div>
+          <div class="terminal-line">
+            <span class="terminal-output terminal-highlight">✓ Generated JWT middleware + updated 8 endpoints</span>
+          </div>
+          <div class="terminal-line">
+            <span class="terminal-output terminal-highlight">✓ All 47 tests passing</span>
+          </div>
+          <div class="terminal-line">
+            <span class="terminal-prompt">$</span>
+            <span class="cursor-blink"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="glow-line"></div>
+
+  <!-- Features -->
+  <section class="section" id="features">
+    <div class="reveal">
+      <span class="section-label">Features</span>
+      <h2 class="section-title">Everything you need to<br />ship faster</h2>
+      <p class="section-desc">Purpose-built for real development workflows. Not a chatbot with a code editor attached.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <h3>Two Built-in Agents</h3>
+        <p>Switch with Tab: <strong>build</strong> for full-access development, <strong>plan</strong> for read-only analysis and exploration.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        </div>
+        <h3>Subagents</h3>
+        <p>Delegate complex searches and multi-step tasks with <code style="color:var(--accent);font-family:'IBM Plex Mono',monospace;font-size:0.8rem;">@general</code>. Parallel execution, isolated context.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-3">
+        <div class="feature-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+        </div>
+        <h3>Tools & Extensibility</h3>
+        <p>Built-in file, shell, and web tools. Extend with MCP servers (OAuth supported) and plugins for infinite capability.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+        </div>
+        <h3>Persistent Sessions</h3>
+        <p>Conversations that last. Continue, resume by ID, or fork any session. Your context is never lost.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3>Fine-grained Permissions</h3>
+        <p>Control exactly which tools and commands may run. Stay in charge of what touches your system.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-3">
+        <div class="feature-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        </div>
+        <h3>Runs Everywhere</h3>
+        <p>Terminal TUI, desktop app (macOS/Windows/Linux), web interface, and headless mode for CI/CD pipelines.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="glow-line"></div>
+
+  <!-- Code Showcase -->
+  <section class="section" id="code">
+    <div class="code-showcase">
+      <div class="reveal">
+        <span class="section-label">Developer Experience</span>
+        <h2 class="section-title">Configure once,<br />control everything</h2>
+        <p class="section-desc">A minimal config gets you started. A powerful schema lets you fine-tune every aspect of your AI coding workflow.</p>
+        <ul class="showcase-list" style="margin-top: 2rem;">
+          <li class="showcase-item">
+            <div class="showcase-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <div>
+              <h4>Instant Setup</h4>
+              <p>One command to start. Environment variables or interactive login.</p>
+            </div>
+          </li>
+          <li class="showcase-item">
+            <div class="showcase-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+            </div>
+            <div>
+              <h4>Provider Agnostic</h4>
+              <p>Anthropic, OpenAI, OpenRouter, Google, and more. Bring your own API key.</p>
+            </div>
+          </li>
+          <li class="showcase-item">
+            <div class="showcase-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+            </div>
+            <div>
+              <h4>Project-level Config</h4>
+              <p>Commit <code style="color:var(--accent);font-family:'IBM Plex Mono',monospace;font-size:0.8rem;">codewright.json</code> to share team settings.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="code-block reveal reveal-delay-2">
+        <div class="code-header">
+          <span class="terminal-dot red"></span>
+          <span class="terminal-dot yellow"></span>
+          <span class="terminal-dot green"></span>
+          <span class="code-tab active">codewright.json</span>
+        </div>
+        <div class="code-body">
+          <div class="code-line"><span class="code-number">1</span><span class="code-content">{</span></div>
+          <div class="code-line"><span class="code-number">2</span><span class="code-content">  <span class="code-string">"model"</span>: <span class="code-string">"anthropic/claude-sonnet-4-5"</span>,</span></div>
+          <div class="code-line"><span class="code-number">3</span><span class="code-content">  <span class="code-string">"provider"</span>: {</span></div>
+          <div class="code-line code-highlight"><span class="code-number">4</span><span class="code-content">    <span class="code-string">"anthropic"</span>: {</span></div>
+          <div class="code-line code-highlight"><span class="code-number">5</span><span class="code-content">      <span class="code-string">"env"</span>: [<span class="code-string">"ANTHROPIC_API_KEY"</span>]</span></div>
+          <div class="code-line code-highlight"><span class="code-number">6</span><span class="code-content">    }</span></div>
+          <div class="code-line"><span class="code-number">7</span><span class="code-content">  },</span></div>
+          <div class="code-line"><span class="code-number">8</span><span class="code-content">  <span class="code-string">"agents"</span>: {</span></div>
+          <div class="code-line"><span class="code-number">9</span><span class="code-content">    <span class="code-string">"build"</span>: {</span></div>
+          <div class="code-line"><span class="code-number">10</span><span class="code-content">      <span class="code-string">"mode"</span>: <span class="code-string">"full-access"</span></span></div>
+          <div class="code-line"><span class="code-number">11</span><span class="code-content">    }</span></div>
+          <div class="code-line"><span class="code-number">12</span><span class="code-content">  }</span></div>
+          <div class="code-line"><span class="code-number">13</span><span class="code-content">}</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="glow-line"></div>
+
+  <!-- Stats -->
+  <section class="section">
+    <div class="reveal" style="text-align:center;">
+      <span class="section-label">By the Numbers</span>
+      <h2 class="section-title" style="margin-left:auto;margin-right:auto;">Trusted by developers</h2>
+    </div>
+    <div class="stats-grid" style="margin-top: 3rem;">
+      <div class="stat-item reveal reveal-delay-1">
+        <div class="stat-number" data-target="100">0</div>
+        <div class="stat-label">Built-in Tools</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-2">
+        <div class="stat-number" data-target="15">0</div>
+        <div class="stat-label">AI Providers</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-3">
+        <div class="stat-number" data-target="4">0</div>
+        <div class="stat-label">Platforms</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-4">
+        <div class="stat-number" data-target="22">0</div>
+        <div class="stat-label">Languages</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="glow-line"></div>
+
+  <!-- Platforms -->
+  <section class="section" id="platforms">
+    <div class="reveal">
+      <span class="section-label">Platforms</span>
+      <h2 class="section-title">One agent, every surface</h2>
+      <p class="section-desc">Same powerful engine, wherever you prefer to work.</p>
+    </div>
+    <div class="platforms-grid" style="margin-top: 2.5rem;">
+      <div class="platform-card reveal reveal-delay-1">
+        <div class="platform-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 8l8 8M16 8l-8 8"/></svg>
+        </div>
+        <div>
+          <div class="platform-name">Terminal TUI</div>
+          <div class="platform-desc">Native terminal interface</div>
+        </div>
+      </div>
+      <div class="platform-card reveal reveal-delay-2">
+        <div class="platform-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        </div>
+        <div>
+          <div class="platform-name">Desktop App</div>
+          <div class="platform-desc">macOS / Windows / Linux</div>
+        </div>
+      </div>
+      <div class="platform-card reveal reveal-delay-3">
+        <div class="platform-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        </div>
+        <div>
+          <div class="platform-name">Web Interface</div>
+          <div class="platform-desc">Browser-based access</div>
+        </div>
+      </div>
+      <div class="platform-card reveal reveal-delay-4">
+        <div class="platform-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+        </div>
+        <div>
+          <div class="platform-name">Headless / CI</div>
+          <div class="platform-desc">Scripts and automation</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="glow-line"></div>
+
+  <!-- CTA -->
+  <section class="cta-section" id="cta">
+    <div class="cta-box reveal">
+      <h2>Ready to code at lightspeed?</h2>
+      <p>Clone the repo, install with Bun, and start building with AI in seconds.</p>
+      <div class="cta-buttons">
+        <a href="https://github.com/yoyo636/codewright" class="btn-primary" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          Get Started
+        </a>
+        <a href="https://github.com/yoyo636/codewright#readme" class="btn-secondary" target="_blank" rel="noopener">
+          Read Docs
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="32" height="32" rx="8" fill="url(#fg)"/>
+          <path d="M10 12L6 16L10 20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M22 12L26 16L22 20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M19 9L13 23" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <defs><linearGradient id="fg" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#00d4ff"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs>
+        </svg>
+        <span>Codewright &copy; 2026</span>
+      </div>
+      <ul class="footer-links">
+        <li><a href="https://github.com/yoyo636/codewright" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="https://github.com/yoyo636/codewright#readme" target="_blank" rel="noopener">Docs</a></li>
+        <li><a href="https://github.com/yoyo636/codewright/issues" target="_blank" rel="noopener">Issues</a></li>
+        <li><a href="https://github.com/yoyo636/codewright/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contribute</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    // ─── Particles ───
+    const particlesEl = document.getElementById('particles');
+    for (let i = 0; i < 30; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = Math.random() * 100 + '%';
+      p.style.animationDuration = (8 + Math.random() * 12) + 's';
+      p.style.animationDelay = Math.random() * 10 + 's';
+      p.style.width = p.style.height = (1 + Math.random() * 2) + 'p';
+      particlesEl.appendChild(p);
+    }
+
+    // ─── Scroll Reveal ───
+    const revealEls = document.querySelectorAll('.reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    revealEls.forEach(el => revealObserver.observe(el));
+
+    // ─── Counter Animation ───
+    const counterEls = document.querySelectorAll('.stat-number');
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const target = parseInt(el.dataset.target);
+          const duration = 1500;
+          const start = performance.now();
+          const animate = (now) => {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            el.textContent = Math.round(eased * target) + '+';
+            if (progress < 1) requestAnimationFrame(animate);
+          };
+          requestAnimationFrame(animate);
+          counterObserver.unobserve(el);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    counterEls.forEach(el => counterObserver.observe(el));
+
+    // ─── Nav scroll effect ───
+    const nav = document.querySelector('.nav');
+    let lastScroll = 0;
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY;
+      if (y > 50) {
+        nav.style.background = 'rgba(6, 6, 12, 0.9)';
+        nav.style.boxShadow = '0 4px 30px rgba(0, 0, 0, 0.3)';
+      } else {
+        nav.style.background = 'rgba(6, 6, 12, 0.7)';
+        nav.style.boxShadow = 'none';
+      }
+      lastScroll = y;
+    }, { passive: true });
+  </script>
+</body>
+</html>

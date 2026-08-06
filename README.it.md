@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/yoyo636/opencode">
+  <a href="https://github.com/yoyo636/codewright">
     <picture>
       <source srcset="packages/console/app/src/asset/logo-ornate-dark.svg" media="(prefers-color-scheme: dark)">
       <source srcset="packages/console/app/src/asset/logo-ornate-light.svg" media="(prefers-color-scheme: light)">
@@ -8,7 +8,7 @@
   </a>
 </p>
 <p align="center">L’agente di coding AI open source.</p>
-<p align="center"><a href="https://github.com/yoyo636/opencode/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/yoyo636/opencode/publish.yml?style=flat-square&branch=dev" /></a>
+<p align="center"><a href="https://github.com/yoyo636/codewright/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/yoyo636/codewright/publish.yml?style=flat-square&branch=dev" /></a>
 </p>
 
 <p align="center">
@@ -36,7 +36,7 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
-[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://github.com/yoyo636/opencode)
+[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://github.com/yoyo636/codewright)
 
 ---
 
@@ -44,7 +44,7 @@
 
 ```bash
 # From source
-git clone https://github.com/yoyo636/opencode.git
+git clone https://github.com/yoyo636/codewright.git
 cd opencode
 npm install
 npm run build
@@ -58,7 +58,7 @@ brew install codewright              # macOS e Linux (formula brew ufficiale, ag
 sudo pacman -S codewright            # Arch Linux (Stable)
 paru -S codewright-bin               # Arch Linux (Latest from AUR)
 mise use -g codewright               # Qualsiasi OS
-nix run nixpkgs#codewright           # oppure github:yoyo636/opencode per l’ultima branch di sviluppo
+nix run nixpkgs#codewright           # oppure github:yoyo636/codewright per l’ultima branch di sviluppo
 ```
 
 > [!TIP]
@@ -66,7 +66,7 @@ nix run nixpkgs#codewright           # oppure github:yoyo636/opencode per l’ul
 
 ### App Desktop (BETA)
 
-Codewright è disponibile anche come applicazione desktop. Puoi scaricarla direttamente dalla [pagina delle release](https://github.com/yoyo636/opencode/releases) oppure da [opencode.ai/download](https://github.com/yoyo636/opencode/download).
+Codewright è disponibile anche come applicazione desktop. Puoi scaricarla direttamente dalla [pagina delle release](https://github.com/yoyo636/codewright/releases) oppure da [opencode.ai/download](https://github.com/yoyo636/codewright/download).
 
 | Piattaforma           | Download                           |
 | --------------------- | ---------------------------------- |
@@ -110,11 +110,11 @@ Codewright include due agenti integrati tra cui puoi passare usando il tasto `Ta
 È inoltre incluso un sotto-agente **general** per ricerche complesse e attività multi-step.
 Viene utilizzato internamente e può essere invocato usando `@general` nei messaggi.
 
-Scopri di più sugli [agenti](https://github.com/yoyo636/opencode/docs/agents).
+Scopri di più sugli [agenti](https://github.com/yoyo636/codewright/docs/agents).
 
 ### Documentazione
 
-Per maggiori informazioni su come configurare Codewright, [**consulta la nostra documentazione**](https://github.com/yoyo636/opencode/docs).
+Per maggiori informazioni su come configurare Codewright, [**consulta la nostra documentazione**](https://github.com/yoyo636/codewright/docs).
 
 ### Contribuire
 
@@ -126,4 +126,4 @@ Se stai lavorando a un progetto correlato a Codewright e che utilizza “codewri
 
 ---
 
-**GitHub** [https://github.com/yoyo636/opencode](https://github.com/yoyo636/opencode)
+**GitHub** [https://github.com/yoyo636/codewright](https://github.com/yoyo636/codewright)

@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/yoyo636/opencode">
+  <a href="https://github.com/yoyo636/codewright">
     <picture>
       <source srcset="packages/console/app/src/asset/logo-ornate-dark.svg" media="(prefers-color-scheme: dark)">
       <source srcset="packages/console/app/src/asset/logo-ornate-light.svg" media="(prefers-color-scheme: light)">
@@ -9,8 +9,8 @@
 </p>
 <p align="center">The open source AI coding agent.</p>
 <p align="center">
-  <a href="https://github.com/yoyo636/opencode/releases"><img alt="GitHub Releases" src="https://img.shields.io/github/v/release/yoyo636/opencode?style=flat-square" /></a>
-  <a href="https://github.com/yoyo636/opencode/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/yoyo636/opencode/publish.yml?style=flat-square&branch=dev" /></a>
+  <a href="https://github.com/yoyo636/codewright/releases"><img alt="GitHub Releases" src="https://img.shields.io/github/v/release/yoyo636/codewright?style=flat-square" /></a>
+  <a href="https://github.com/yoyo636/codewright/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/yoyo636/codewright/publish.yml?style=flat-square&branch=dev" /></a>
 </p>
 
 <p align="center">
@@ -54,7 +54,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/yoyo636/opencode.git
+git clone https://github.com/yoyo636/codewright.git
 cd opencode
 
 # Install dependencies
@@ -71,7 +71,7 @@ bun run --cwd packages/opencode build
 
 ### Desktop App (BETA)
 
-Codewright is also available as a desktop application. Download directly from the [releases page](https://github.com/yoyo636/opencode/releases).
+Codewright is also available as a desktop application. Download directly from the [releases page](https://github.com/yoyo636/codewright/releases).
 
 | Platform              | Download                           |
 | --------------------- | ---------------------------------- |
@@ -181,4 +181,4 @@ If you are working on a project that's related to Codewright and is using "codew
 
 ---
 
-**Project Link** [GitHub](https://github.com/yoyo636/opencode)
+**Project Link** [GitHub](https://github.com/yoyo636/codewright)

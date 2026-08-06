@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/yoyo636/opencode">
+  <a href="https://github.com/yoyo636/codewright">
     <picture>
       <source srcset="packages/console/app/src/asset/logo-ornate-dark.svg" media="(prefers-color-scheme: dark)">
       <source srcset="packages/console/app/src/asset/logo-ornate-light.svg" media="(prefers-color-scheme: light)">
@@ -8,7 +8,7 @@
   </a>
 </p>
 <p align="center">開源的 AI Coding Agent。</p>
-<p align="center"><a href="https://github.com/yoyo636/opencode/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/yoyo636/opencode/publish.yml?style=flat-square&branch=dev" /></a>
+<p align="center"><a href="https://github.com/yoyo636/codewright/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/yoyo636/codewright/publish.yml?style=flat-square&branch=dev" /></a>
 </p>
 
 <p align="center">
@@ -36,7 +36,7 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
-[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://github.com/yoyo636/opencode)
+[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://github.com/yoyo636/codewright)
 
 ---
 
@@ -44,7 +44,7 @@
 
 ```bash
 # From source
-git clone https://github.com/yoyo636/opencode.git
+git clone https://github.com/yoyo636/codewright.git
 cd opencode
 npm install
 npm run build
@@ -58,7 +58,7 @@ brew install codewright              # macOS 與 Linux（官方 brew formula，�
 sudo pacman -S codewright            # Arch Linux (Stable)
 paru -S codewright-bin               # Arch Linux (Latest from AUR)
 mise use -g codewright               # 任何作業系統
-nix run nixpkgs#codewright           # 或使用 github:yoyo636/opencode 以取得最新開發分支
+nix run nixpkgs#codewright           # 或使用 github:yoyo636/codewright 以取得最新開發分支
 ```
 
 > [!TIP]
@@ -66,7 +66,7 @@ nix run nixpkgs#codewright           # 或使用 github:yoyo636/opencode 以取�
 
 ### 桌面應用程式 (BETA)
 
-Codewright 也提供桌面版應用程式。您可以直接從 [發佈頁面 (releases page)](https://github.com/yoyo636/opencode/releases) 或 [opencode.ai/download](https://github.com/yoyo636/opencode/download) 下載。
+Codewright 也提供桌面版應用程式。您可以直接從 [發佈頁面 (releases page)](https://github.com/yoyo636/codewright/releases) 或 [opencode.ai/download](https://github.com/yoyo636/codewright/download) 下載。
 
 | 平台                  | 下載連結                           |
 | --------------------- | ---------------------------------- |
@@ -109,11 +109,11 @@ Codewright 內建了兩種 Agent，您可以使用 `Tab` 鍵快速切換。
 
 此外，Codewright 還包含一個 **general** 子 Agent，用於處理複雜搜尋與多步驟任務。此 Agent 供系統內部使用，亦可透過在訊息中輸入 `@general` 來呼叫。
 
-了解更多關於 [Agents](https://github.com/yoyo636/opencode/docs/agents) 的資訊。
+了解更多關於 [Agents](https://github.com/yoyo636/codewright/docs/agents) 的資訊。
 
 ### 線上文件
 
-關於如何設定 Codewright 的詳細資訊，請參閱我們的 [**官方文件**](https://github.com/yoyo636/opencode/docs)。
+關於如何設定 Codewright 的詳細資訊，請參閱我們的 [**官方文件**](https://github.com/yoyo636/codewright/docs)。
 
 ### 參與貢獻
 
@@ -125,4 +125,4 @@ Codewright 內建了兩種 Agent，您可以使用 `Tab` 鍵快速切換。
 
 ---
 
-**GitHub** [https://github.com/yoyo636/opencode](https://github.com/yoyo636/opencode)
+**GitHub** [https://github.com/yoyo636/codewright](https://github.com/yoyo636/codewright)

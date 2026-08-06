@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/yoyo636/opencode">
+  <a href="https://github.com/yoyo636/codewright">
     <picture>
       <source srcset="packages/console/app/src/asset/logo-ornate-dark.svg" media="(prefers-color-scheme: dark)">
       <source srcset="packages/console/app/src/asset/logo-ornate-light.svg" media="(prefers-color-scheme: light)">
@@ -8,7 +8,7 @@
   </a>
 </p>
 <p align="center">Trợ lý lập trình AI mã nguồn mở.</p>
-<p align="center"><a href="https://github.com/yoyo636/opencode/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/yoyo636/opencode/publish.yml?style=flat-square&branch=dev" /></a>
+<p align="center"><a href="https://github.com/yoyo636/codewright/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/yoyo636/codewright/publish.yml?style=flat-square&branch=dev" /></a>
 </p>
 
 <p align="center">
@@ -36,7 +36,7 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
-[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://github.com/yoyo636/opencode)
+[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://github.com/yoyo636/codewright)
 
 ---
 
@@ -44,7 +44,7 @@
 
 ```bash
 # From source
-git clone https://github.com/yoyo636/opencode.git
+git clone https://github.com/yoyo636/codewright.git
 cd opencode
 npm install
 npm run build
@@ -58,7 +58,7 @@ brew install codewright              # macOS và Linux (công thức brew chính
 sudo pacman -S codewright            # Arch Linux (Bản ổn định)
 paru -S codewright-bin               # Arch Linux (Bản mới nhất từ AUR)
 mise use -g codewright               # Mọi hệ điều hành
-nix run nixpkgs#codewright           # hoặc github:yoyo636/opencode cho nhánh dev mới nhất
+nix run nixpkgs#codewright           # hoặc github:yoyo636/codewright cho nhánh dev mới nhất
 ```
 
 > [!TIP]
@@ -66,7 +66,7 @@ nix run nixpkgs#codewright           # hoặc github:yoyo636/opencode cho nhánh
 
 ### Ứng dụng Desktop (BETA)
 
-Codewright cũng có sẵn dưới dạng ứng dụng desktop. Tải trực tiếp từ [trang releases](https://github.com/yoyo636/opencode/releases) hoặc [opencode.ai/download](https://github.com/yoyo636/opencode/download).
+Codewright cũng có sẵn dưới dạng ứng dụng desktop. Tải trực tiếp từ [trang releases](https://github.com/yoyo636/codewright/releases) hoặc [opencode.ai/download](https://github.com/yoyo636/codewright/download).
 
 | Nền tảng              | Tải xuống                          |
 | --------------------- | ---------------------------------- |
@@ -110,11 +110,11 @@ Codewright bao gồm hai agent được tích hợp sẵn mà bạn có thể ch
 Ngoài ra còn có một subagent **general** dùng cho các tìm kiếm phức tạp và tác vụ nhiều bước.
 Agent này được sử dụng nội bộ và có thể gọi bằng cách dùng `@general` trong tin nhắn.
 
-Tìm hiểu thêm về [agents](https://github.com/yoyo636/opencode/docs/agents).
+Tìm hiểu thêm về [agents](https://github.com/yoyo636/codewright/docs/agents).
 
 ### Tài liệu
 
-Để biết thêm thông tin về cách cấu hình Codewright, [**hãy truy cập tài liệu của chúng tôi**](https://github.com/yoyo636/opencode/docs).
+Để biết thêm thông tin về cách cấu hình Codewright, [**hãy truy cập tài liệu của chúng tôi**](https://github.com/yoyo636/codewright/docs).
 
 ### Đóng góp
 
@@ -126,4 +126,4 @@ Nếu bạn đang làm việc trên một dự án liên quan đến Codewright 
 
 ---
 
-**GitHub** [https://github.com/yoyo636/opencode](https://github.com/yoyo636/opencode)
+**GitHub** [https://github.com/yoyo636/codewright](https://github.com/yoyo636/codewright)

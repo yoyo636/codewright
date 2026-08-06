@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/yoyo636/opencode">
+  <a href="https://github.com/yoyo636/codewright">
     <picture>
       <source srcset="packages/console/app/src/asset/logo-ornate-dark.svg" media="(prefers-color-scheme: dark)">
       <source srcset="packages/console/app/src/asset/logo-ornate-light.svg" media="(prefers-color-scheme: light)">
@@ -8,7 +8,7 @@
   </a>
 </p>
 <p align="center">Ο πράκτορας τεχνητής νοημοσύνης ανοικτού κώδικα για προγραμματισμό.</p>
-<p align="center"><a href="https://github.com/yoyo636/opencode/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/yoyo636/opencode/publish.yml?style=flat-square&branch=dev" /></a>
+<p align="center"><a href="https://github.com/yoyo636/codewright/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/yoyo636/codewright/publish.yml?style=flat-square&branch=dev" /></a>
 </p>
 
 <p align="center">
@@ -36,7 +36,7 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
-[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://github.com/yoyo636/opencode)
+[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://github.com/yoyo636/codewright)
 
 ---
 
@@ -44,7 +44,7 @@
 
 ```bash
 # From source
-git clone https://github.com/yoyo636/opencode.git
+git clone https://github.com/yoyo636/codewright.git
 cd opencode
 npm install
 npm run build
@@ -58,7 +58,7 @@ brew install codewright              # macOS και Linux (επίσημος τύ
 sudo pacman -S codewright            # Arch Linux (Σταθερό)
 paru -S codewright-bin               # Arch Linux (Τελευταία έκδοση από AUR)
 mise use -g codewright               # Οποιοδήποτε λειτουργικό σύστημα
-nix run nixpkgs#codewright           # ή github:yoyo636/opencode με βάση την πιο πρόσφατη αλλαγή από το dev branch
+nix run nixpkgs#codewright           # ή github:yoyo636/codewright με βάση την πιο πρόσφατη αλλαγή από το dev branch
 ```
 
 > [!TIP]
@@ -66,7 +66,7 @@ nix run nixpkgs#codewright           # ή github:yoyo636/opencode με βάση 
 
 ### Εφαρμογή Desktop (BETA)
 
-Το Codewright είναι επίσης διαθέσιμο ως εφαρμογή. Κατέβασε το απευθείας από τη [σελίδα εκδόσεων](https://github.com/yoyo636/opencode/releases) ή το [opencode.ai/download](https://github.com/yoyo636/opencode/download).
+Το Codewright είναι επίσης διαθέσιμο ως εφαρμογή. Κατέβασε το απευθείας από τη [σελίδα εκδόσεων](https://github.com/yoyo636/codewright/releases) ή το [opencode.ai/download](https://github.com/yoyo636/codewright/download).
 
 | Πλατφόρμα             | Λήψη                               |
 | --------------------- | ---------------------------------- |
@@ -110,11 +110,11 @@ scoop bucket add extras; scoop install extras/codewright-desktop
 Περιλαμβάνεται επίσης ένας **general** υποπράκτορας για σύνθετες αναζητήσεις και πολυβηματικές διεργασίες.
 Χρησιμοποιείται εσωτερικά και μπορεί να κληθεί χρησιμοποιώντας `@general` στα μηνύματα.
 
-Μάθετε περισσότερα για τους [πράκτορες](https://github.com/yoyo636/opencode/docs/agents).
+Μάθετε περισσότερα για τους [πράκτορες](https://github.com/yoyo636/codewright/docs/agents).
 
 ### Οδηγός Χρήσης
 
-Για περισσότερες πληροφορίες σχετικά με τη ρύθμιση του Codewright, [**πλοηγήσου στον οδηγό χρήσης μας**](https://github.com/yoyo636/opencode/docs).
+Για περισσότερες πληροφορίες σχετικά με τη ρύθμιση του Codewright, [**πλοηγήσου στον οδηγό χρήσης μας**](https://github.com/yoyo636/codewright/docs).
 
 ### Συνεισφορά
 
@@ -126,4 +126,4 @@ scoop bucket add extras; scoop install extras/codewright-desktop
 
 ---
 
-**GitHub** [https://github.com/yoyo636/opencode](https://github.com/yoyo636/opencode)
+**GitHub** [https://github.com/yoyo636/codewright](https://github.com/yoyo636/codewright)

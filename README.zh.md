@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/yoyo636/opencode">
+  <a href="https://github.com/yoyo636/codewright">
     <picture>
       <source srcset="packages/console/app/src/asset/logo-ornate-dark.svg" media="(prefers-color-scheme: dark)">
       <source srcset="packages/console/app/src/asset/logo-ornate-light.svg" media="(prefers-color-scheme: light)">
@@ -8,7 +8,7 @@
   </a>
 </p>
 <p align="center">开源的 AI Coding Agent。</p>
-<p align="center"><a href="https://github.com/yoyo636/opencode/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/yoyo636/opencode/publish.yml?style=flat-square&branch=dev" /></a>
+<p align="center"><a href="https://github.com/yoyo636/codewright/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/yoyo636/codewright/publish.yml?style=flat-square&branch=dev" /></a>
 </p>
 
 <p align="center">
@@ -36,7 +36,7 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
-[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://github.com/yoyo636/opencode)
+[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://github.com/yoyo636/codewright)
 
 ---
 
@@ -54,7 +54,7 @@
 
 ```bash
 # From source
-git clone https://github.com/yoyo636/opencode.git
+git clone https://github.com/yoyo636/codewright.git
 cd opencode
 npm install
 npm run build
@@ -68,7 +68,7 @@ brew install codewright              # macOS 和 Linux（官方 brew formula，�
 sudo pacman -S codewright            # Arch Linux (Stable)
 paru -S codewright-bin               # Arch Linux (Latest from AUR)
 mise use -g codewright               # 任意系统
-nix run nixpkgs#codewright           # 或用 github:yoyo636/opencode 获取最新 dev 分支
+nix run nixpkgs#codewright           # 或用 github:yoyo636/codewright 获取最新 dev 分支
 ```
 
 > [!TIP]
@@ -76,7 +76,7 @@ nix run nixpkgs#codewright           # 或用 github:yoyo636/opencode 获取最�
 
 ### 桌面应用程序 (BETA)
 
-Codewright 也提供桌面版应用。可直接从 [发布页 (releases page)](https://github.com/yoyo636/opencode/releases) 或 [opencode.ai/download](https://github.com/yoyo636/opencode/download) 下载。
+Codewright 也提供桌面版应用。可直接从 [发布页 (releases page)](https://github.com/yoyo636/codewright/releases) 或 [opencode.ai/download](https://github.com/yoyo636/codewright/download) 下载。
 
 | 平台                  | 下载文件                           |
 | --------------------- | ---------------------------------- |
@@ -154,7 +154,7 @@ Codewright 从以下来源加载配置：
 - **模型引用**使用 `provider/model` 格式（如 `anthropic/claude-sonnet-4-5`）。
 - **密钥** - 用 `{env:VAR}` 内联环境变量，或用 `{file:path}` 读取文件，如 `"apiKey": "{env:ANTHROPIC_API_KEY}"`。默认情况下 `{env:}` 变量缺失会报错。
 
-完整 schema 请查看[官方文档](https://github.com/yoyo636/opencode/docs)。
+完整 schema 请查看[官方文档](https://github.com/yoyo636/codewright/docs)。
 
 ### Agents
 
@@ -168,11 +168,11 @@ Codewright 内置两种 Agent，可用 `Tab` 键快速切换：
 
 另外还包含一个 **general** 子 Agent，用于复杂搜索和多步任务，内部使用，也可在消息中输入 `@general` 调用。
 
-了解更多 [Agents](https://github.com/yoyo636/opencode/docs/agents) 相关信息。
+了解更多 [Agents](https://github.com/yoyo636/codewright/docs/agents) 相关信息。
 
 ### 文档
 
-更多配置说明请查看我们的 [**官方文档**](https://github.com/yoyo636/opencode/docs)。
+更多配置说明请查看我们的 [**官方文档**](https://github.com/yoyo636/codewright/docs)。
 
 ### 问题排查与诊断
 
@@ -218,4 +218,4 @@ codewright logs --path     # 打印日志文件路径
 
 ---
 
-**GitHub** [https://github.com/yoyo636/opencode](https://github.com/yoyo636/opencode)
+**GitHub** [https://github.com/yoyo636/codewright](https://github.com/yoyo636/codewright)

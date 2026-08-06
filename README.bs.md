@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/yoyo636/opencode">
+  <a href="https://github.com/yoyo636/codewright">
     <picture>
       <source srcset="packages/console/app/src/asset/logo-ornate-dark.svg" media="(prefers-color-scheme: dark)">
       <source srcset="packages/console/app/src/asset/logo-ornate-light.svg" media="(prefers-color-scheme: light)">
@@ -8,7 +8,7 @@
   </a>
 </p>
 <p align="center">Codewright je open source AI agent za programiranje.</p>
-<p align="center"><a href="https://github.com/yoyo636/opencode/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/yoyo636/opencode/publish.yml?style=flat-square&branch=dev" /></a>
+<p align="center"><a href="https://github.com/yoyo636/codewright/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/yoyo636/codewright/publish.yml?style=flat-square&branch=dev" /></a>
 </p>
 
 <p align="center">
@@ -36,7 +36,7 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
-[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://github.com/yoyo636/opencode)
+[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://github.com/yoyo636/codewright)
 
 ---
 
@@ -44,7 +44,7 @@
 
 ```bash
 # From source
-git clone https://github.com/yoyo636/opencode.git
+git clone https://github.com/yoyo636/codewright.git
 cd opencode
 npm install
 npm run build
@@ -58,7 +58,7 @@ brew install codewright              # macOS i Linux (zvanična brew formula, rj
 sudo pacman -S codewright            # Arch Linux (Stable)
 paru -S codewright-bin               # Arch Linux (Latest from AUR)
 mise use -g codewright               # Bilo koji OS
-nix run nixpkgs#codewright           # ili github:yoyo636/opencode za najnoviji dev branch
+nix run nixpkgs#codewright           # ili github:yoyo636/codewright za najnoviji dev branch
 ```
 
 > [!TIP]
@@ -66,7 +66,7 @@ nix run nixpkgs#codewright           # ili github:yoyo636/opencode za najnoviji 
 
 ### Desktop aplikacija (BETA)
 
-Codewright je dostupan i kao desktop aplikacija. Preuzmi je direktno sa [stranice izdanja](https://github.com/yoyo636/opencode/releases) ili sa [opencode.ai/download](https://github.com/yoyo636/opencode/download).
+Codewright je dostupan i kao desktop aplikacija. Preuzmi je direktno sa [stranice izdanja](https://github.com/yoyo636/codewright/releases) ili sa [opencode.ai/download](https://github.com/yoyo636/codewright/download).
 
 | Platforma             | Preuzimanje                        |
 | --------------------- | ---------------------------------- |
@@ -110,11 +110,11 @@ Codewright uključuje dva ugrađena agenta između kojih možeš prebacivati tas
 Uključen je i **general** pod-agent za složene pretrage i višekoračne zadatke.
 Koristi se interno i može se pozvati pomoću `@general` u porukama.
 
-Saznaj više o [agentima](https://github.com/yoyo636/opencode/docs/agents).
+Saznaj više o [agentima](https://github.com/yoyo636/codewright/docs/agents).
 
 ### Dokumentacija
 
-Za više informacija o konfiguraciji Codewright-a, [**pogledaj dokumentaciju**](https://github.com/yoyo636/opencode/docs).
+Za više informacija o konfiguraciji Codewright-a, [**pogledaj dokumentaciju**](https://github.com/yoyo636/codewright/docs).
 
 ### Doprinosi
 
@@ -126,4 +126,4 @@ Ako radiš na projektu koji je povezan s Codewright-om i koristi "codewright" ka
 
 ---
 
-**GitHub** [https://github.com/yoyo636/opencode](https://github.com/yoyo636/opencode)
+**GitHub** [https://github.com/yoyo636/codewright](https://github.com/yoyo636/codewright)

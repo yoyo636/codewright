@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/yoyo636/opencode">
+  <a href="https://github.com/yoyo636/codewright">
     <picture>
       <source srcset="packages/console/app/src/asset/logo-ornate-dark.svg" media="(prefers-color-scheme: dark)">
       <source srcset="packages/console/app/src/asset/logo-ornate-light.svg" media="(prefers-color-scheme: light)">
@@ -8,7 +8,7 @@
   </a>
 </p>
 <p align="center">وكيل برمجة بالذكاء الاصطناعي مفتوح المصدر.</p>
-<p align="center"><a href="https://github.com/yoyo636/opencode/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/yoyo636/opencode/publish.yml?style=flat-square&branch=dev" /></a>
+<p align="center"><a href="https://github.com/yoyo636/codewright/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/yoyo636/codewright/publish.yml?style=flat-square&branch=dev" /></a>
 </p>
 
 <p align="center">
@@ -36,7 +36,7 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
-[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://github.com/yoyo636/opencode)
+[![Codewright Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://github.com/yoyo636/codewright)
 
 ---
 
@@ -44,7 +44,7 @@
 
 ```bash
 # From source
-git clone https://github.com/yoyo636/opencode.git
+git clone https://github.com/yoyo636/codewright.git
 cd opencode
 npm install
 npm run build
@@ -58,7 +58,7 @@ brew install codewright              # macOS و Linux (صيغة brew الرسم�
 sudo pacman -S codewright            # Arch Linux (Stable)
 paru -S codewright-bin               # Arch Linux (Latest from AUR)
 mise use -g codewright               # اي نظام
-nix run nixpkgs#codewright           # او github:yoyo636/opencode لاحدث فرع dev
+nix run nixpkgs#codewright           # او github:yoyo636/codewright لاحدث فرع dev
 ```
 
 > [!TIP]
@@ -66,7 +66,7 @@ nix run nixpkgs#codewright           # او github:yoyo636/opencode لاحدث �
 
 ### تطبيق سطح المكتب (BETA)
 
-يتوفر Codewright ايضا كتطبيق سطح مكتب. قم بالتنزيل مباشرة من [صفحة الاصدارات](https://github.com/yoyo636/opencode/releases) او من [opencode.ai/download](https://github.com/yoyo636/opencode/download).
+يتوفر Codewright ايضا كتطبيق سطح مكتب. قم بالتنزيل مباشرة من [صفحة الاصدارات](https://github.com/yoyo636/codewright/releases) او من [opencode.ai/download](https://github.com/yoyo636/codewright/download).
 
 | المنصة                | التنزيل                            |
 | --------------------- | ---------------------------------- |
@@ -110,11 +110,11 @@ scoop bucket add extras; scoop install extras/codewright-desktop
 بالاضافة الى ذلك يوجد وكيل فرعي **general** للبحث المعقد والمهام متعددة الخطوات.
 يستخدم داخليا ويمكن استدعاؤه بكتابة `@general` في الرسائل.
 
-تعرف على المزيد حول [agents](https://github.com/yoyo636/opencode/docs/agents).
+تعرف على المزيد حول [agents](https://github.com/yoyo636/codewright/docs/agents).
 
 ### التوثيق
 
-لمزيد من المعلومات حول كيفية ضبط Codewright، [**راجع التوثيق**](https://github.com/yoyo636/opencode/docs).
+لمزيد من المعلومات حول كيفية ضبط Codewright، [**راجع التوثيق**](https://github.com/yoyo636/codewright/docs).
 
 ### المساهمة
 
@@ -126,4 +126,4 @@ scoop bucket add extras; scoop install extras/codewright-desktop
 
 ---
 
-**GitHub** [https://github.com/yoyo636/opencode](https://github.com/yoyo636/opencode)
+**GitHub** [https://github.com/yoyo636/codewright](https://github.com/yoyo636/codewright)
