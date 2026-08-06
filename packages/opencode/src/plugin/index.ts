@@ -14,7 +14,7 @@ import { Session } from "@/session/session"
 import { NamedError } from "@codewright-ai/core/util/error"
 import { CopilotAuthPlugin } from "./github-copilot/copilot"
 import { ModalPlugin } from "./modal/modal"
-import { gitlabAuthPlugin } from "codewright-gitlab-auth"
+import { gitlabAuthPlugin } from "opencode-gitlab-auth"
 import { PoeAuthPlugin as PoeAuthPluginRaw } from "opencode-poe-auth"
 const GitlabAuthPlugin = gitlabAuthPlugin as unknown as PluginInstance
 const PoeAuthPlugin = PoeAuthPluginRaw as unknown as PluginInstance
