@@ -101,7 +101,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
   meta = {
     description = "The open source coding agent";
-    homepage = "https://opencode.ai";
+    homepage = "https://codewright.dev";
     license = lib.licenses.mit;
     mainProgram = "codewright";
     inherit (node_modules.meta) platforms;
