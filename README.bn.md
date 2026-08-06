@@ -66,7 +66,7 @@ nix run nixpkgs#codewright           # or github:yoyo636/codewright for latest d
 
 ### ডেস্কটপ অ্যাপ (BETA)
 
-Codewright ডেস্কটপ অ্যাপ্লিকেশন হিসেবেও উপলব্ধ। সরাসরি [রিলিজ পেজ](https://github.com/yoyo636/codewright/releases) অথবা [opencode.ai/download](https://github.com/yoyo636/codewright/download) থেকে ডাউনলোড করুন।
+Codewright ডেস্কটপ অ্যাপ্লিকেশন হিসেবেও উপলব্ধ। সরাসরি [রিলিজ পেজ](https://github.com/yoyo636/codewright/releases) অথবা [codewright.dev/download](https://github.com/yoyo636/codewright/download) থেকে ডাউনলোড করুন।
 
 | প্ল্যাটফর্ম           | ডাউনলোড                            |
 | --------------------- | ---------------------------------- |

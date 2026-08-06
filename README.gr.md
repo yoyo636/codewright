@@ -66,7 +66,7 @@ nix run nixpkgs#codewright           # ή github:yoyo636/codewright με βάσ�
 
 ### Εφαρμογή Desktop (BETA)
 
-Το Codewright είναι επίσης διαθέσιμο ως εφαρμογή. Κατέβασε το απευθείας από τη [σελίδα εκδόσεων](https://github.com/yoyo636/codewright/releases) ή το [opencode.ai/download](https://github.com/yoyo636/codewright/download).
+Το Codewright είναι επίσης διαθέσιμο ως εφαρμογή. Κατέβασε το απευθείας από τη [σελίδα εκδόσεων](https://github.com/yoyo636/codewright/releases) ή το [codewright.dev/download](https://github.com/yoyo636/codewright/download).
 
 | Πλατφόρμα             | Λήψη                               |
 | --------------------- | ---------------------------------- |

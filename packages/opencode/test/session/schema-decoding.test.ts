@@ -240,7 +240,7 @@ describe("SessionStatus.Info", () => {
         title: "Free limit reached",
         message: "Subscribe to Codewright Go.",
         label: "subscribe",
-        link: "https://opencode.ai/go",
+        link: "https://codewright.dev/go",
       },
       next: 500,
     }

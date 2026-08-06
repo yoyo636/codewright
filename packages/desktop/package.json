@@ -4,10 +4,10 @@
   "version": "2.1.1",
   "type": "module",
   "license": "MIT",
-  "homepage": "https://opencode.ai",
+  "homepage": "https://codewright.dev",
   "author": {
     "name": "Codewright",
-    "email": "hello@opencode.ai"
+    "email": "hello@codewright.dev"
   },
   "scripts": {
     "typecheck": "tsgo -b",

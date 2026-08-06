@@ -1,4 +1,4 @@
-const modelsUrl = process.env.CODEWRIGHT_MODELS_URL || "https://models.opencode.ai"
+const modelsUrl = process.env.CODEWRIGHT_MODELS_URL || "https://models.codewright.dev"
 
 export const modelsData = process.env.MODELS_DEV_API_JSON
   ? await Bun.file(process.env.MODELS_DEV_API_JSON).text()

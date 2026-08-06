@@ -35,7 +35,7 @@ config.
 
 ```json title="codewright.json" {6}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "anthropic": {
       "options": {
@@ -57,7 +57,7 @@ codewright ile iyi çalıştığı test edilip doğrulandı. [Daha fazla bilgi](
 Yeniyseniz Codewright Zen ile başlamanızı öneririz.
 :::
 
-1. TUI'de `/connect` komutunu çalıştırın, codewright'u seçin ve [opencode.ai/auth](https://opencode.ai/auth)'ye gidin.
+1. TUI'de `/connect` komutunu çalıştırın, codewright'u seçin ve [codewright.dev/auth](https://codewright.dev/auth)'ye gidin.
 
    ```txt
    /connect
@@ -88,7 +88,7 @@ codewright'daki diğer sağlayıcılar gibi çalışır ve kullanımı tamamen i
 
 Codewright Go, codewright ile iyi çalıştığı test edilmiş ve doğrulanmış, codewright ekibi tarafından sağlanan popüler açık kodlama modellerine güvenilir erişim sağlayan düşük maliyetli bir abonelik planıdır.
 
-1. TUI'de `/connect` komutunu çalıştırın, `Codewright Go`'yu seçin ve [opencode.ai/auth](https://opencode.ai/zen) adresine gidin.
+1. TUI'de `/connect` komutunu çalıştırın, `Codewright Go`'yu seçin ve [codewright.dev/auth](https://codewright.dev/zen) adresine gidin.
 
    ```txt
    /connect
@@ -194,7 +194,7 @@ Amazon Bedrock'u codewright ile kullanmak için:
 
    ```json title="codewright.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "amazon-bedrock": {
          "options": {
@@ -221,7 +221,7 @@ Bedrock için VPC uç noktaları kullanıyorsanız:
 
 ```json title="codewright.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "amazon-bedrock": {
       "options": {
@@ -267,7 +267,7 @@ Bir taşıyıcı belirteç ayarlandığında (`/connect` veya `AWS_BEARER_TOKEN_
 
 ```json title="codewright.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "amazon-bedrock": {
       // ...
@@ -329,7 +329,7 @@ codewright'u, yerel LLM'leri OpenAI uyumlu bir API sunucusunun arkasında çalı
 
 ```json title="codewright.json" "atomic-chat" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "atomic-chat": {
       "npm": "@ai-sdk/openai-compatible",
@@ -557,7 +557,7 @@ Cloudflare AI Gateway, OpenAI, Anthropic, Workers AI ve daha fazlasındaki model
 
    ```json title="codewright.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "cloudflare-ai-gateway": {
          "models": {
@@ -763,7 +763,7 @@ yalnızca kendi GitLab tarafından barındırılan örneğinizi kullanmak için 
 
 ```json
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "small_model": "gitlab/duo-chat-haiku-4-5",
   "share": "disabled"
 }
@@ -817,7 +817,7 @@ Then expose application ID as environment variable:
 export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
 ```
 
-Daha fazla belge [opencode-gitlab-auth](https://www.npmjs.com/package/opencode-gitlab-auth) ana sayfasında.
+Daha fazla belge [codewright-gitlab-auth](https://www.npmjs.com/package/codewright-gitlab-auth) ana sayfasında.
 
 ##### Yapılandırma
 
@@ -825,7 +825,7 @@ Daha fazla belge [opencode-gitlab-auth](https://www.npmjs.com/package/opencode-g
 
 ```json title="codewright.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "gitlab": {
       "options": {
@@ -842,7 +842,7 @@ GitLab araçlarına (birleştirme istekleri, sorunlar, işlem hatları, CI/CD vb
 
 ```json title="codewright.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "plugin": ["opencode-gitlab-plugin"]
 }
 ```
@@ -1024,7 +1024,7 @@ Helicone'un codewright aracılığıyla otomatik olarak yapılandırılmayan bir
 
 ```jsonc title="~/.config/codewright/codewright.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1052,7 +1052,7 @@ Helicone, önbelleğe alma, kullanıcı izleme ve oturum yönetimi gibi özellik
 
 ```jsonc title="~/.config/codewright/codewright.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1106,7 +1106,7 @@ codewright'u yerel modelleri kullanacak şekilde [llama.cpp's](https://github.co
 
 ```json title="codewright.json" "llama.cpp" {5, 6, 8, 10-15}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "llama.cpp": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1173,7 +1173,7 @@ LM Studio aracılığıyla codewright'u yerel modelleri kullanacak şekilde yap�
 
 ```json title="codewright.json" "lmstudio" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "lmstudio": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1294,7 +1294,7 @@ Ollama kendisini codewright için otomatik olarak yapılandırabilir. Ayrıntıl
 
 ```json title="codewright.json" "ollama" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1456,7 +1456,7 @@ Codewright Zen, codewright ekibinin test edip doğruladığı modellerin bir lis
 
    ```json title="codewright.json" {6}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "openrouter": {
          "models": {
@@ -1471,7 +1471,7 @@ Codewright Zen, codewright ekibinin test edip doğruladığı modellerin bir lis
 
    ```json title="codewright.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "openrouter": {
          "models": {
@@ -1720,7 +1720,7 @@ Modelleri codewright yapılandırmanız aracılığıyla da özelleştirebilirsi
 
 ```json title="codewright.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "vercel": {
       "models": {
@@ -1830,7 +1830,7 @@ Bazı yararlı yönlendirme seçenekleri:
 
    ```json title="codewright.json" {6}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "zenmux": {
          "models": {
@@ -1898,7 +1898,7 @@ OpenAI uyumlu herhangi bir sağlayıcıyı codewright ile kullanabilirsiniz. Ço
 
    ```json title="codewright.json" ""myprovider"" {5-15}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "myprovider": {
          "npm": "@ai-sdk/openai-compatible",
@@ -1936,7 +1936,7 @@ Burada `apiKey`, `headers` ve model `limit` seçeneklerini ayarlayan bir örnek 
 
 ```json title="codewright.json" {9,11,17-20}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "myprovider": {
       "npm": "@ai-sdk/openai-compatible",

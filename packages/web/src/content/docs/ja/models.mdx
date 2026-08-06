@@ -51,7 +51,7 @@ Codewright は [AI SDK](https://ai-sdk.dev/) および [Models.dev](https://mode
 
 ```json title="codewright.json" {3}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "model": "lmstudio/google/gemma-3n-e4b"
 }
 ```
@@ -68,7 +68,7 @@ config を通じてモデルのオプションをグローバルに設定でき�
 
 ```jsonc title="codewright.jsonc" {7-12,19-24}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "openai": {
       "models": {
@@ -107,7 +107,7 @@ config を通じてモデルのオプションをグローバルに設定でき�
 
 ```jsonc title="codewright.jsonc" {6-21}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "codewright": {
       "models": {
@@ -172,7 +172,7 @@ Codewright には、多くのプロバイダーのデフォルトのバリアン
 
 ```jsonc title="codewright.jsonc" {7-18}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "openai": {
       "models": {
@@ -209,7 +209,7 @@ Codewright が起動すると、次の優先順位でモデルがチェックさ
 
    ```json title="codewright.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "model": "anthropic/claude-sonnet-4-20250514"
    }
    ```

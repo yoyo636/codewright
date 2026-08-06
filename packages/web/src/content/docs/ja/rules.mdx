@@ -103,7 +103,7 @@ Codewright が開始されると、次の順序でルールファイルが検索
 
 ```json title="codewright.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "instructions": ["CONTRIBUTING.md", "docs/guidelines.md", ".cursor/rules/*.md"]
 }
 ```
@@ -112,7 +112,7 @@ Codewright が開始されると、次の順序でルールファイルが検索
 
 ```json title="codewright.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "instructions": ["https://raw.githubusercontent.com/my-org/shared-rules/main/style.md"]
 }
 ```
@@ -133,7 +133,7 @@ Codewright は `AGENTS.md` のファイル参照を自動的に解析しませ�
 
 ```json title="codewright.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "instructions": ["docs/development-standards.md", "test/testing-guidelines.md", "packages/*/AGENTS.md"]
 }
 ```

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://opencode.ai/desktop-theme.json",
+  "$id": "https://codewright.dev/desktop-theme.json",
   "title": "Codewright Desktop Theme",
   "description": "A theme definition for the Codewright desktop application",
   "type": "object",

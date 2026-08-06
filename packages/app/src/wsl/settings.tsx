@@ -94,7 +94,7 @@ export function WslServerSettings(props: {
       <For each={props.servers()}>
         {(item) => {
           const key = ServerConnection.Key.make(item.config.id)
-          const check = () => wsl.data?.opencodeChecks[item.config.distro]
+          const check = () => wsl.data?.codewrightChecks[item.config.distro]
           const opencodeAction = () => wslCodewrightAction(check())
           const busy = () => wsl.data?.job?.kind === "install-codewright" && wsl.data.job.distro === item.config.distro
           return (

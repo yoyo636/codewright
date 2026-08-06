@@ -59,7 +59,7 @@ function model(input: {
     providerID: "codewright",
     api: {
       id: "codewright",
-      url: "https://opencode.ai",
+      url: "https://codewright.dev",
       npm: "@ai-sdk/openai-compatible",
     },
     name: input.name,

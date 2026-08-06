@@ -66,7 +66,7 @@ nix run nixpkgs#codewright           # หรือ github:yoyo636/codewright �
 
 ### แอปพลิเคชันเดสก์ท็อป (เบต้า)
 
-Codewright มีให้ใช้งานเป็นแอปพลิเคชันเดสก์ท็อป ดาวน์โหลดโดยตรงจาก [หน้ารุ่น](https://github.com/yoyo636/codewright/releases) หรือ [opencode.ai/download](https://github.com/yoyo636/codewright/download)
+Codewright มีให้ใช้งานเป็นแอปพลิเคชันเดสก์ท็อป ดาวน์โหลดโดยตรงจาก [หน้ารุ่น](https://github.com/yoyo636/codewright/releases) หรือ [codewright.dev/download](https://github.com/yoyo636/codewright/download)
 
 | แพลตฟอร์ม             | ดาวน์โหลด                          |
 | --------------------- | ---------------------------------- |

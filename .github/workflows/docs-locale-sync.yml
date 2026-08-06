@@ -50,7 +50,7 @@ jobs:
 
       - name: Install Codewright
         if: steps.changes.outputs.has_changes == 'true'
-        run: curl -fsSL https://opencode.ai/install | bash
+        run: curl -fsSL https://codewright.dev/install | bash
 
       - name: Sync locale docs with Codewright
         if: steps.changes.outputs.has_changes == 'true'

@@ -33607,9 +33607,9 @@
     "id": "codewright-go",
     "env": ["CODEWRIGHT_API_KEY"],
     "npm": "@ai-sdk/openai-compatible",
-    "api": "https://opencode.ai/zen/go/v1",
+    "api": "https://codewright.dev/zen/go/v1",
     "name": "Codewright Go",
-    "doc": "https://opencode.ai/docs/zen",
+    "doc": "https://codewright.dev/docs/zen",
     "models": {
       "deepseek-v4-flash": {
         "id": "deepseek-v4-flash",
@@ -90323,9 +90323,9 @@
     "id": "codewright",
     "env": ["CODEWRIGHT_API_KEY"],
     "npm": "@ai-sdk/openai-compatible",
-    "api": "https://opencode.ai/zen/v1",
+    "api": "https://codewright.dev/zen/v1",
     "name": "Codewright Zen",
-    "doc": "https://opencode.ai/docs/zen",
+    "doc": "https://codewright.dev/docs/zen",
     "models": {
       "ring-2.6-1t-free": {
         "id": "ring-2.6-1t-free",

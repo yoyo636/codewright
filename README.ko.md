@@ -66,7 +66,7 @@ nix run nixpkgs#codewright           # 또는 github:yoyo636/codewright 로 최�
 
 ### 데스크톱 앱 (BETA)
 
-Codewright 는 데스크톱 앱으로도 제공됩니다. [releases page](https://github.com/yoyo636/codewright/releases) 에서 직접 다운로드하거나 [opencode.ai/download](https://github.com/yoyo636/codewright/download) 를 이용하세요.
+Codewright 는 데스크톱 앱으로도 제공됩니다. [releases page](https://github.com/yoyo636/codewright/releases) 에서 직접 다운로드하거나 [codewright.dev/download](https://github.com/yoyo636/codewright/download) 를 이용하세요.
 
 | 플랫폼                | 다운로드                           |
 | --------------------- | ---------------------------------- |

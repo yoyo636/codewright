@@ -66,7 +66,7 @@ nix run nixpkgs#codewright           # или github:yoyo636/codewright для �
 
 ### Десктопное приложение (BETA)
 
-Codewright также доступен как десктопное приложение. Скачайте его со [страницы релизов](https://github.com/yoyo636/codewright/releases) или с [opencode.ai/download](https://github.com/yoyo636/codewright/download).
+Codewright также доступен как десктопное приложение. Скачайте его со [страницы релизов](https://github.com/yoyo636/codewright/releases) или с [codewright.dev/download](https://github.com/yoyo636/codewright/download).
 
 | Платформа             | Загрузка                           |
 | --------------------- | ---------------------------------- |

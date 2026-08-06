@@ -35,7 +35,7 @@ Możesz dostosować podstawowy adres URL dla dowolnego dostawcy, ustawiając opc
 
 ```json title="codewright.json" {6}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "anthropic": {
       "options": {
@@ -57,7 +57,7 @@ przetestowane i zweryfikowane, aby dobrze współpracować z codewright. [Dowied
 Jeśli jesteś nowy, zalecamy rozpoczęcie od Codewright Zen.
 :::
 
-1. Uruchom polecenie `/connect` w TUI, wybierz `Codewright Zen` i przejdź do [opencode.ai/auth](https://opencode.ai/zen).
+1. Uruchom polecenie `/connect` w TUI, wybierz `Codewright Zen` i przejdź do [codewright.dev/auth](https://codewright.dev/zen).
 
    ```txt
    /connect
@@ -88,7 +88,7 @@ Działa jak każdy inny dostawca w codewright i jest całkowicie opcjonalny w u�
 
 Codewright Go to tani plan subskrypcji, który zapewnia niezawodny dostęp do popularnych modeli open coding dostarczanych przez zespół codewright, które zostały przetestowane i zweryfikowane pod kątem dobrej współpracy z codewright.
 
-1. Uruchom polecenie `/connect` w TUI, wybierz `Codewright Go` i przejdź do [opencode.ai/auth](https://opencode.ai/zen).
+1. Uruchom polecenie `/connect` w TUI, wybierz `Codewright Go` i przejdź do [codewright.dev/auth](https://codewright.dev/zen).
 
    ```txt
    /connect
@@ -194,7 +194,7 @@ Aby używać Amazon Bedrock z codewright:
 
    ```json title="codewright.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "amazon-bedrock": {
          "options": {
@@ -221,7 +221,7 @@ Aby używać Amazon Bedrock z codewright:
 
    ```json title="codewright.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "amazon-bedrock": {
          "options": {
@@ -265,7 +265,7 @@ W przypadku niestandardowych profili wnioskowania użyj nazwy modelu i dostawcy 
 
 ```json title="codewright.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "amazon-bedrock": {
       // ...
@@ -327,7 +327,7 @@ Możesz skonfigurować codewright do korzystania z modeli lokalnych przez [Atomi
 
 ```json title="codewright.json" "atomic-chat" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "atomic-chat": {
       "npm": "@ai-sdk/openai-compatible",
@@ -555,7 +555,7 @@ Cloudflare AI Gateway umożliwia dostęp do modeli z OpenAI, Anthropic, Workers 
 
    ```json title="codewright.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "cloudflare-ai-gateway": {
          "models": {
@@ -761,7 +761,7 @@ aby używać tylko własnej instancji hostowanej przez GitLab, dodaj następują
 
 ```json
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "small_model": "gitlab/duo-chat-haiku-4-5",
   "share": "disabled"
 }
@@ -815,7 +815,7 @@ Następnie ustaw ID aplikacji jako zmienną środowiskową:
 export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
 ```
 
-Więcej informacji znajdziesz na stronie [opencode-gitlab-auth](https://www.npmjs.com/package/opencode-gitlab-auth).
+Więcej informacji znajdziesz na stronie [codewright-gitlab-auth](https://www.npmjs.com/package/codewright-gitlab-auth).
 
 ##### Konfiguracja
 
@@ -823,7 +823,7 @@ Customize through `codewright.json`:
 
 ```json title="codewright.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "gitlab": {
       "options": {
@@ -840,7 +840,7 @@ To access GitLab tools (merge requests, issues, pipelines, CI/CD, etc.):
 
 ```json title="codewright.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "plugin": ["opencode-gitlab-plugin"]
 }
 ```
@@ -1022,7 +1022,7 @@ Oto [Katalog modeli Helicone](https://helicone.ai/models), będziesz go potrzebo
 
 ```jsonc title="~/.config/codewright/codewright.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1050,7 +1050,7 @@ Helicone obsługuje niestandardowe nagłówki dla funkcji takich jak buforowanie
 
 ```jsonc title="~/.config/codewright/codewright.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1104,7 +1104,7 @@ Możesz skonfigurować codewright tak, aby korzystał z modeli lokalnych, za pom
 
 ```json title="codewright.json" "llama.cpp" {5, 6, 8, 10-15}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "llama.cpp": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1171,7 +1171,7 @@ Możesz skonfigurować codewright tak, aby korzystał z modeli lokalnych poprzez
 
 ```json title="codewright.json" "lmstudio" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "lmstudio": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1292,7 +1292,7 @@ Ollama może automatycznie skonfigurować się pod kątem codewright. Aby uzyska
 
 ```json title="codewright.json" "ollama" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1454,7 +1454,7 @@ Codewright Zen to lista przetestowanych i zweryfikowanych modeli udostępniona p
 
    ```json title="codewright.json" {6}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "openrouter": {
          "models": {
@@ -1469,7 +1469,7 @@ Codewright Zen to lista przetestowanych i zweryfikowanych modeli udostępniona p
 
    ```json title="codewright.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "openrouter": {
          "models": {
@@ -1718,7 +1718,7 @@ Możesz także dostosować modele za pomocą konfiguracji codewright. Oto przyk�
 
 ```json title="codewright.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "vercel": {
       "models": {
@@ -1828,7 +1828,7 @@ Przydatne opcje routingu:
 
    ```json title="codewright.json" {6}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "zenmux": {
          "models": {
@@ -1896,7 +1896,7 @@ Możesz użyć dowolnego dostawcy kompatybilnego z OpenAI z codewright. Większo
 
    ```json title="codewright.json" ""myprovider"" {5-15}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "myprovider": {
          "npm": "@ai-sdk/openai-compatible",
@@ -1934,7 +1934,7 @@ Oto przykład ustawienia opcji `apiKey`, `headers` i modelu `limit`.
 
 ```json title="codewright.json" {9,11,17-20}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "myprovider": {
       "npm": "@ai-sdk/openai-compatible",

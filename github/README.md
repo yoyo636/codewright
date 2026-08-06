@@ -1,6 +1,6 @@
 # codewright GitHub Action
 
-A GitHub Action that integrates [codewright](https://opencode.ai) directly into your GitHub workflow.
+A GitHub Action that integrates [codewright](https://codewright.dev) directly into your GitHub workflow.
 
 Mention `/codewright` in your comment, and codewright will execute tasks within your GitHub Actions runner.
 

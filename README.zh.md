@@ -76,7 +76,7 @@ nix run nixpkgs#codewright           # 或用 github:yoyo636/codewright 获取�
 
 ### 桌面应用程序 (BETA)
 
-Codewright 也提供桌面版应用。可直接从 [发布页 (releases page)](https://github.com/yoyo636/codewright/releases) 或 [opencode.ai/download](https://github.com/yoyo636/codewright/download) 下载。
+Codewright 也提供桌面版应用。可直接从 [发布页 (releases page)](https://github.com/yoyo636/codewright/releases) 或 [codewright.dev/download](https://github.com/yoyo636/codewright/download) 下载。
 
 | 平台                  | 下载文件                           |
 | --------------------- | ---------------------------------- |

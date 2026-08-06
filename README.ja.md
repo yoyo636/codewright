@@ -66,7 +66,7 @@ nix run nixpkgs#codewright           # または github:yoyo636/codewright で�
 
 ### デスクトップアプリ (BETA)
 
-Codewright はデスクトップアプリとしても利用できます。[releases page](https://github.com/yoyo636/codewright/releases) から直接ダウンロードするか、[opencode.ai/download](https://github.com/yoyo636/codewright/download) を利用してください。
+Codewright はデスクトップアプリとしても利用できます。[releases page](https://github.com/yoyo636/codewright/releases) から直接ダウンロードするか、[codewright.dev/download](https://github.com/yoyo636/codewright/download) を利用してください。
 
 | プラットフォーム      | ダウンロード                       |
 | --------------------- | ---------------------------------- |

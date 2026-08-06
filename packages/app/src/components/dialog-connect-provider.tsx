@@ -835,17 +835,17 @@ function ProviderConnection(props: {
             fallback={language.t("provider.connect.apiKey.description", { provider: provider().name })}
           >
             <div class="flex flex-col gap-5">
-              <div>{language.t("provider.connect.opencodeZen.line1")}</div>
-              <div>{language.t("provider.connect.opencodeZen.line2")}</div>
+              <div>{language.t("provider.connect.codewrightZen.line1")}</div>
+              <div>{language.t("provider.connect.codewrightZen.line2")}</div>
               <div>
-                {language.t("provider.connect.opencodeZen.visit.prefix")}
+                {language.t("provider.connect.codewrightZen.visit.prefix")}
                 <ExternalLink
-                  href="https://opencode.ai/zen"
+                  href="https://codewright.dev/zen"
                   class="text-v2-text-text-base focus-visible:rounded-xs focus-visible:outline-2 focus-visible:outline-v2-border-border-focus"
                 >
-                  {language.t("provider.connect.opencodeZen.visit.link")}
+                  {language.t("provider.connect.codewrightZen.visit.link")}
                 </ExternalLink>
-                {language.t("provider.connect.opencodeZen.visit.suffix")}
+                {language.t("provider.connect.codewrightZen.visit.suffix")}
               </div>
             </div>
           </Show>
@@ -885,14 +885,14 @@ function ProviderConnection(props: {
         <Switch>
           <Match when={provider().id === "codewright"}>
             <div class="flex flex-col gap-4">
-              <div class="text-14-regular text-text-base">{language.t("provider.connect.opencodeZen.line1")}</div>
-              <div class="text-14-regular text-text-base">{language.t("provider.connect.opencodeZen.line2")}</div>
+              <div class="text-14-regular text-text-base">{language.t("provider.connect.codewrightZen.line1")}</div>
+              <div class="text-14-regular text-text-base">{language.t("provider.connect.codewrightZen.line2")}</div>
               <div class="text-14-regular text-text-base">
-                {language.t("provider.connect.opencodeZen.visit.prefix")}
-                <ExternalLink href="https://opencode.ai/zen" tabIndex={-1}>
-                  {language.t("provider.connect.opencodeZen.visit.link")}
+                {language.t("provider.connect.codewrightZen.visit.prefix")}
+                <ExternalLink href="https://codewright.dev/zen" tabIndex={-1}>
+                  {language.t("provider.connect.codewrightZen.visit.link")}
                 </ExternalLink>
-                {language.t("provider.connect.opencodeZen.visit.suffix")}
+                {language.t("provider.connect.codewrightZen.visit.suffix")}
               </div>
             </div>
           </Match>

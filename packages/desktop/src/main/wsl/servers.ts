@@ -123,8 +123,8 @@ export function createWslServersController(
 
   const setCodewrightCheck = (distro: string, check: WslCodewrightCheck) => {
     setState({
-      opencodeChecks: {
-        ...state.opencodeChecks,
+      codewrightChecks: {
+        ...state.codewrightChecks,
         [distro]: check,
       },
     })
@@ -135,7 +135,7 @@ export function createWslServersController(
     const version = resolved
       ? await (options?.readCommandVersion ?? readWslCommandVersion)(resolved, distro, opts)
       : null
-    return opencodeCheck(distro, resolved, version, appVersion)
+    return codewrightCheck(distro, resolved, version, appVersion)
   }
 
   const refreshCodewrightCheck = async (distro: string, opts?: { signal?: AbortSignal }) => {
@@ -153,14 +153,14 @@ export function createWslServersController(
       setState({ distroProbes: { ...state.distroProbes, ...Object.fromEntries(distroProbes) } })
     }
 
-    const opencodeChecks = await Promise.all(
+    const codewrightChecks = await Promise.all(
       unique
         .filter((distro) => distroProbeReady(state.distroProbes[distro]))
-        .filter((distro) => !state.opencodeChecks[distro])
+        .filter((distro) => !state.codewrightChecks[distro])
         .map(async (distro) => [distro, await checkCodewright(distro, opts)] as const),
     )
-    if (opencodeChecks.length) {
-      setState({ opencodeChecks: { ...state.opencodeChecks, ...Object.fromEntries(opencodeChecks) } })
+    if (codewrightChecks.length) {
+      setState({ codewrightChecks: { ...state.codewrightChecks, ...Object.fromEntries(codewrightChecks) } })
     }
   }
 
@@ -365,7 +365,7 @@ export function createWslServersController(
           throw new Error(summarize(result.stderr || result.stdout) || "Codewright installation failed")
         }
         await refreshCodewrightCheck(name, { signal: abort.signal })
-        expectCodewrightVersion(state.opencodeChecks[name]?.version ?? null, appVersion, name)
+        expectCodewrightVersion(state.codewrightChecks[name]?.version ?? null, appVersion, name)
         const id = wslServerIdToRestart(state.servers, name)
         if (id) await startServer(id)
       })
@@ -400,7 +400,7 @@ export function createWslServersController(
       persistServers(remaining)
       setState({
         servers: state.servers.filter((item) => item.config.id !== id),
-        ...(distro ? clearWslDistroState(state.distroProbes, state.opencodeChecks, distro) : {}),
+        ...(distro ? clearWslDistroState(state.distroProbes, state.codewrightChecks, distro) : {}),
       })
     },
 
@@ -426,7 +426,7 @@ function initialState(): WslServersState {
     installed: [],
     online: [],
     distroProbes: {},
-    opencodeChecks: {},
+    codewrightChecks: {},
     pendingRestart: false,
     servers: [],
     job: null,
@@ -462,7 +462,7 @@ function normalizePersistedServer(value: unknown): WslServerConfig[] {
   ]
 }
 
-function opencodeCheck(
+function codewrightCheck(
   distro: string,
   resolvedPath: string | null,
   version: string | null,

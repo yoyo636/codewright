@@ -200,7 +200,7 @@ export const DESKTOP_MENU: DesktopMenu[] = [
     id: "help",
     label: "Help",
     items: [
-      { type: "item", label: "Codewright Documentation", href: "https://opencode.ai/docs" },
+      { type: "item", label: "Codewright Documentation", href: "https://codewright.dev/docs" },
       { type: "item", label: "Support Forum", href: "https://discord.com/invite/codewright" },
       { type: "item", label: "Export Logs...", command: "logs.export" },
       { type: "separator" },

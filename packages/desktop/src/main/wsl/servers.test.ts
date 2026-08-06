@@ -64,7 +64,7 @@ test("clears cached distro probes when removing a WSL server", () => {
       },
       "Debian",
     ),
-  ).toEqual({ distroProbes: {}, opencodeChecks: {} })
+  ).toEqual({ distroProbes: {}, codewrightChecks: {} })
 })
 
 test("opens terminals for distro names containing spaces", () => {
@@ -128,7 +128,7 @@ test("ignores stale background Codewright checks after removing a WSL server", a
   await new Promise((resolve) => setTimeout(resolve, 0))
 
   expect(controller.getState().servers).toEqual([])
-  expect(controller.getState().opencodeChecks).toEqual({})
+  expect(controller.getState().codewrightChecks).toEqual({})
 })
 
 test("ignores stale startup Codewright checks after removing a WSL server", async () => {
@@ -147,7 +147,7 @@ test("ignores stale startup Codewright checks after removing a WSL server", asyn
   await new Promise((resolve) => setTimeout(resolve, 0))
 
   expect(controller.getState().servers).toEqual([])
-  expect(controller.getState().opencodeChecks).toEqual({})
+  expect(controller.getState().codewrightChecks).toEqual({})
 })
 
 test("probes addable distros in parallel before checking Codewright", async () => {
@@ -178,7 +178,7 @@ test("probes addable distros in parallel before checking Codewright", async () =
 
   expect(Object.keys(controller.getState().distroProbes)).toEqual(["Debian", "Ubuntu"])
   expect(codewright).toEqual(["Debian", "Ubuntu"])
-  expect(Object.keys(controller.getState().opencodeChecks)).toEqual(["Debian", "Ubuntu"])
+  expect(Object.keys(controller.getState().codewrightChecks)).toEqual(["Debian", "Ubuntu"])
 })
 
 test("does not check Codewright in addable distros that cannot execute commands", async () => {
@@ -203,7 +203,7 @@ test("does not check Codewright in addable distros that cannot execute commands"
 
   expect(Object.keys(controller.getState().distroProbes)).toEqual(["Debian", "Ubuntu"])
   expect(codewright).toEqual(["Debian"])
-  expect(Object.keys(controller.getState().opencodeChecks)).toEqual(["Debian"])
+  expect(Object.keys(controller.getState().codewrightChecks)).toEqual(["Debian"])
 })
 
 async function waitFor(check: () => boolean) {

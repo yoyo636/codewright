@@ -66,7 +66,7 @@ nix run nixpkgs#codewright           # veya en güncel geliştirme dalı için g
 
 ### Masaüstü Uygulaması (BETA)
 
-Codewright ayrıca masaüstü uygulaması olarak da mevcuttur. Doğrudan [sürüm sayfasından](https://github.com/yoyo636/codewright/releases) veya [opencode.ai/download](https://github.com/yoyo636/codewright/download) adresinden indirebilirsiniz.
+Codewright ayrıca masaüstü uygulaması olarak da mevcuttur. Doğrudan [sürüm sayfasından](https://github.com/yoyo636/codewright/releases) veya [codewright.dev/download](https://github.com/yoyo636/codewright/download) adresinden indirebilirsiniz.
 
 | Platform              | İndirme                            |
 | --------------------- | ---------------------------------- |

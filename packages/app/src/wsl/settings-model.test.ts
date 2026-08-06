@@ -19,7 +19,7 @@ function readyState(input: Partial<WslServersState> = {}): WslServersState {
     installed: [],
     online: [],
     distroProbes: {},
-    opencodeChecks: {},
+    codewrightChecks: {},
     pendingRestart: false,
     servers: [],
     job: null,
@@ -188,7 +188,7 @@ describe("WSL server settings presentation", () => {
         distroProbes: {
           Debian: { name: "Debian", canExecute: true, hasBash: true, hasCurl: true, error: null },
         },
-        opencodeChecks: {
+        codewrightChecks: {
           Debian: {
             distro: "Debian",
             resolvedPath: "/home/me/.codewright/bin/codewright",

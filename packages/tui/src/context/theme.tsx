@@ -255,20 +255,41 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
       themeRefreshTimeouts.length = 0
     })
 
+    const clampDark = (bg: RGBA): RGBA => {
+      if (store.mode !== "dark") return bg
+      const lum = bg.r * 0.299 + bg.g * 0.587 + bg.b * 0.114
+      if (lum > 200) return RGBA.fromInts(12, 12, 22, 255)
+      return bg
+    }
+
     const values = createMemo(() => {
       const active = store.themes[store.active]
-      if (active) return resolveTheme(active, store.mode)
+      let resolved = active ? resolveTheme(active, store.mode) : undefined
 
-      const saved = kv.get("theme")
-      if (typeof saved === "string") {
-        const theme = store.themes[saved]
-        if (theme) return resolveTheme(theme, store.mode)
+      if (!resolved) {
+        const saved = kv.get("theme")
+        if (typeof saved === "string") {
+          const theme = store.themes[saved]
+          if (theme) resolved = resolveTheme(theme, store.mode)
+        }
       }
 
-      return resolveTheme(store.themes[DEFAULT_THEME] ?? store.themes.codewright, store.mode)
+      if (!resolved) resolved = resolveTheme(store.themes[DEFAULT_THEME] ?? store.themes.codewright, store.mode)
+
+      resolved.background = clampDark(resolved.background)
+      resolved.backgroundPanel = clampDark(resolved.backgroundPanel)
+      resolved.backgroundElement = clampDark(resolved.backgroundElement)
+      resolved.backgroundMenu = clampDark(resolved.backgroundMenu)
+      return resolved
     })
 
-    createEffect(() => renderer.setBackgroundColor(values().background))
+    createEffect(() => {
+      const bg = values().background
+      const safe = bg.a === 0 || (bg.r > 240 && bg.g > 240 && bg.b > 240 && bg.a > 240)
+        ? RGBA.fromInts(10, 10, 20, 255)
+        : bg
+      renderer.setBackgroundColor(safe)
+    })
 
     const syntax = createSyntaxStyleMemo(() => generateSyntax(values()))
     const subtleSyntax = createSyntaxStyleMemo(() => generateSubtleSyntax(values()))

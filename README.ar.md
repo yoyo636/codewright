@@ -66,7 +66,7 @@ nix run nixpkgs#codewright           # او github:yoyo636/codewright لاحدث
 
 ### تطبيق سطح المكتب (BETA)
 
-يتوفر Codewright ايضا كتطبيق سطح مكتب. قم بالتنزيل مباشرة من [صفحة الاصدارات](https://github.com/yoyo636/codewright/releases) او من [opencode.ai/download](https://github.com/yoyo636/codewright/download).
+يتوفر Codewright ايضا كتطبيق سطح مكتب. قم بالتنزيل مباشرة من [صفحة الاصدارات](https://github.com/yoyo636/codewright/releases) او من [codewright.dev/download](https://github.com/yoyo636/codewright/download).
 
 | المنصة                | التنزيل                            |
 | --------------------- | ---------------------------------- |

@@ -35,7 +35,7 @@ config.
 
 ```json title="codewright.json" {6}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "anthropic": {
       "options": {
@@ -57,7 +57,7 @@ Codewright で適切に動作することがテストおよび検証されてい
 初めての方は、Codewright Zen から始めることをお勧めします。
 :::
 
-1. TUI で `/connect` コマンドを実行し、`Codewright Zen` を選択して、[opencode.ai/zen](https://opencode.ai/zen) にアクセスします。
+1. TUI で `/connect` コマンドを実行し、`Codewright Zen` を選択して、[codewright.dev/zen](https://codewright.dev/zen) にアクセスします。
 
    ```txt
    /connect
@@ -88,7 +88,7 @@ Codewright で適切に動作することがテストおよび検証されてい
 
 Codewright Go は、Codewright チームによって提供される、人気のあるオープンコーディングモデルへの信頼性の高いアクセスを提供する低コストのサブスクリプションプランです。これらは Codewright でうまく機能することがテストおよび検証されています。
 
-1. TUI で `/connect` コマンドを実行し、`Codewright Go` を選択して、[opencode.ai/zen](https://opencode.ai/zen) にアクセスします。
+1. TUI で `/connect` コマンドを実行し、`Codewright Go` を選択して、[codewright.dev/zen](https://codewright.dev/zen) にアクセスします。
 
    ```txt
    /connect
@@ -197,7 +197,7 @@ Codewright で Amazon Bedrock を使用するには:
 
    ```json title="codewright.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "amazon-bedrock": {
          "options": {
@@ -226,7 +226,7 @@ Codewright で Amazon Bedrock を使用するには:
 
    ```json title="codewright.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "amazon-bedrock": {
          "options": {
@@ -275,7 +275,7 @@ Codewright で Amazon Bedrock を使用するには:
 
 ```json title="codewright.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "amazon-bedrock": {
       // ...
@@ -335,7 +335,7 @@ codewright は、OpenAI 互換の API サーバーの背後でローカル LLM �
 
 ```json title="codewright.json" "atomic-chat" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "atomic-chat": {
       "npm": "@ai-sdk/openai-compatible",
@@ -563,7 +563,7 @@ Codewright 設定を通じてモデルを追加することもできます。
 
 ```json title="codewright.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "cloudflare-ai-gateway": {
       "models": {
@@ -857,7 +857,7 @@ GitLab 管理者は以下を有効にする必要があります。
 export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
 ```
 
-詳細については、[opencode-gitlab-auth](https://www.npmjs.com/package/opencode-gitlab-auth) ホームページ。
+詳細については、[codewright-gitlab-auth](https://www.npmjs.com/package/codewright-gitlab-auth) ホームページ。
 
 ##### 設定
 
@@ -865,7 +865,7 @@ export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
 
 ```json title="codewright.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "gitlab": {
       "options": {
@@ -882,7 +882,7 @@ GitLab ツール (マージリクエスト、問題、パイプライン、CI/CD
 
 ```json title="codewright.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "plugin": ["opencode-gitlab-plugin"]
 }
 ```
@@ -1066,7 +1066,7 @@ Codewright を通じて自動的に構成されていない Helicone の機能�
 
 ```jsonc title="~/.config/codewright/codewright.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1094,7 +1094,7 @@ Helicone は、キャッシュ、ユーザー追跡、セッション管理な�
 
 ```jsonc title="~/.config/codewright/codewright.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1148,7 +1148,7 @@ npm install -g codewright-helicone-session
 
 ```json title="codewright.json" "llama.cpp" {5, 6, 8, 10-15}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "llama.cpp": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1215,7 +1215,7 @@ LM Studio を通じてローカルモデルを使用するように codewright �
 
 ```json title="codewright.json" "lmstudio" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "lmstudio": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1336,7 +1336,7 @@ Ollama は Codewright 用に自動的に構成できます。詳細について�
 
 ```json title="codewright.json" "ollama" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1498,7 +1498,7 @@ Codewright 設定を通じて追加のモデルを追加することもできま
 
 ```json title="codewright.json" {6}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "openrouter": {
       "models": {
@@ -1513,7 +1513,7 @@ Codewright 設定を通じて追加のモデルを追加することもできま
 
    ```json title="codewright.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "openrouter": {
          "models": {
@@ -1729,7 +1729,7 @@ Codewright 設定を通じてモデルをカスタマイズすることもでき
 
 ```json title="codewright.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "vercel": {
       "models": {
@@ -1839,7 +1839,7 @@ Codewright 設定を通じて追加のモデルを追加することもできま
 
 ```json title="codewright.json" {6}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "zenmux": {
       "models": {
@@ -1907,7 +1907,7 @@ OpenAI と互換性のある任意のプロバイダーを Codewright で使用�
 
    ```json title="codewright.json" ""myprovider"" {5-15}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "myprovider": {
          "npm": "@ai-sdk/openai-compatible",
@@ -1946,7 +1946,7 @@ OpenAI と互換性のある任意のプロバイダーを Codewright で使用�
 
 ```json title="codewright.json" {9,11,17-20}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "myprovider": {
       "npm": "@ai-sdk/openai-compatible",

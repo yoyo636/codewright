@@ -74,7 +74,7 @@ describe("plugin.workspace", () => {
           path.join(dir, "codewright.json"),
           JSON.stringify(
             {
-              $schema: "https://opencode.ai/config.json",
+              $schema: "https://codewright.dev/config.json",
               plugin: [pathToFileURL(file).href],
             },
             null,

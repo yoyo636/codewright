@@ -66,7 +66,7 @@ nix run nixpkgs#codewright           # hoặc github:yoyo636/codewright cho nhá
 
 ### Ứng dụng Desktop (BETA)
 
-Codewright cũng có sẵn dưới dạng ứng dụng desktop. Tải trực tiếp từ [trang releases](https://github.com/yoyo636/codewright/releases) hoặc [opencode.ai/download](https://github.com/yoyo636/codewright/download).
+Codewright cũng có sẵn dưới dạng ứng dụng desktop. Tải trực tiếp từ [trang releases](https://github.com/yoyo636/codewright/releases) hoặc [codewright.dev/download](https://github.com/yoyo636/codewright/download).
 
 | Nền tảng              | Tải xuống                          |
 | --------------------- | ---------------------------------- |

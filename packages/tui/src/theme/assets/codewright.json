@@ -1,5 +1,5 @@
 {
-  "$schema": "https://opencode.ai/theme.json",
+  "$schema": "https://codewright.dev/theme.json",
   "defs": {
     "darkStep1": "#08090d",
     "darkStep2": "#0e1015",

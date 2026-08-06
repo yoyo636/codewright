@@ -66,7 +66,7 @@ nix run nixpkgs#codewright           # ili github:yoyo636/codewright za najnovij
 
 ### Desktop aplikacija (BETA)
 
-Codewright je dostupan i kao desktop aplikacija. Preuzmi je direktno sa [stranice izdanja](https://github.com/yoyo636/codewright/releases) ili sa [opencode.ai/download](https://github.com/yoyo636/codewright/download).
+Codewright je dostupan i kao desktop aplikacija. Preuzmi je direktno sa [stranice izdanja](https://github.com/yoyo636/codewright/releases) ili sa [codewright.dev/download](https://github.com/yoyo636/codewright/download).
 
 | Platforma             | Preuzimanje                        |
 | --------------------- | ---------------------------------- |

@@ -9,7 +9,7 @@
 
 ## Local Dev
 
-- `codewright dev web` proxies `https://app.opencode.ai`, so local UI/CSS changes will not show there.
+- `codewright dev web` proxies `https://app.codewright.dev`, so local UI/CSS changes will not show there.
 - For local UI changes, run the backend and app dev servers separately.
 - Backend (from `packages/codewright`): `bun run --conditions=browser ./src/index.ts serve --port 4096`
 - App (from `packages/app`): `bun dev -- --port 4444`

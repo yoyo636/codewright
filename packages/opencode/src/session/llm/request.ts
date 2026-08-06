@@ -174,7 +174,7 @@ export const prepare = Effect.fn("LLMRequestPrep.prepare")(function* (input: Pre
     })
   }
 
-  const opencodeProjectID = input.model.providerID.startsWith("codewright")
+  const codewrightProjectID = input.model.providerID.startsWith("codewright")
     ? (yield* InstanceState.context).project.id
     : undefined
 
@@ -187,7 +187,7 @@ export const prepare = Effect.fn("LLMRequestPrep.prepare")(function* (input: Pre
     headers: {
       ...(input.model.providerID.startsWith("codewright")
         ? {
-            ...(opencodeProjectID ? { "x-codewright-project": opencodeProjectID } : {}),
+            ...(codewrightProjectID ? { "x-codewright-project": codewrightProjectID } : {}),
             "x-codewright-session": input.sessionID,
             "x-codewright-request": input.user.id,
             "x-codewright-client": input.flags.client,

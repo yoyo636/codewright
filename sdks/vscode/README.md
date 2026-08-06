@@ -1,10 +1,10 @@
 # codewright VS Code Extension
 
-A Visual Studio Code extension that integrates [codewright](https://opencode.ai) directly into your development workflow.
+A Visual Studio Code extension that integrates [codewright](https://codewright.dev) directly into your development workflow.
 
 ## Prerequisites
 
-This extension requires the [codewright CLI](https://opencode.ai) to be installed on your system. Visit [opencode.ai](https://opencode.ai) for installation instructions.
+This extension requires the [codewright CLI](https://codewright.dev) to be installed on your system. Visit [codewright.dev](https://codewright.dev) for installation instructions.
 
 ## Features
 

@@ -66,7 +66,7 @@ nix run nixpkgs#codewright           # o github:yoyo636/codewright para la rama 
 
 ### App de escritorio (BETA)
 
-Codewright también está disponible como aplicación de escritorio. Descárgala directamente desde la [página de releases](https://github.com/yoyo636/codewright/releases) o desde [opencode.ai/download](https://github.com/yoyo636/codewright/download).
+Codewright también está disponible como aplicación de escritorio. Descárgala directamente desde la [página de releases](https://github.com/yoyo636/codewright/releases) o desde [codewright.dev/download](https://github.com/yoyo636/codewright/download).
 
 | Plataforma            | Descarga                           |
 | --------------------- | ---------------------------------- |

@@ -34,7 +34,7 @@ Codewright 설정의 `provider` 섹션을 통해 공급자를 사용자 정의�
 
 ```json title="codewright.json" {6}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "anthropic": {
       "options": {
@@ -55,7 +55,7 @@ Codewright Zen은 Codewright 팀이 Codewright와 잘 작동하도록 테스트�
 처음이라면 Codewright Zen으로 시작하는 것이 좋습니다.
 :::
 
-1. TUI에서 `/connect` 명령을 실행하고 `Codewright Zen`을 선택한 뒤, [opencode.ai/auth](https://opencode.ai/zen)로 이동합니다.
+1. TUI에서 `/connect` 명령을 실행하고 `Codewright Zen`을 선택한 뒤, [codewright.dev/auth](https://codewright.dev/zen)로 이동합니다.
 
    ```txt
    /connect
@@ -86,7 +86,7 @@ Codewright의 다른 공급자처럼 작동하며 사용은 완전히 선택 사
 
 Codewright Go는 Codewright 팀이 테스트하고 검증하여 Codewright와 잘 작동하는 인기 있는 오픈 코딩 모델에 안정적으로 액세스할 수 있는 저렴한 구독 요금제입니다.
 
-1. TUI에서 `/connect` 명령을 실행하고 `Codewright Go`를 선택한 뒤 [opencode.ai/auth](https://opencode.ai/zen)로 이동하십시오.
+1. TUI에서 `/connect` 명령을 실행하고 `Codewright Go`를 선택한 뒤 [codewright.dev/auth](https://codewright.dev/zen)로 이동하십시오.
 
    ```txt
    /connect
@@ -194,7 +194,7 @@ Codewright로 Amazon Bedrock을 사용하려면:
 
    ```json title="codewright.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "amazon-bedrock": {
          "options": {
@@ -223,7 +223,7 @@ Codewright로 Amazon Bedrock을 사용하려면:
 
    ```json title="codewright.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "amazon-bedrock": {
          "options": {
@@ -272,7 +272,7 @@ Codewright로 Amazon Bedrock을 사용하려면:
 
 ```json title="codewright.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "amazon-bedrock": {
       // ...
@@ -331,7 +331,7 @@ OpenAI 호환 API 서버 뒤에서 로컬 LLM을 실행하는 데스크톱 애�
 
 ```json title="codewright.json" "atomic-chat" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "atomic-chat": {
       "npm": "@ai-sdk/openai-compatible",
@@ -559,7 +559,7 @@ Cloudflare AI Gateway는 OpenAI, Anthropic, Workers AI 등의 모델에 액세�
 
    ```json title="codewright.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "cloudflare-ai-gateway": {
          "models": {
@@ -764,7 +764,7 @@ Codewright를 자체 호스팅 GitLab 인스턴스만 사용하도록 제한하�
 
 ```json
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "small_model": "gitlab/duo-chat-haiku-4-5",
   "share": "disabled"
 }
@@ -817,7 +817,7 @@ GitLab 관리자는 다음을 활성화해야 합니다:
 export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
 ```
 
-[opencode-gitlab-auth](https://www.npmjs.com/package/opencode-gitlab-auth) 홈페이지에 추가 문서가 있습니다.
+[codewright-gitlab-auth](https://www.npmjs.com/package/codewright-gitlab-auth) 홈페이지에 추가 문서가 있습니다.
 
 #### 구성
 
@@ -825,7 +825,7 @@ export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
 
 ```json title="codewright.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "gitlab": {
       "options": {
@@ -842,7 +842,7 @@ GitLab 도구(병합 요청, 이슈, 파이프라인, CI/CD 등)에 액세스하
 
 ```json title="codewright.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "plugin": ["opencode-gitlab-plugin"]
 }
 ```
@@ -1022,7 +1022,7 @@ Codewright를 통해 자동으로 구성되지 않는 Helicone의 기능이나 �
 
 ```jsonc title="~/.config/codewright/codewright.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1050,7 +1050,7 @@ Helicone는 캐싱, 사용자 추적 및 세션 관리와 같은 기능을 위�
 
 ```jsonc title="~/.config/codewright/codewright.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1104,7 +1104,7 @@ npm install -g codewright-helicone-session
 
 ```json title="codewright.json" "llama.cpp" {5, 6, 8, 10-15}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "llama.cpp": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1171,7 +1171,7 @@ LM Studio를 통해 로컬 모델을 사용하도록 구성할 수 있습니다.
 
 ```json title="codewright.json" "lmstudio" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "lmstudio": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1292,7 +1292,7 @@ Ollama는 Codewright에 대해 자동으로 구성될 수 있습니다. 자세�
 
 ```json title="codewright.json" "ollama" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1453,7 +1453,7 @@ Codewright Zen은 Codewright 팀에서 제공하는 테스트 및 검증된 모�
 
    ```json title="codewright.json" {6}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "openrouter": {
          "models": {
@@ -1468,7 +1468,7 @@ Codewright Zen은 Codewright 팀에서 제공하는 테스트 및 검증된 모�
 
    ```json title="codewright.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "openrouter": {
          "models": {
@@ -1717,7 +1717,7 @@ Codewright 구성을 통해 모델을 사용자 정의할 수도 있습니다. �
 
 ```json title="codewright.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "vercel": {
       "models": {
@@ -1827,7 +1827,7 @@ Codewright 구성을 통해 모델을 사용자 정의할 수도 있습니다. �
 
    ```json title="codewright.json" {6}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "zenmux": {
          "models": {
@@ -1895,7 +1895,7 @@ Codewright에서 모든 OpenAI 호환 공급자를 사용할 수 있습니다. �
 
    ```json title="codewright.json" ""myprovider"" {5-15}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://codewright.dev/config.json",
      "provider": {
        "myprovider": {
          "npm": "@ai-sdk/openai-compatible",
@@ -1933,7 +1933,7 @@ Codewright에서 모든 OpenAI 호환 공급자를 사용할 수 있습니다. �
 
 ```json title="codewright.json" {9,11,17-20}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://codewright.dev/config.json",
   "provider": {
     "myprovider": {
       "npm": "@ai-sdk/openai-compatible",

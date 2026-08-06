@@ -1716,6 +1716,11 @@ function TextPart(props: { last: boolean; part: TextPart; message: AssistantMess
   const { theme, syntax } = useTheme()
   const subtleSyntax = createSyntaxStyleMemo(() => generateSubtleSyntax(theme))
   const segments = createMemo(() => splitThink(props.part.text.trim()))
+  const stableSegments = createMemo(
+    () => segments(),
+    undefined,
+    { equals: (a, b) => a.length === b.length && a.every((s, i) => s.type === b[i]?.type && s.content === b[i]?.content) },
+  )
   return (
     <Show when={props.part.text.trim()}>
       <box
@@ -1725,7 +1730,7 @@ function TextPart(props: { last: boolean; part: TextPart; message: AssistantMess
         flexShrink={0}
         flexDirection="column"
       >
-        <For each={segments()}>
+        <For each={stableSegments()}>
           {(segment) => (
             <Switch>
               <Match when={segment.type === "think"}>
