@@ -11,6 +11,7 @@ import { Flag } from "@codewright-ai/core/flag/flag"
 import { FSUtil } from "@codewright-ai/core/fs-util"
 import { withTransientReadRetry } from "@/util/effect-http-client"
 import { Global } from "@codewright-ai/core/global"
+import { ConfigMarkdown } from "@/config/markdown"
 import type { MessageV2 } from "./message-v2"
 import type { MessageID } from "./schema"
 
@@ -88,9 +89,33 @@ const layer: Layer.Layer<
         .pipe(Effect.catch(() => Effect.succeed([] as string[])))
     })
 
-    const read = Effect.fnUntraced(function* (filepath: string) {
-      return yield* fs.readFileString(filepath).pipe(Effect.catch(() => Effect.succeed("")))
-    })
+    const read: (filepath: string, visited?: Set<string>) => Effect.Effect<string> = Effect.fnUntraced(
+      function* (filepath: string, visited: Set<string> = new Set()) {
+        const content = yield* fs.readFileString(filepath).pipe(Effect.catch(() => Effect.succeed("")))
+        if (!content) return ""
+        const resolved = path.resolve(filepath)
+        if (visited.has(resolved)) return ""
+        visited.add(resolved)
+        const matches = ConfigMarkdown.files(content)
+        if (matches.length === 0) return content
+        const dir = path.dirname(resolved)
+        let result = content
+        for (const match of matches) {
+          const ref = match[1]
+          if (!ref) continue
+          const refPath = ref.startsWith("~/")
+            ? path.join(Global.Path.home, ref.slice(2))
+            : path.resolve(dir, ref)
+          const refResolved = path.resolve(refPath)
+          if (visited.has(refResolved)) continue
+          const refContent = yield* read(refPath, visited)
+          if (refContent) {
+            result = result.replace(match[0], refContent)
+          }
+        }
+        return result
+      },
+    )
 
     const fetch = Effect.fnUntraced(function* (url: string) {
       const res = yield* http.execute(HttpClientRequest.get(url)).pipe(
@@ -159,7 +184,7 @@ const layer: Layer.Layer<
         (item) => item.startsWith("https://") || item.startsWith("http://"),
       )
 
-      const files = yield* Effect.forEach(Array.from(paths), read, { concurrency: 8 })
+      const files = yield* Effect.forEach(Array.from(paths), (p) => read(p), { concurrency: 8 })
       const remote = yield* Effect.forEach(urls, fetch, { concurrency: 4 })
 
       return [

@@ -1,5 +1,4 @@
 import {
-  batch,
   createContext,
   createEffect,
   createMemo,
@@ -52,10 +51,11 @@ import { StatusPanel } from "./status-panel"
 import type { PromptInfo } from "../../component/prompt/history"
 import { DialogConfirm } from "../../ui/dialog-confirm"
 import { DialogTimeline } from "./dialog-timeline"
+import { DialogQueuedPrompts } from "./dialog-queued-prompts"
 import { DialogForkFromTimeline } from "./dialog-fork-from-timeline"
 import { DialogSessionRename } from "../../component/dialog-session-rename"
-import { Sidebar } from "./sidebar"
 import { SubagentFooter } from "./subagent-footer.tsx"
+import { Footer } from "./footer.tsx"
 import { filetype } from "../../util/filetype"
 import parsers from "../../parsers-config"
 import { errorMessage } from "../../util/error"
@@ -123,7 +123,6 @@ const sessionBindingCommands = [
   "session.unshare",
   "session.undo",
   "session.redo",
-  "session.sidebar.toggle",
   "session.toggle.conceal",
   "session.toggle.timestamps",
   "session.toggle.thinking",
@@ -142,6 +141,7 @@ const sessionBindingCommands = [
   "session.parent",
   "session.child.next",
   "session.child.previous",
+  "session.queued_prompts",
 ] as const
 
 const sessionGlobalBindingCommands = [
@@ -247,8 +247,6 @@ export function Session() {
   })
 
   const dimensions = useTerminalDimensions()
-  const [sidebar, setSidebar] = kv.signal<"auto" | "hide">("sidebar", "auto")
-  const [sidebarOpen, setSidebarOpen] = createSignal(false)
   const [conceal, setConceal] = createSignal(true)
   const thinking = useThinkingMode()
   const thinkingMode = thinking.mode
@@ -261,16 +259,9 @@ export function Session() {
   const [_animationsEnabled, _setAnimationsEnabled] = kv.signal("animations_enabled", true)
   const [showGenericToolOutput, setShowGenericToolOutput] = kv.signal("generic_tool_output_visibility", false)
 
-  const wide = createMemo(() => dimensions().width > 120)
-  const sidebarVisible = createMemo(() => {
-    if (session()?.parentID) return false
-    if (sidebarOpen()) return true
-    if (sidebar() === "auto" && wide()) return true
-    return false
-  })
   const showTimestamps = createMemo(() => timestamps() === "show")
   const hasUserMessage = createMemo(() => (sync.data.message[route.sessionID] ?? []).some((m) => m.role === "user"))
-  const contentWidth = createMemo(() => dimensions().width - (sidebarVisible() ? 42 : 0) - (hasUserMessage() ? 44 : 0) - 4)
+  const contentWidth = createMemo(() => dimensions().width - (hasUserMessage() ? 44 : 0) - 4)
   const providers = createMemo(() => Model.index(sync.data.provider))
 
   const scrollAcceleration = createMemo(() => getScrollAcceleration(tuiConfig))
@@ -554,6 +545,14 @@ export function Session() {
       },
     },
     {
+      title: "Queued prompts",
+      value: "session.queued_prompts",
+      category: "Session",
+      run: () => {
+        dialog.replace(() => <DialogQueuedPrompts sessionID={route.sessionID} />)
+      },
+    },
+    {
       title: "Compact session",
       value: "session.compact",
       category: "Session",
@@ -663,19 +662,6 @@ export function Session() {
           sessionID: route.sessionID,
           messageID: message.id,
         })
-      },
-    },
-    {
-      title: sidebarVisible() ? "Hide sidebar" : "Show sidebar",
-      value: "session.sidebar.toggle",
-      category: "Session",
-      run: () => {
-        batch(() => {
-          const isVisible = sidebarVisible()
-          setSidebar(() => (isVisible ? "hide" : "auto"))
-          setSidebarOpen(!isVisible)
-        })
-        dialog.clear()
       },
     },
     {
@@ -1323,27 +1309,8 @@ export function Session() {
             </Show>
             <Toast />
           </box>
-          <Show when={sidebarVisible()}>
-            <Switch>
-              <Match when={wide()}>
-                <Sidebar sessionID={route.sessionID} />
-              </Match>
-              <Match when={!wide()}>
-                <box
-                  position="absolute"
-                  top={0}
-                  left={0}
-                  right={0}
-                  bottom={0}
-                  alignItems="flex-end"
-                  backgroundColor={RGBA.fromInts(0, 0, 0, 70)}
-                >
-                  <Sidebar sessionID={route.sessionID} />
-                </box>
-              </Match>
-            </Switch>
-          </Show>
           <StatusPanel sessionID={route.sessionID} />
+          <Footer />
         </box>
       </context.Provider>
     </LocationProvider>
@@ -1718,14 +1685,15 @@ function TextPart(props: { last: boolean; part: TextPart; message: AssistantMess
   const ctx = use()
   const { theme, syntax } = useTheme()
   const subtleSyntax = createSyntaxStyleMemo(() => generateSubtleSyntax(theme))
-  const segments = createMemo(() => splitThink(props.part.text.trim()))
+  const trimmedText = createMemo(() => props.part.text.trim())
+  const segments = createMemo(() => splitThink(trimmedText()))
   const stableSegments = createMemo(
     () => segments(),
     undefined,
     { equals: (a, b) => a.length === b.length && a.every((s, i) => s.type === b[i]?.type && s.content === b[i]?.content) },
   )
   return (
-    <Show when={props.part.text.trim()}>
+    <Show when={trimmedText()}>
       <box
         ref={(el: BoxRenderable) => alwaysSeparate.add(el)}
         paddingLeft={3}
@@ -1734,49 +1702,53 @@ function TextPart(props: { last: boolean; part: TextPart; message: AssistantMess
         flexDirection="column"
       >
         <For each={stableSegments()}>
-          {(segment) => (
-            <Switch>
-              <Match when={segment.type === "think"}>
-                <Show when={segment.content.trim()}>
-                  <box flexDirection="column" marginBottom={1}>
-                    <ReasoningHeader
-                      toggleable={false}
-                      open={true}
-                      done={true}
-                      title={reasoningSummary(segment.content.trim()).title}
+          {(segment) => {
+            const trimmed = createMemo(() => segment.content.trim())
+            const summary = createMemo(() => reasoningSummary(trimmed()))
+            return (
+              <Switch>
+                <Match when={segment.type === "think"}>
+                  <Show when={trimmed()}>
+                    <box flexDirection="column" marginBottom={1}>
+                      <ReasoningHeader
+                        toggleable={false}
+                        open={true}
+                        done={true}
+                        title={summary().title}
+                      />
+                      <Show when={summary().body}>
+                        <box marginTop={1}>
+                          <code
+                            filetype="markdown"
+                            drawUnstyledText={false}
+                            streaming={true}
+                            syntaxStyle={subtleSyntax()}
+                            content={summary().body}
+                            conceal={ctx.conceal()}
+                            fg={theme.textMuted}
+                          />
+                        </box>
+                      </Show>
+                    </box>
+                  </Show>
+                </Match>
+                <Match when={true}>
+                  <Show when={trimmed()}>
+                    <markdown
+                      syntaxStyle={syntax()}
+                      streaming={true}
+                      internalBlockMode="top-level"
+                      content={trimmed()}
+                      tableOptions={{ style: "grid" }}
+                      conceal={ctx.conceal()}
+                      fg={theme.markdownText}
+                      bg={theme.background}
                     />
-                    <Show when={reasoningSummary(segment.content.trim()).body}>
-                      <box marginTop={1}>
-                        <code
-                          filetype="markdown"
-                          drawUnstyledText={false}
-                          streaming={true}
-                          syntaxStyle={subtleSyntax()}
-                          content={reasoningSummary(segment.content.trim()).body}
-                          conceal={ctx.conceal()}
-                          fg={theme.textMuted}
-                        />
-                      </box>
-                    </Show>
-                  </box>
-                </Show>
-              </Match>
-              <Match when={true}>
-                <Show when={segment.content.trim()}>
-                  <markdown
-                    syntaxStyle={syntax()}
-                    streaming={true}
-                    internalBlockMode="top-level"
-                    content={segment.content.trim()}
-                    tableOptions={{ style: "grid" }}
-                    conceal={ctx.conceal()}
-                    fg={theme.markdownText}
-                    bg={theme.background}
-                  />
-                </Show>
-              </Match>
-            </Switch>
-          )}
+                  </Show>
+                </Match>
+              </Switch>
+            )
+          }}
         </For>
       </box>
     </Show>

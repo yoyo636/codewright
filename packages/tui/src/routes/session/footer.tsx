@@ -1,10 +1,17 @@
 import { createMemo, Match, onCleanup, onMount, Show, Switch } from "solid-js"
+import type { AssistantMessage } from "@codewright-ai/sdk/v2"
 import { useTheme } from "../../context/theme"
 import { useSync } from "../../context/sync"
 import { useDirectory } from "../../context/directory"
 import { useConnected } from "../../component/use-connected"
 import { createStore } from "solid-js/store"
 import { useRoute } from "../../context/route"
+
+const money = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  minimumFractionDigits: 2,
+})
 
 export function Footer() {
   const { theme } = useTheme()
@@ -19,6 +26,41 @@ export function Footer() {
   })
   const directory = useDirectory()
   const connected = useConnected()
+
+  const sessionID = createMemo(() => (route.data.type === "session" ? route.data.sessionID : null))
+  const messages = createMemo(() => {
+    const id = sessionID()
+    return id ? (sync.data.message[id] ?? []) : []
+  })
+  const lastAssistant = createMemo(() =>
+    messages().findLast((m): m is AssistantMessage => m.role === "assistant" && (m.tokens?.output ?? 0) > 0),
+  )
+  const provider = createMemo(() => {
+    const msg = lastAssistant()
+    if (!msg) return null
+    return sync.data.provider.find((p) => p.id === msg.providerID)
+  })
+  const model = createMemo(() => {
+    const p = provider()
+    const msg = lastAssistant()
+    if (!p || !msg) return null
+    return p.models[msg.modelID]
+  })
+  const modelName = createMemo(() => model()?.name?.split("/").pop() ?? null)
+  const contextPercent = createMemo(() => {
+    const msg = lastAssistant()
+    if (!msg) return null
+    const contextTokens =
+      (msg.tokens?.input ?? 0) + (msg.tokens?.cache?.read ?? 0) + (msg.tokens?.cache?.write ?? 0)
+    const limit = model()?.limit?.context
+    return limit ? Math.round((contextTokens / limit) * 100) : null
+  })
+  const totalCost = createMemo(() =>
+    messages()
+      .filter((m): m is AssistantMessage => m.role === "assistant")
+      .reduce((sum, m) => sum + (m.cost ?? 0), 0),
+  )
+  const gitBranch = createMemo(() => sync.data.vcs?.branch)
 
   const [store, setStore] = createStore({
     welcome: false,
@@ -51,7 +93,15 @@ export function Footer() {
 
   return (
     <box flexDirection="row" justifyContent="space-between" gap={1} flexShrink={0}>
-      <text fg={theme.textMuted}>{directory()}</text>
+      <box gap={1} flexDirection="row" flexShrink={0}>
+        <text fg={theme.textMuted}>{directory()}</text>
+        <Show when={gitBranch()}>
+          <text fg={theme.textMuted}>
+            <span style={{ fg: theme.success }}> </span>
+            {gitBranch()}
+          </text>
+        </Show>
+      </box>
       <box gap={2} flexDirection="row" flexShrink={0}>
         <Switch>
           <Match when={store.welcome}>
@@ -60,6 +110,15 @@ export function Footer() {
             </text>
           </Match>
           <Match when={connected()}>
+            <Show when={modelName()}>
+              <text fg={theme.textMuted}>{modelName()}</text>
+            </Show>
+            <Show when={contextPercent() !== null}>
+              <text fg={contextPercent()! > 80 ? theme.warning : theme.textMuted}>ctx:{contextPercent()}%</text>
+            </Show>
+            <Show when={totalCost() > 0}>
+              <text fg={theme.textMuted}>{money.format(totalCost())}</text>
+            </Show>
             <Show when={permissions().length > 0}>
               <text fg={theme.warning}>
                 <span style={{ fg: theme.warning }}>△</span> {permissions().length} Permission

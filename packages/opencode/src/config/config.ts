@@ -4,7 +4,7 @@ import { serviceUse } from "@codewright-ai/core/effect/service-use"
 import path from "path"
 import { pathToFileURL } from "url"
 import os from "os"
-import { mergeDeep } from "remeda"
+import { mergeDeep, unique } from "remeda"
 import { Global } from "@codewright-ai/core/global"
 import fsNode from "fs/promises"
 import { Flag } from "@codewright-ai/core/flag/flag"
@@ -463,6 +463,34 @@ const layer = Layer.effect(
           // returns normalized Specs and we only need to attach origin metadata here.
           const list = yield* Effect.promise(() => ConfigPlugin.load(dir))
           yield* mergePluginOrigins(dir, list)
+        }
+
+        // Claude Code compatibility: load agents and commands from .claude directories
+        const disableClaudeCode =
+          process.env.CODEWRIGHT_DISABLE_CLAUDE_CODE === "1" ||
+          process.env.CODEWRIGHT_DISABLE_CLAUDE_CODE === "true"
+        const disableClaudeCodePrompt =
+          disableClaudeCode ||
+          process.env.CODEWRIGHT_DISABLE_CLAUDE_CODE_PROMPT === "1" ||
+          process.env.CODEWRIGHT_DISABLE_CLAUDE_CODE_PROMPT === "true"
+        if (!disableClaudeCodePrompt) {
+          const afs = yield* FSUtil.Service
+          const claudeDirs = unique([
+            ...(yield* afs.up({
+              targets: [".claude"],
+              start: ctx.directory,
+              stop: ctx.worktree,
+            })),
+            ...(yield* afs.up({
+              targets: [".claude"],
+              start: Global.Path.home,
+              stop: Global.Path.home,
+            })),
+          ])
+          for (const dir of claudeDirs) {
+            result.command = mergeDeep(result.command ?? {}, yield* Effect.promise(() => ConfigCommand.load(dir)))
+            result.agent = mergeDeep(result.agent ?? {}, yield* Effect.promise(() => ConfigAgent.load(dir)))
+          }
         }
 
         if (process.env.CODEWRIGHT_CONFIG_CONTENT) {

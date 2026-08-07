@@ -1,0 +1,9 @@
+Performs multiple exact string replacements in a single file in one atomic operation. All edits are applied sequentially - each edit operates on the result of the previous one. If any edit fails, no changes are applied to the file.
+
+Usage:
+- You must use your `Read` tool at least once in the conversation before editing. This tool will error if you attempt an edit without reading the file.
+- Provide an ordered list of edits. Each edit has `oldString`, `newString`, and an optional `replaceAll` flag.
+- Edits are applied in order: the first edit transforms the original content, the second edit transforms the result of the first, and so on. Keep this in mind when crafting `oldString` values for later edits - they must match the content as it exists after prior edits have been applied.
+- This tool is more efficient than calling `edit` multiple times when you need to make several changes to the same file. It also ensures atomicity: either all edits succeed or none are applied.
+- The same matching rules as `edit` apply: `oldString` must match exactly including whitespace and indentation. If `oldString` is found multiple times, provide more surrounding context to make it unique, or use `replaceAll`.
+- Use `replaceAll` on an individual edit to replace every occurrence of that `oldString` in the current state of the content.

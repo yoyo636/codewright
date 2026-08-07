@@ -7,6 +7,9 @@ import DESCRIPTION from "./skill.txt"
 
 export const Parameters = Schema.Struct({
   name: Schema.String.annotate({ description: "The name of the skill from available_skills" }),
+  args: Schema.optional(Schema.String).annotate({
+    description: "Optional arguments to pass to the skill, injected as ARGUMENTS into the skill content",
+  }),
 })
 
 export const SkillTool = Tool.define(
@@ -48,6 +51,7 @@ export const SkillTool = Tool.define(
               `<skill_content name="${info.name}">`,
               `# Skill: ${info.name}`,
               "",
+              ...(params.args ? [`ARGUMENTS: ${params.args}`, ""] : []),
               info.content.trim(),
               "",
               `Base directory for this skill: ${base}`,

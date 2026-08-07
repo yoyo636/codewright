@@ -19,6 +19,10 @@ export const Parameters = Schema.Struct({
     })
     .pipe(Schema.withDecodingDefault(Effect.succeed("markdown" as const))),
   timeout: Schema.optional(Schema.Number).annotate({ description: "Optional timeout in seconds (max 120)" }),
+  prompt: Schema.optional(Schema.String).annotate({
+    description:
+      "Optional prompt to extract specific information from the fetched content. When provided, the content is returned with the prompt as extraction instructions.",
+  }),
 })
 
 export const WebFetchTool = Tool.define(
@@ -125,31 +129,42 @@ export const WebFetchTool = Tool.define(
 
           const content = new TextDecoder().decode(arrayBuffer)
 
+          let fetchOutput = ""
           // Handle content based on requested format and actual content type
           switch (params.format) {
             case "markdown":
               if (contentType.includes("text/html")) {
-                const markdown = convertHTMLToMarkdown(content)
-                return {
-                  output: markdown,
-                  title,
-                  metadata: {},
-                }
+                fetchOutput = convertHTMLToMarkdown(content)
+              } else {
+                fetchOutput = content
               }
-              return { output: content, title, metadata: {} }
+              break
 
             case "text":
               if (contentType.includes("text/html")) {
-                return { output: extractTextFromHTML(content), title, metadata: {} }
+                fetchOutput = extractTextFromHTML(content)
+              } else {
+                fetchOutput = content
               }
-              return { output: content, title, metadata: {} }
+              break
 
             case "html":
-              return { output: content, title, metadata: {} }
+              fetchOutput = content
+              break
 
             default:
-              return { output: content, title, metadata: {} }
+              fetchOutput = content
           }
+
+          if (params.prompt) {
+            return {
+              output: `<fetch_prompt>${params.prompt}</fetch_prompt>\n\n<fetched_content>\n${fetchOutput}\n</fetched_content>`,
+              title,
+              metadata: {},
+            }
+          }
+
+          return { output: fetchOutput, title, metadata: {} }
         }).pipe(Effect.orDie),
     }
   }),

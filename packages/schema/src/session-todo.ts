@@ -12,6 +12,10 @@ export const Info = Schema.Struct({
   priority: Schema.String.annotate({
     description: "Priority level of the task: high, medium, low",
   }),
+  activeForm: Schema.optional(Schema.String).annotate({
+    description:
+      'Current activity description shown when task is in_progress (e.g., "Editing file.ts"). Omit or empty when not in_progress.',
+  }),
 }).annotate({ identifier: "Todo" })
 export interface Info extends Schema.Schema.Type<typeof Info> {}
 

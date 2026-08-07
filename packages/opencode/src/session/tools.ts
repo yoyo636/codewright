@@ -11,6 +11,8 @@ import { ToolRegistry } from "@/tool/registry"
 import { Truncate } from "@/tool/truncate"
 
 import { Plugin } from "@/plugin"
+import { hook } from "@/hook"
+import { Config } from "@/config/config"
 import type { TaskPromptOps } from "@/tool/task"
 import { type Tool as AITool, tool, jsonSchema, type ToolExecutionOptions, asSchema } from "ai"
 import { Effect } from "effect"
@@ -46,12 +48,14 @@ export const resolve = Effect.fn("SessionTools.resolve")(function* (input: {
   bypassAgentCheck: boolean
   messages: SessionV1.WithParts[]
   promptOps: TaskPromptOps
+  config: Config.Interface
 }) {
   const tools: Record<string, AITool> = {}
   const run = yield* EffectBridge.make()
   const plugin = yield* Plugin.Service
   const permission = yield* Permission.Service
   const registry = yield* ToolRegistry.Service
+  const config = input.config
   const mcp = yield* MCP.Service
   const truncate = yield* Truncate.Service
   const flags = yield* RuntimeFlags.Service
@@ -108,6 +112,25 @@ export const resolve = Effect.fn("SessionTools.resolve")(function* (input: {
               { tool: item.id, sessionID: ctx.sessionID, callID: ctx.callID },
               { args },
             )
+            const preHook = yield* hook.run(
+              "PreToolUse",
+              {
+                toolName: item.id,
+                toolArgs: args,
+                sessionID: ctx.sessionID,
+                cwd: input.session.directory,
+              },
+              config,
+            )
+            if (preHook.blocked) {
+              const blocked = {
+                title: `Blocked: ${item.id}`,
+                metadata: {} as Record<string, unknown>,
+                output: `Tool execution was blocked by a PreToolUse hook.\n\nReason: ${preHook.reason ?? "no reason provided"}`,
+              }
+              yield* input.processor.completeToolCall(options.toolCallId, blocked)
+              return blocked
+            }
             const result = yield* item.execute(args, ctx)
             const output = {
               ...result,
@@ -123,6 +146,19 @@ export const resolve = Effect.fn("SessionTools.resolve")(function* (input: {
               { tool: item.id, sessionID: ctx.sessionID, callID: ctx.callID, args },
               output,
             )
+            const postHook = yield* hook.run(
+              "PostToolUse",
+              {
+                toolName: item.id,
+                toolArgs: args,
+                sessionID: ctx.sessionID,
+                cwd: input.session.directory,
+              },
+              config,
+            )
+            if (postHook.context) {
+              output.output = `${output.output}\n\n[PostToolUse hook context]\n${postHook.context}`
+            }
             if (options.abortSignal?.aborted) {
               yield* input.processor.completeToolCall(options.toolCallId, output)
             }

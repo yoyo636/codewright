@@ -168,7 +168,7 @@ export const {
     }
 
     // Delta batching for smooth streaming rendering
-    const deltaBuffer = new Map<string, { messageID: string; field: string; delta: string }>()
+    const deltaBuffer = new Map<string, { messageID: string; partID: string; field: string; delta: string }>()
     let flushScheduled = false
     function flushDeltas() {
       if (deltaBuffer.size === 0) return
@@ -176,17 +176,18 @@ export const {
       const entries = [...deltaBuffer.values()]
       deltaBuffer.clear()
       batch(() => {
-        for (const { messageID, field, delta } of entries) {
+        for (const { messageID, partID, field, delta } of entries) {
           const parts = store.part[messageID]
           if (!parts) continue
           setStore(
             "part",
             messageID,
             produce((draft) => {
-              for (const part of draft) {
-                const existing = part[field] as string | undefined
-                ;(part[field] as string) = (existing ?? "") + delta
-              }
+              const match = search(draft, partID, (p) => p.id)
+              if (!match.found) return
+              const part = draft[match.index]
+              const existing = part[field] as string | undefined
+              ;(part[field] as string) = (existing ?? "") + delta
             }),
           )
         }
@@ -429,6 +430,7 @@ export const {
           } else {
             deltaBuffer.set(key, {
               messageID: event.properties.messageID,
+              partID: event.properties.partID,
               field: event.properties.field,
               delta: event.properties.delta,
             })

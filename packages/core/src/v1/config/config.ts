@@ -13,6 +13,7 @@ import { ConfigLSPV1 } from "./lsp"
 import { ConfigMCPV1 } from "./mcp"
 import { ConfigPermissionV1 } from "./permission"
 import { ConfigPluginV1 } from "./plugin"
+import { ConfigHooksV1 } from "./hooks"
 import { ConfigProviderV1 } from "./provider"
 import { ConfigServerV1 } from "./server"
 import { ConfigSkillsV1 } from "./skills"
@@ -54,6 +55,14 @@ export const Info = Schema.Struct({
       "Enable or disable snapshot tracking. When false, filesystem snapshots are not recorded and undoing or reverting will not undo/redo file changes. Defaults to true.",
   }),
   plugin: Schema.optional(Schema.mutable(Schema.Array(ConfigPluginV1.Spec))),
+  hooks: Schema.optional(Schema.mutable(Schema.Array(ConfigHooksV1.Spec))).annotate({
+    description:
+      "Shell command hooks that run on specific events (PreToolUse, PostToolUse, UserPromptSubmit, SessionStart, Stop)",
+  }),
+  outputStyle: Schema.optional(Schema.String).annotate({
+    description:
+      "Custom output style instructions appended to the system prompt, controlling tone, format, and verbosity of responses",
+  }),
   share: Schema.optional(Schema.Literals(["manual", "auto", "disabled"])).annotate({
     description:
       "Control sharing behavior:'manual' allows manual sharing via commands, 'auto' enables automatic sharing, 'disabled' disables all sharing",

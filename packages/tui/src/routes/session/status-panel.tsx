@@ -1,7 +1,9 @@
 import { Show, createMemo, For, createSignal } from "solid-js"
 import type { AssistantMessage } from "@codewright-ai/sdk/v2"
 import { useSync } from "../../context/sync"
+import { useProject } from "../../context/project"
 import { useTheme } from "../../context/theme"
+import { WorkspaceLabel } from "../../component/workspace-label"
 import type { JSX } from "@opentui/solid"
 const money = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -36,16 +38,18 @@ function Section(props: { title: string; children: JSX.Element }) {
 }
 
 function LabelValue(props: { label: string; value: string; valueColor?: string }) {
+  const { theme } = useTheme()
   return (
     <box flexDirection="row" gap={1}>
-      <text fg="#555570">{props.label}</text>
-      <text fg={props.valueColor ?? "#f0f0f5"}>{props.value}</text>
+      <text fg={theme.textMuted}>{props.label}</text>
+      <text fg={props.valueColor ?? theme.text}>{props.value}</text>
     </box>
   )
 }
 
 export function StatusPanel(props: { sessionID: string }) {
   const sync = useSync()
+  const project = useProject()
   const { theme } = useTheme()
 
   const session = createMemo(() => sync.session.get(props.sessionID))
@@ -95,6 +99,12 @@ export function StatusPanel(props: { sessionID: string }) {
   const completedTodos = createMemo(() => todos().filter((t) => t.status === "completed").length)
   const pendingTodos = createMemo(() => todos().filter((t) => t.status !== "completed").length)
 
+  const workspace = () => {
+    const workspaceID = session()?.workspaceID
+    if (!workspaceID) return
+    return project.workspace.get(workspaceID)
+  }
+
   return (
     <Show when={hasUserMessage()}>
       <box
@@ -113,6 +123,28 @@ export function StatusPanel(props: { sessionID: string }) {
                 <b>◆ {session()?.title ?? "Session"}</b>
               </text>
               <text fg={theme.textMuted}>{session()?.id.slice(0, 8)}</text>
+              <Show when={session()?.workspaceID}>
+                <text fg={theme.textMuted}>
+                  <Show
+                    when={workspace()}
+                    fallback={
+                      <WorkspaceLabel type="unknown" name={session()!.workspaceID!} status="error" icon />
+                    }
+                  >
+                    {(item) => (
+                      <WorkspaceLabel
+                        type={item().type}
+                        name={item().name}
+                        status={project.workspace.status(item().id) ?? "error"}
+                        icon
+                      />
+                    )}
+                  </Show>
+                </text>
+              </Show>
+              <Show when={session()?.share?.url}>
+                <text fg={theme.textMuted}>{session()!.share!.url}</text>
+              </Show>
             </box>
 
             <text fg={theme.border}>{"─".repeat(40)}</text>
@@ -122,7 +154,7 @@ export function StatusPanel(props: { sessionID: string }) {
               <LabelValue
                 label="Provider:"
                 value={provider()?.id ?? "—"}
-                valueColor={provider() ? "#00ff88" : theme.textMuted}
+                valueColor={provider() ? "#00ff88" : undefined}
               />
               <LabelValue
                 label="Model:"
@@ -146,7 +178,7 @@ export function StatusPanel(props: { sessionID: string }) {
               >
                 <box flexDirection="row" gap={1}>
                   <text fg={theme.textMuted}>Ctx:</text>
-                  <text fg="#f0f0f5">{number.format(tokenState()!.contextTokens)}</text>
+                  <text fg={theme.text}>{number.format(tokenState()!.contextTokens)}</text>
                 </box>
                 <Show when={tokenState()!.percent !== null}>
                   <box flexDirection="row" gap={1}>
@@ -160,7 +192,7 @@ export function StatusPanel(props: { sessionID: string }) {
                 </Show>
                 <box flexDirection="row" gap={1}>
                   <text fg={theme.textMuted}>Out:</text>
-                  <text fg="#f0f0f5">{number.format(tokenState()!.outputTokens)}</text>
+                  <text fg={theme.text}>{number.format(tokenState()!.outputTokens)}</text>
                 </box>
                 <LabelValue label="Total:" value={number.format(totalTokens())} />
               </Show>
@@ -172,7 +204,7 @@ export function StatusPanel(props: { sessionID: string }) {
             <Section title="Cost">
               <box flexDirection="row" gap={1}>
                 <text fg={theme.textMuted}>Session:</text>
-                <text fg="#f0f0f5">{money.format(totalCost())}</text>
+                <text fg={theme.text}>{money.format(totalCost())}</text>
               </box>
               <Show when={lastAssistant()?.cost}>
                 <LabelValue
@@ -211,13 +243,13 @@ export function StatusPanel(props: { sessionID: string }) {
                                 ? "#00ff88"
                                 : item.status === "in_progress"
                                   ? "#ff9f0a"
-                                  : "#555570",
+                                  : theme.textMuted,
                           }}
                         >
                           {item.status === "completed" ? "✓" : item.status === "in_progress" ? "◎" : "○"}
                         </text>
                         <text
-                          fg={item.status === "completed" ? theme.textMuted : "#f0f0f5"}
+                          fg={item.status === "completed" ? theme.textMuted : theme.text}
                           style={item.status === "completed" ? { strikethrough: true } : undefined}
                         >
                           {item.content}
@@ -262,7 +294,7 @@ export function StatusPanel(props: { sessionID: string }) {
 
             {/* Footer */}
             <box flexDirection="column" gap={0}>
-              <text fg="#555570">{"─".repeat(40)}</text>
+              <text fg={theme.border}>{"─".repeat(40)}</text>
               <text fg={theme.textMuted}>
                 <span style={{ fg: "#00d4ff" }}>◆</span> Codewright v2.1.1
               </text>

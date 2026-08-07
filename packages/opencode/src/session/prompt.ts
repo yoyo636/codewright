@@ -55,6 +55,7 @@ import { eq } from "drizzle-orm"
 import { SessionTable } from "@codewright-ai/core/session/sql"
 import { SessionReminders } from "./reminders"
 import { SessionTools } from "./tools"
+import { hook } from "@/hook"
 import { LLMEvent } from "@codewright-ai/llm"
 
 // @ts-ignore
@@ -1054,7 +1055,29 @@ const layer = Layer.effect(
     )(function* (input: PromptInput) {
       const session = yield* sessions.get(input.sessionID).pipe(Effect.orDie)
       yield* revert.cleanup(session)
-      const message = yield* createUserMessage(input)
+      const userText = input.parts
+        .filter((p): p is { type: "text"; text: string } => p.type === "text")
+        .map((p) => p.text)
+        .join("\n")
+      const submitHook = yield* hook.run(
+        "UserPromptSubmit",
+        {
+          userPrompt: userText,
+          sessionID: input.sessionID,
+          cwd: session.directory,
+        },
+        config,
+      )
+      const enrichedInput: PromptInput = submitHook.context
+        ? {
+            ...input,
+            parts: [
+              ...input.parts,
+              { type: "text" as const, text: `[UserPromptSubmit hook context]\n${submitHook.context}` },
+            ],
+          }
+        : input
+      const message = yield* createUserMessage(enrichedInput)
       yield* sessions.touch(input.sessionID)
 
       const permissions: PermissionV1.Rule[] = []
@@ -1231,6 +1254,7 @@ const layer = Layer.effect(
               bypassAgentCheck,
               messages: msgs,
               promptOps,
+              config,
             }).pipe(
               Effect.provideService(Plugin.Service, plugin),
               Effect.provideService(Permission.Service, permission),
@@ -1267,6 +1291,8 @@ const layer = Layer.effect(
               ...(mcpInstructions ? [mcpInstructions] : []),
               ...(skills ? [skills] : []),
             ]
+            const outputStyle = (yield* config.get()).outputStyle
+            if (outputStyle) system.push(`# Output Style\n\n${outputStyle}`)
             const format = lastUser.format ?? { type: "text" as const }
             if (format.type === "json_schema") system.push(STRUCTURED_OUTPUT_SYSTEM_PROMPT)
             const result = yield* handle.process({
@@ -1343,7 +1369,15 @@ const layer = Layer.effect(
     const loop: (input: LoopInput) => Effect.Effect<SessionV1.WithParts> = Effect.fn("SessionPrompt.loop")(function* (
       input: LoopInput,
     ) {
-      return yield* state.ensureRunning(input.sessionID, lastAssistant(input.sessionID), runLoop(input.sessionID))
+      const session = yield* sessions.get(input.sessionID).pipe(Effect.orDie)
+      yield* hook.run("SessionStart", { sessionID: input.sessionID, cwd: session.directory }, config)
+      const result = yield* state.ensureRunning(
+        input.sessionID,
+        lastAssistant(input.sessionID),
+        runLoop(input.sessionID),
+      )
+      yield* hook.run("Stop", { sessionID: input.sessionID, cwd: session.directory }, config)
+      return result
     })
 
     const shell: (input: ShellInput) => Effect.Effect<SessionV1.WithParts, Session.BusyError> = Effect.fn(

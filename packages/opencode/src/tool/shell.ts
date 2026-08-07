@@ -20,6 +20,7 @@ import { Plugin } from "@/plugin"
 import { ChildProcess } from "effect/unstable/process"
 import { ChildProcessSpawner } from "effect/unstable/process/ChildProcessSpawner"
 import { ShellPrompt, type Parameters } from "./shell/prompt"
+import * as BackgroundShell from "./shell/background"
 import { BashArity } from "@/permission/arity"
 
 export { Parameters } from "./shell/prompt"
@@ -627,6 +628,25 @@ export const ShellTool = Tool.define(
                   yield* ask(ctx, scan, params)
                 }),
               )
+
+              if (params.run_in_background) {
+                const env = yield* shellEnv(ctx, cwd)
+                const id = BackgroundShell.start({ command: params.command, shell, cwd, env })
+                yield* ctx.metadata({
+                  metadata: {
+                    output: `Background shell started with ID: ${id}`,
+                  },
+                })
+                return {
+                  title: params.command,
+                  metadata: {
+                    output: `Background shell started with ID: ${id}`,
+                    exit: null,
+                    truncated: false,
+                  },
+                  output: `Background shell started with ID: ${id}\nUse the read-output tool with shell_id "${id}" to check progress.\nUse the kill-shell tool with shell_id "${id}" to terminate it.`,
+                }
+              }
 
               return yield* run(
                 {

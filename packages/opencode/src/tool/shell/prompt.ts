@@ -19,6 +19,10 @@ export function parameterSchema() {
     workdir: Schema.optional(Schema.String).annotate({
       description: `The working directory to run the command in. Defaults to the current directory. Use this instead of 'cd' commands.`,
     }),
+    run_in_background: Schema.optional(Schema.Boolean).annotate({
+      description:
+        "If true, the command runs in the background and the tool returns immediately with a shell ID. Use the read-output tool to check progress and the kill-shell tool to terminate it. Useful for long-running commands like dev servers or file watchers.",
+    }),
   })
 }
 
