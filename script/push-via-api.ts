@@ -36,10 +36,34 @@ async function api(path: string, options: RequestInit = {}): Promise<any> {
 const remoteSha = (await api(`/repos/${REPO}/git/refs/heads/${BRANCH}`)).object.sha
 console.log(`Remote ${BRANCH} SHA: ${remoteSha}`)
 
-const commitsToPush = (await $`git rev-list --reverse ${remoteSha}..HEAD`.text())
-  .trim()
-  .split("\n")
-  .filter(Boolean)
+// Check if remote SHA exists locally; if not, use HEAD's first parent chain
+const remoteExistsLocally = (await $`git cat-file -t ${remoteSha}`.text().catch(() => "")).trim() === "commit"
+
+let commitsToPush: string[]
+if (remoteExistsLocally) {
+  commitsToPush = (await $`git rev-list --reverse ${remoteSha}..HEAD`.text())
+    .trim()
+    .split("\n")
+    .filter(Boolean)
+} else {
+  // Remote SHA was created via API (different SHA, same content).
+  // Find local commits not yet pushed by walking from HEAD until we reach
+  // a commit whose tree matches the remote tree.
+  const remoteTreeSha = (await api(`/repos/${REPO}/git/commits/${remoteSha}`)).tree.sha
+  const allLocal = (await $`git rev-list --reverse HEAD`.text())
+    .trim()
+    .split("\n")
+    .filter(Boolean)
+  commitsToPush = []
+  for (const sha of allLocal) {
+    const treeSha = (await $`git rev-parse ${sha}^{tree}`.text()).trim()
+    if (treeSha === remoteTreeSha) {
+      commitsToPush = []
+    } else {
+      commitsToPush.push(sha)
+    }
+  }
+}
 console.log(`Commits to push: ${commitsToPush.length}`)
 
 // apiParentSha tracks the commit created via the API (for parent linking)
