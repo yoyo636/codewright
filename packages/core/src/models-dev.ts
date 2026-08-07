@@ -228,7 +228,13 @@ const layer = Layer.effect(
         }),
       )
       return JSON.parse(text) as Record<string, Provider>
-    }).pipe(Effect.withSpan("ModelsDev.populate"), Effect.orDie)
+    }).pipe(
+      Effect.withSpan("ModelsDev.populate"),
+      Effect.tapError((cause) =>
+        Effect.logError("Failed to fetch models.dev", { cause: cause }),
+      ),
+      Effect.catch(() => Effect.succeed({} as Record<string, Provider>)),
+    )
 
     const [cachedGet, invalidate] = yield* Effect.cachedInvalidateWithTTL(populate, Duration.infinity)
 
