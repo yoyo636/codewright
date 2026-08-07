@@ -1,6 +1,6 @@
 {
   "name": "@codewright-ai/landing",
-  "version": "2.1.1",
+  "version": "2.4.1",
   "private": true,
   "description": "Codewright marketing landing page",
   "scripts": {
