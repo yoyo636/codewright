@@ -5,7 +5,7 @@ export default {
   console: stage === "production" ? "https://codewright.dev/auth" : `https://${stage}.codewright.dev/auth`,
   email: "help@anoma.ly",
   socialCard: "https://social-cards.sst.dev",
-  github: "https://github.com/anomalyco/codewright",
+  github: "https://github.com/yoyo636/codewright",
   discord: "https://codewright.dev/discord",
   headerLinks: [
     { name: "app.header.home", url: "/" },
