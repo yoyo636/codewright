@@ -13,6 +13,10 @@ const money = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 2,
 })
 
+// Context usage thresholds (percentage of the model context window).
+const CONTEXT_WARN_PCT = 60
+const CONTEXT_DANGER_PCT = 80
+
 export function Footer() {
   const { theme } = useTheme()
   const sync = useSync()
@@ -55,6 +59,13 @@ export function Footer() {
     const limit = model()?.limit?.context
     return limit ? Math.round((contextTokens / limit) * 100) : null
   })
+  const contextState = createMemo(() => {
+    const pct = contextPercent()
+    if (pct === null) return null
+    if (pct >= CONTEXT_DANGER_PCT) return "danger"
+    if (pct >= CONTEXT_WARN_PCT) return "warn"
+    return "ok"
+  })
   const totalCost = createMemo(() =>
     messages()
       .filter((m): m is AssistantMessage => m.role === "assistant")
@@ -92,17 +103,25 @@ export function Footer() {
   })
 
   return (
-    <box flexDirection="row" justifyContent="space-between" gap={1} flexShrink={0}>
-      <box gap={1} flexDirection="row" flexShrink={0}>
+    <box
+      flexDirection="row"
+      justifyContent="space-between"
+      gap={1}
+      flexShrink={0}
+      border={["top"]}
+      borderColor={theme.borderSubtle}
+      paddingTop={1}
+    >
+      <box gap={1} flexDirection="row" flexShrink={0} alignItems="center">
         <text fg={theme.textMuted}>{directory()}</text>
         <Show when={gitBranch()}>
           <text fg={theme.textMuted}>
-            <span style={{ fg: theme.success }}> </span>
-            {gitBranch()}
+            <span style={{ fg: theme.border }}>│</span>{" "}
+            <span style={{ fg: theme.success }}>⎇</span> {gitBranch()}
           </text>
         </Show>
       </box>
-      <box gap={2} flexDirection="row" flexShrink={0}>
+      <box gap={2} flexDirection="row" flexShrink={0} alignItems="center">
         <Switch>
           <Match when={store.welcome}>
             <text fg={theme.text}>
@@ -111,10 +130,22 @@ export function Footer() {
           </Match>
           <Match when={connected()}>
             <Show when={modelName()}>
-              <text fg={theme.textMuted}>{modelName()}</text>
+              <text fg={theme.text}>
+                <span style={{ fg: theme.primary }}>◆</span> {modelName()}
+              </text>
             </Show>
             <Show when={contextPercent() !== null}>
-              <text fg={contextPercent()! > 80 ? theme.warning : theme.textMuted}>ctx:{contextPercent()}%</text>
+              <text
+                fg={
+                  contextState() === "danger"
+                    ? theme.error
+                    : contextState() === "warn"
+                      ? theme.warning
+                      : theme.textMuted
+                }
+              >
+                ctx:{contextPercent()}%
+              </text>
             </Show>
             <Show when={totalCost() > 0}>
               <text fg={theme.textMuted}>{money.format(totalCost())}</text>
@@ -125,11 +156,13 @@ export function Footer() {
                 {permissions().length > 1 ? "s" : ""}
               </text>
             </Show>
-            <text fg={theme.text}>
-              <span style={{ fg: lsp().length > 0 ? theme.success : theme.textMuted }}>•</span> {lsp().length} LSP
-            </text>
+            <Show when={lsp().length > 0}>
+              <text fg={theme.textMuted}>
+                <span style={{ fg: lsp().length > 0 ? theme.success : theme.textMuted }}>●</span> {lsp().length} LSP
+              </text>
+            </Show>
             <Show when={mcp()}>
-              <text fg={theme.text}>
+              <text fg={theme.textMuted}>
                 <Switch>
                   <Match when={mcpError()}>
                     <span style={{ fg: theme.error }}>⊙ </span>

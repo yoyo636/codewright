@@ -9,6 +9,8 @@ import { MCP } from "../mcp"
 import { Skill } from "../skill"
 import PROMPT_INITIALIZE from "./template/initialize.txt"
 import PROMPT_REVIEW from "./template/review.txt"
+import PROMPT_MEMORY from "./template/memory.txt"
+import PROMPT_DOCTOR from "./template/doctor.txt"
 import { LegacyEvent } from "@codewright-ai/schema/legacy-event"
 
 type State = {
@@ -85,6 +87,20 @@ const layer = Layer.effect(
         },
         subtask: true,
         hints: hints(PROMPT_REVIEW),
+      }
+      commands["memory"] = {
+        name: "memory",
+        description: "view or update persistent memory",
+        source: "command",
+        template: PROMPT_MEMORY,
+        hints: hints(PROMPT_MEMORY),
+      }
+      commands["doctor"] = {
+        name: "doctor",
+        description: "run an environment health check",
+        source: "command",
+        template: PROMPT_DOCTOR,
+        hints: hints(PROMPT_DOCTOR),
       }
 
       for (const [name, command] of Object.entries(cfg.command ?? {})) {

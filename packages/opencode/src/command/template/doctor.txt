@@ -1,0 +1,22 @@
+Run an environment health check for this Codewright installation and report the results.
+
+Investigate and report on the following, using the tools available:
+
+## Git
+- Check that `git` is installed and on PATH (run `git --version`).
+- Check the current repository status: branch, and whether the working tree is clean (run `git status` / `git branch --show-current`).
+
+## Configuration
+- Check for a project config file (`codewright.json`, `opencode.json`) and note any configured provider or hooks.
+- Note the current working directory and whether it is a git repository.
+
+## Provider connectivity
+- List the configured providers and note which ones have API keys set (check env vars referenced by the provider config — never print the keys themselves, only whether each is present).
+- If a model is currently configured, note its provider and model ID.
+
+## Diagnostics summary
+Report back in a concise checklist:
+- ✅ / ❌ for each check, with a one-line explanation
+- A final "All good" or a short list of actionable fixes
+
+Do not modify any files or configuration. This is a read-only diagnostic command. Never echo or log any secret values.

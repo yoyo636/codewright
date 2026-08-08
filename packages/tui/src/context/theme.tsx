@@ -1,4 +1,4 @@
-import { CliRenderEvents, SyntaxStyle, type TerminalColors } from "@opentui/core"
+import { CliRenderEvents, RGBA, SyntaxStyle, type TerminalColors } from "@opentui/core"
 import { useRenderer } from "@opentui/solid"
 import {
   DEFAULT_THEMES,
@@ -81,7 +81,7 @@ export {
 
 const THEME_REFRESH_DELAYS = [250, 1000] as const
 
-const DEFAULT_THEME = "macos"
+const DEFAULT_THEME = "claude"
 
 type State = {
   themes: Record<string, ThemeJson>
@@ -276,10 +276,13 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
 
       if (!resolved) resolved = resolveTheme(store.themes[DEFAULT_THEME] ?? store.themes.codewright, store.mode)
 
-      resolved.background = clampDark(resolved.background)
-      resolved.backgroundPanel = clampDark(resolved.backgroundPanel)
-      resolved.backgroundElement = clampDark(resolved.backgroundElement)
-      resolved.backgroundMenu = clampDark(resolved.backgroundMenu)
+      resolved = {
+        ...resolved,
+        background: clampDark(resolved.background),
+        backgroundPanel: clampDark(resolved.backgroundPanel),
+        backgroundElement: clampDark(resolved.backgroundElement),
+        backgroundMenu: clampDark(resolved.backgroundMenu),
+      }
       return resolved
     })
 

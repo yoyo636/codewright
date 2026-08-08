@@ -47,7 +47,6 @@ import { useDialog } from "../../ui/dialog"
 import { DialogAlert } from "../../ui/dialog-alert"
 import { TodoItem } from "../../component/todo-item"
 import { DialogMessage } from "./dialog-message"
-import { StatusPanel } from "./status-panel"
 import type { PromptInfo } from "../../component/prompt/history"
 import { DialogConfirm } from "../../ui/dialog-confirm"
 import { DialogTimeline } from "./dialog-timeline"
@@ -260,8 +259,7 @@ export function Session() {
   const [showGenericToolOutput, setShowGenericToolOutput] = kv.signal("generic_tool_output_visibility", false)
 
   const showTimestamps = createMemo(() => timestamps() === "show")
-  const hasUserMessage = createMemo(() => (sync.data.message[route.sessionID] ?? []).some((m) => m.role === "user"))
-  const contentWidth = createMemo(() => dimensions().width - (hasUserMessage() ? 44 : 0) - 4)
+  const contentWidth = createMemo(() => dimensions().width - 4)
   const providers = createMemo(() => Model.index(sync.data.provider))
 
   const scrollAcceleration = createMemo(() => getScrollAcceleration(tuiConfig))
@@ -1309,7 +1307,6 @@ export function Session() {
             </Show>
             <Toast />
           </box>
-          <StatusPanel sessionID={route.sessionID} />
           <Footer />
         </box>
       </context.Provider>
@@ -1369,7 +1366,6 @@ function UserMessage(props: {
             paddingTop={1}
             paddingBottom={1}
             paddingLeft={2}
-            backgroundColor={hover() ? theme.backgroundElement : theme.backgroundPanel}
             flexShrink={0}
           >
             <text fg={theme.text}>{text()}</text>

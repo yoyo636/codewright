@@ -1,5 +1,6 @@
 import { LayerNode } from "@codewright-ai/core/effect/layer-node"
 import { Context, Effect, Layer } from "effect"
+import path from "path"
 
 import { InstanceState } from "@/effect/instance-state"
 
@@ -18,9 +19,11 @@ import type { Agent } from "@/agent/agent"
 import { Permission } from "@/permission"
 import { Skill } from "@/skill"
 import { AbsolutePath } from "@codewright-ai/core/schema"
+import { Global } from "@codewright-ai/core/global"
 import { Location } from "@codewright-ai/core/location"
 import { LocationServiceMap, locationServiceMapLayer } from "@codewright-ai/core/location-services"
 import { Reference } from "@codewright-ai/core/reference"
+import { FSUtil } from "@codewright-ai/core/fs-util"
 import { MCP } from "@/mcp"
 import { PermissionV1 } from "@codewright-ai/core/v1/permission"
 
@@ -45,6 +48,7 @@ export interface Interface {
   readonly environment: (model: Provider.Model) => Effect.Effect<string[]>
   readonly skills: (agent: Agent.Info) => Effect.Effect<string | undefined>
   readonly mcp: (agent: Agent.Info, permission?: PermissionV1.Ruleset) => Effect.Effect<string | undefined>
+  readonly memory: () => Effect.Effect<string | undefined>
 }
 
 export class Service extends Context.Service<Service, Interface>()("@codewright/SystemPrompt") {}
@@ -54,6 +58,7 @@ const layer = Layer.effect(
   Effect.gen(function* () {
     const skill = yield* Skill.Service
     const mcp = yield* MCP.Service
+    const fsys = yield* FSUtil.Service
     const locations = yield* LocationServiceMap.Service
 
     return Service.of({
@@ -126,6 +131,25 @@ const layer = Layer.effect(
           "</mcp_instructions>",
         ].join("\n")
       }),
+
+      memory: Effect.fn("SystemPrompt.memory")(function* () {
+        // Persistent memories live in the Codewright config directory.
+        // Keep this injection cheap: a single stat + read per prompt,
+        // tolerating a missing, unreadable, or empty file.
+        const filepath = path.join(Global.Path.config, "memory.md")
+        const exists = yield* fsys.existsSafe(filepath).pipe(Effect.catch(() => Effect.succeed(false)))
+        if (!exists) return
+        const content = yield* fsys.readFileStringSafe(filepath).pipe(Effect.catch(() => Effect.succeed(undefined)))
+        if (!content || !content.trim()) return
+        const trimmed = content.trim().slice(0, 4096)
+        return [
+          "<memory>",
+          "Persistent memories provided by the user, relevant across sessions.",
+          `Stored at ${filepath}. You may view or update them via the /memory command.`,
+          trimmed,
+          "</memory>",
+        ].join("\n")
+      }),
     })
   }),
 )
@@ -139,7 +163,7 @@ const locationServiceMapNode = LayerNode.make({
 export const node = LayerNode.make({
   service: Service,
   layer: layer,
-  deps: [Skill.node, MCP.node, locationServiceMapNode],
+  deps: [Skill.node, MCP.node, FSUtil.node, locationServiceMapNode],
 })
 
 export * as SystemPrompt from "./system"

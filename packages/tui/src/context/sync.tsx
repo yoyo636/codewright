@@ -185,9 +185,9 @@ export const {
             produce((draft) => {
               const match = search(draft, partID, (p) => p.id)
               if (!match.found) return
-              const part = draft[match.index]
+              const part = draft[match.index] as unknown as Record<string, unknown>
               const existing = part[field] as string | undefined
-              ;(part[field] as string) = (existing ?? "") + delta
+              part[field] = (existing ?? "") + delta
             }),
           )
         }

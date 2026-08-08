@@ -12,6 +12,8 @@ IMPORTANT: You must NEVER generate or guess URLs for the user unless you are con
 
 If the user asks for help or wants to give feedback inform them of the following:
 - ctrl+p to list available actions
+- /memory to view or update persistent memories carried across sessions
+- /doctor to run an environment health check
 - To give feedback, users should report the issue at
   https://github.com/yoyo636/codewright/issues
 
