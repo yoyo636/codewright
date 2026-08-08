@@ -31,102 +31,26 @@ export const console = config.console
 
 ## التثبيت
 
-أسهل طريقة لتثبيت Codewright هي عبر سكربت التثبيت.
+Codewright is currently distributed as source. Clone the repository, install dependencies with [Bun](https://bun.sh), and build.
 
 ```bash
-curl -fsSL https://codewright.dev/install | bash
+# Clone the repository
+git clone https://github.com/yoyo636/codewright.git
+cd codewright
+
+# Install dependencies
+bun install
+
+# Build and run
+bun run --cwd packages/opencode build
+./packages/opencode/dist/yoyocode
 ```
 
-يمكنك أيضا تثبيته عبر الأوامر التالية:
+Prebuilt binaries will be published to [GitHub Releases](https://github.com/yoyo636/codewright/releases).
 
-- **باستخدام Node.js**
-
-        <Tabs>
-
-      <TabItem label="npm">
-      ```bash
-      npm install -g codewright-ai
-      ```
-
-          </TabItem>
-
-        <TabItem label="Bun">
-        ```bash
-        bun install -g codewright-ai
-        ```
-
-          </TabItem>
-
-        <TabItem label="pnpm">
-        ```bash
-        pnpm install -g codewright-ai
-        ```
-
-          </TabItem>
-
-        <TabItem label="Yarn">
-        ```bash
-        yarn global add codewright-ai
-        ```
-
-      </TabItem>
-
-  </Tabs>
-
-- **باستخدام Homebrew على macOS وLinux**
-
-  ```bash
-  brew install anomalyco/tap/codewright
-  ```
-
-  > نوصي باستخدام tap الخاص بـ Codewright للحصول على أحدث الإصدارات. صيغة `brew install codewright` الرسمية تُدار بواسطة فريق Homebrew ويتم تحديثها بوتيرة أقل.
-
-- **باستخدام Paru على Arch Linux**
-
-  ```bash
-  sudo pacman -S codewright           # Arch Linux (Stable)
-  paru -S codewright-bin              # Arch Linux (Latest from AUR)
-  ```
-
-#### Windows
-
-:::tip[موصى به: استخدم WSL]
-لأفضل تجربة على Windows، نوصي باستخدام [Windows Subsystem for Linux (WSL)](/docs/windows-wsl). يوفر أداء أفضل وتوافقا كاملا مع ميزات Codewright.
+:::tip[Windows]
+For the best experience on Windows, we recommend using [Windows Subsystem for Linux (WSL)](/docs/windows-wsl).
 :::
-
-- **باستخدام Chocolatey**
-
-  ```bash
-  choco install codewright
-  ```
-
-- **باستخدام Scoop**
-
-  ```bash
-  scoop install codewright
-  ```
-
-- **باستخدام NPM**
-
-  ```bash
-  npm install -g codewright-ai
-  ```
-
-- **باستخدام Mise**
-
-  ```bash
-  mise use -g github:anomalyco/codewright
-  ```
-
-- **باستخدام Docker**
-
-  ```bash
-  docker run -it --rm ghcr.io/anomalyco/codewright
-  ```
-
-دعم تثبيت Codewright على Windows باستخدام Bun قيد العمل حاليا.
-
-يمكنك أيضا تنزيل الملف التنفيذي من صفحة [Releases](https://github.com/anomalyco/codewright/releases).
 
 ---
 

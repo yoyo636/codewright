@@ -55,7 +55,7 @@
 ```bash
 # Clone the repository
 git clone https://github.com/yoyo636/codewright.git
-cd opencode
+cd codewright
 
 # Install dependencies
 bun install

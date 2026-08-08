@@ -45,20 +45,20 @@
 ```bash
 # From source
 git clone https://github.com/yoyo636/codewright.git
-cd opencode
-npm install
-npm run build
+cd codewright
+bun install
+bun run --cwd packages/opencode build
 
 # Các trình quản lý gói (Package managers)
 
-scoop install codewright             # Windows
-choco install codewright             # Windows
+# no scoop manifest yet — build from source             # Windows
+# no chocolatey package yet — build from source             # Windows
 # Build from source (see above)
-brew install codewright              # macOS và Linux (công thức brew chính thức, ít cập nhật hơn)
-sudo pacman -S codewright            # Arch Linux (Bản ổn định)
-paru -S codewright-bin               # Arch Linux (Bản mới nhất từ AUR)
-mise use -g codewright               # Mọi hệ điều hành
-nix run nixpkgs#codewright           # hoặc github:yoyo636/codewright cho nhánh dev mới nhất
+# no brew formula yet — build from source              # macOS và Linux (công thức brew chính thức, ít cập nhật hơn)
+# no pacman package yet — build from source            # Arch Linux (Bản ổn định)
+# no AUR package yet — build from source               # Arch Linux (Bản mới nhất từ AUR)
+# build from source: git clone https://github.com/yoyo636/codewright.git               # Mọi hệ điều hành
+# no nix package yet — build from source           # hoặc github:yoyo636/codewright cho nhánh dev mới nhất
 ```
 
 > [!TIP]

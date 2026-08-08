@@ -45,20 +45,20 @@
 ```bash
 # From source
 git clone https://github.com/yoyo636/codewright.git
-cd opencode
-npm install
-npm run build
+cd codewright
+bun install
+bun run --cwd packages/opencode build
 
 # Διαχειριστές πακέτων
 
-scoop install codewright             # Windows
-choco install codewright             # Windows
+# no scoop manifest yet — build from source             # Windows
+# no chocolatey package yet — build from source             # Windows
 # Build from source (see above)
-brew install codewright              # macOS και Linux (επίσημος τύπος brew, λιγότερο συχνές ενημερώσεις)
-sudo pacman -S codewright            # Arch Linux (Σταθερό)
-paru -S codewright-bin               # Arch Linux (Τελευταία έκδοση από AUR)
-mise use -g codewright               # Οποιοδήποτε λειτουργικό σύστημα
-nix run nixpkgs#codewright           # ή github:yoyo636/codewright με βάση την πιο πρόσφατη αλλαγή από το dev branch
+# no brew formula yet — build from source              # macOS και Linux (επίσημος τύπος brew, λιγότερο συχνές ενημερώσεις)
+# no pacman package yet — build from source            # Arch Linux (Σταθερό)
+# no AUR package yet — build from source               # Arch Linux (Τελευταία έκδοση από AUR)
+# build from source: git clone https://github.com/yoyo636/codewright.git               # Οποιοδήποτε λειτουργικό σύστημα
+# no nix package yet — build from source           # ή github:yoyo636/codewright με βάση την πιο πρόσφατη αλλαγή από το dev branch
 ```
 
 > [!TIP]

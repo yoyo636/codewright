@@ -26,7 +26,10 @@ WSL nudi bolje performanse fajl sistema, punu terminalsku podrsku i kompatibilno
    Kad je WSL spreman, otvorite WSL terminal i instalirajte Codewright jednom od [metoda instalacije](/docs/).
 
    ```bash
-   curl -fsSL https://codewright.dev/install | bash
+   git clone https://github.com/yoyo636/codewright.git
+cd codewright
+bun install
+bun run --cwd packages/opencode build
    ```
 
 3. **Koristite Codewright iz WSL-a**

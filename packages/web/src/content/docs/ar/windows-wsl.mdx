@@ -26,7 +26,10 @@ import { Steps } from "@astrojs/starlight/components"
    بعد إعداد WSL، افتح terminal داخل WSL وثبّت Codewright باستخدام إحدى [طرق التثبيت](/docs/).
 
    ```bash
-   curl -fsSL https://codewright.dev/install | bash
+   git clone https://github.com/yoyo636/codewright.git
+cd codewright
+bun install
+bun run --cwd packages/opencode build
    ```
 
 3. **استخدم Codewright من WSL**

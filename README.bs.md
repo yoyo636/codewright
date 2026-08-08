@@ -45,20 +45,20 @@
 ```bash
 # From source
 git clone https://github.com/yoyo636/codewright.git
-cd opencode
-npm install
-npm run build
+cd codewright
+bun install
+bun run --cwd packages/opencode build
 
 # Package manageri
 
-scoop install codewright             # Windows
-choco install codewright             # Windows
+# no scoop manifest yet — build from source             # Windows
+# no chocolatey package yet — build from source             # Windows
 # Build from source (see above)
-brew install codewright              # macOS i Linux (zvanična brew formula, rjeđe se ažurira)
-sudo pacman -S codewright            # Arch Linux (Stable)
-paru -S codewright-bin               # Arch Linux (Latest from AUR)
-mise use -g codewright               # Bilo koji OS
-nix run nixpkgs#codewright           # ili github:yoyo636/codewright za najnoviji dev branch
+# no brew formula yet — build from source              # macOS i Linux (zvanična brew formula, rjeđe se ažurira)
+# no pacman package yet — build from source            # Arch Linux (Stable)
+# no AUR package yet — build from source               # Arch Linux (Latest from AUR)
+# build from source: git clone https://github.com/yoyo636/codewright.git               # Bilo koji OS
+# no nix package yet — build from source           # ili github:yoyo636/codewright za najnoviji dev branch
 ```
 
 > [!TIP]

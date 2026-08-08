@@ -31,102 +31,26 @@ export const console = config.console
 
 ## 安装
 
-安装 Codewright 最简单的方法是通过安装脚本。
+Codewright is currently distributed as source. Clone the repository, install dependencies with [Bun](https://bun.sh), and build.
 
 ```bash
-curl -fsSL https://codewright.dev/install | bash
+# Clone the repository
+git clone https://github.com/yoyo636/codewright.git
+cd codewright
+
+# Install dependencies
+bun install
+
+# Build and run
+bun run --cwd packages/opencode build
+./packages/opencode/dist/yoyocode
 ```
 
-你也可以使用以下方式安装：
+Prebuilt binaries will be published to [GitHub Releases](https://github.com/yoyo636/codewright/releases).
 
-- **使用 Node.js**
-
-        <Tabs>
-
-      <TabItem label="npm">
-      ```bash
-      npm install -g codewright-ai
-      ```
-
-          </TabItem>
-
-        <TabItem label="Bun">
-        ```bash
-        bun install -g codewright-ai
-        ```
-
-          </TabItem>
-
-        <TabItem label="pnpm">
-        ```bash
-        pnpm install -g codewright-ai
-        ```
-
-          </TabItem>
-
-        <TabItem label="Yarn">
-        ```bash
-        yarn global add codewright-ai
-        ```
-
-      </TabItem>
-
-  </Tabs>
-
-- **在 macOS 和 Linux 上使用 Homebrew**
-
-  ```bash
-  brew install anomalyco/tap/codewright
-  ```
-
-  > 我们推荐使用 Codewright tap 以获取最新版本。官方的 `brew install codewright` formula 由 Homebrew 团队维护，更新频率较低。
-
-- **在 Arch Linux 上安装**
-
-  ```bash
-  sudo pacman -S codewright           # Arch Linux (Stable)
-  paru -S codewright-bin              # Arch Linux (Latest from AUR)
-  ```
-
-#### Windows
-
-:::tip[推荐：使用 WSL]
-为了在 Windows 上获得最佳体验，我们推荐使用 [Windows Subsystem for Linux (WSL)](/docs/windows-wsl)。它提供更好的性能，并完全兼容 Codewright 的所有功能。
+:::tip[Windows]
+For the best experience on Windows, we recommend using [Windows Subsystem for Linux (WSL)](/docs/windows-wsl).
 :::
-
-- **使用 Chocolatey**
-
-  ```bash
-  choco install codewright
-  ```
-
-- **使用 Scoop**
-
-  ```bash
-  scoop install codewright
-  ```
-
-- **使用 NPM**
-
-  ```bash
-  npm install -g codewright-ai
-  ```
-
-- **使用 Mise**
-
-  ```bash
-  mise use -g github:anomalyco/codewright
-  ```
-
-- **使用 Docker**
-
-  ```bash
-  docker run -it --rm ghcr.io/anomalyco/codewright
-  ```
-
-在 Windows 上通过 Bun 安装 Codewright 的支持目前正在开发中。
-
-你也可以从 [Releases](https://github.com/anomalyco/codewright/releases) 页面直接下载二进制文件。
 
 ---
 

@@ -26,7 +26,10 @@ WSL, daha iyi dosya sistemi performansi, tam terminal destegi ve codewright'un d
    WSL hazir olduktan sonra WSL terminalini acin ve codewright'u [kurulum yontemlerinden](/docs/) biriyle yukleyin.
 
    ```bash
-   curl -fsSL https://codewright.dev/install | bash
+   git clone https://github.com/yoyo636/codewright.git
+cd codewright
+bun install
+bun run --cwd packages/opencode build
    ```
 
 3. **codewright'u WSL icinden kullanin**

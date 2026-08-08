@@ -31,102 +31,26 @@ export const console = config.console
 
 ## インストール
 
-Codewright をインストールする最も簡単な方法は、インストールスクリプトを使用することです。
+Codewright is currently distributed as source. Clone the repository, install dependencies with [Bun](https://bun.sh), and build.
 
 ```bash
-curl -fsSL https://codewright.dev/install | bash
+# Clone the repository
+git clone https://github.com/yoyo636/codewright.git
+cd codewright
+
+# Install dependencies
+bun install
+
+# Build and run
+bun run --cwd packages/opencode build
+./packages/opencode/dist/yoyocode
 ```
 
-次のコマンドを使用してインストールすることもできます。
+Prebuilt binaries will be published to [GitHub Releases](https://github.com/yoyo636/codewright/releases).
 
-- **Node.js の使用**
-
-        <Tabs>
-
-      <TabItem label="npm">
-      ```bash
-      npm install -g codewright-ai
-      ```
-
-          </TabItem>
-
-        <TabItem label="Bun">
-        ```bash
-        bun install -g codewright-ai
-        ```
-
-          </TabItem>
-
-        <TabItem label="pnpm">
-        ```bash
-        pnpm install -g codewright-ai
-        ```
-
-          </TabItem>
-
-        <TabItem label="Yarn">
-        ```bash
-        yarn global add codewright-ai
-        ```
-
-      </TabItem>
-
-  </Tabs>
-
-- **macOS および Linux での Homebrew の使用**
-
-  ```bash
-  brew install anomalyco/tap/codewright
-  ```
-
-  > 最新のリリースには Codewright タップを使用することをお勧めします。公式の `brew install codewright` 式は Homebrew チームによって維持されており、更新頻度は低くなります。
-
-- **Arch Linux での Paru の使用**
-
-  ```bash
-  sudo pacman -S codewright           # Arch Linux (Stable)
-  paru -S codewright-bin              # Arch Linux (Latest from AUR)
-  ```
-
-#### Windows
-
-:::tip[推奨: WSL を使用する]
-Windows で最高のエクスペリエンスを得るには、[Windows Subsystem for Linux (WSL)](/docs/windows-wsl) を使用することをお勧めします。これにより、パフォーマンスが向上し、Codewright の機能との完全な互換性が提供されます。
+:::tip[Windows]
+For the best experience on Windows, we recommend using [Windows Subsystem for Linux (WSL)](/docs/windows-wsl).
 :::
-
-- **Chocolatey の使用**
-
-  ```bash
-  choco install codewright
-  ```
-
-- **Scoop の使用**
-
-  ```bash
-  scoop install codewright
-  ```
-
-- **npm の使用**
-
-  ```bash
-  npm install -g codewright-ai
-  ```
-
-- **Mise の使用**
-
-  ```bash
-  mise use -g github:anomalyco/codewright
-  ```
-
-- **Docker の使用**
-
-  ```bash
-  docker run -it --rm ghcr.io/anomalyco/codewright
-  ```
-
-Bun を使用して Windows に Codewright をインストールするためのサポートは現在進行中です。
-
-[Releases](https://github.com/anomalyco/codewright/releases).
 
 ---
 

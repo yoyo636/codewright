@@ -45,20 +45,20 @@
 ```bash
 # From source
 git clone https://github.com/yoyo636/codewright.git
-cd opencode
-npm install
-npm run build
+cd codewright
+bun install
+bun run --cwd packages/opencode build
 
 # 패키지 매니저
 
-scoop install codewright             # Windows
-choco install codewright             # Windows
+# no scoop manifest yet — build from source             # Windows
+# no chocolatey package yet — build from source             # Windows
 # Build from source (see above)
-brew install codewright              # macOS 및 Linux (공식 brew formula, 업데이트 빈도 낮음)
-sudo pacman -S codewright            # Arch Linux (Stable)
-paru -S codewright-bin               # Arch Linux (Latest from AUR)
-mise use -g codewright               # 어떤 OS든
-nix run nixpkgs#codewright           # 또는 github:yoyo636/codewright 로 최신 dev 브랜치
+# no brew formula yet — build from source              # macOS 및 Linux (공식 brew formula, 업데이트 빈도 낮음)
+# no pacman package yet — build from source            # Arch Linux (Stable)
+# no AUR package yet — build from source               # Arch Linux (Latest from AUR)
+# build from source: git clone https://github.com/yoyo636/codewright.git               # 어떤 OS든
+# no nix package yet — build from source           # 또는 github:yoyo636/codewright 로 최신 dev 브랜치
 ```
 
 > [!TIP]

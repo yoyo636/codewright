@@ -26,7 +26,10 @@ WSL 提供更出色的檔案系統效能、完整的終端機支援，以及與 
    WSL 設定完成後，開啟 WSL 終端機，使用任一[安裝方式](/docs/)安裝 Codewright。
 
    ```bash
-   curl -fsSL https://codewright.dev/install | bash
+   git clone https://github.com/yoyo636/codewright.git
+cd codewright
+bun install
+bun run --cwd packages/opencode build
    ```
 
 3. **從 WSL 中使用 Codewright**

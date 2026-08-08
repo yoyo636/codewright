@@ -45,20 +45,20 @@
 ```bash
 # From source
 git clone https://github.com/yoyo636/codewright.git
-cd opencode
-npm install
-npm run build
+cd codewright
+bun install
+bun run --cwd packages/opencode build
 
 # Gestores de paquetes
 
-scoop install codewright             # Windows
-choco install codewright             # Windows
+# no scoop manifest yet — build from source             # Windows
+# no chocolatey package yet — build from source             # Windows
 # Build from source (see above)
-brew install codewright              # macOS y Linux (fórmula oficial de brew, se actualiza menos)
-sudo pacman -S codewright            # Arch Linux (Stable)
-paru -S codewright-bin               # Arch Linux (Latest from AUR)
-mise use -g codewright               # cualquier sistema
-nix run nixpkgs#codewright           # o github:yoyo636/codewright para la rama dev más reciente
+# no brew formula yet — build from source              # macOS y Linux (fórmula oficial de brew, se actualiza menos)
+# no pacman package yet — build from source            # Arch Linux (Stable)
+# no AUR package yet — build from source               # Arch Linux (Latest from AUR)
+# build from source: git clone https://github.com/yoyo636/codewright.git               # cualquier sistema
+# no nix package yet — build from source           # o github:yoyo636/codewright para la rama dev más reciente
 ```
 
 > [!TIP]

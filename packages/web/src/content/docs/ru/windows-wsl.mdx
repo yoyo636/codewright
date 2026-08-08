@@ -26,7 +26,10 @@ WSL дает более высокую производительность фа
    После настройки WSL откройте терминал WSL и установите codewright одним из [способов установки](/docs/).
 
    ```bash
-   curl -fsSL https://codewright.dev/install | bash
+   git clone https://github.com/yoyo636/codewright.git
+cd codewright
+bun install
+bun run --cwd packages/opencode build
    ```
 
 3. **Запускайте codewright из WSL**

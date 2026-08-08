@@ -26,7 +26,10 @@ WSL oferuje lepsza wydajnosc systemu plikow, pelna obsluge terminala i zgodnosc 
    Po skonfigurowaniu WSL otworz terminal WSL i zainstaluj codewright jedna z [metod instalacji](/docs/).
 
    ```bash
-   curl -fsSL https://codewright.dev/install | bash
+   git clone https://github.com/yoyo636/codewright.git
+cd codewright
+bun install
+bun run --cwd packages/opencode build
    ```
 
 3. **Korzystaj z codewright przez WSL**

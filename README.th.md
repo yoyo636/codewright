@@ -45,20 +45,20 @@
 ```bash
 # From source
 git clone https://github.com/yoyo636/codewright.git
-cd opencode
-npm install
-npm run build
+cd codewright
+bun install
+bun run --cwd packages/opencode build
 
 # ตัวจัดการแพ็กเกจ
 
-scoop install codewright             # Windows
-choco install codewright             # Windows
+# no scoop manifest yet — build from source             # Windows
+# no chocolatey package yet — build from source             # Windows
 # Build from source (see above)
-brew install codewright              # macOS และ Linux (brew formula อย่างเป็นทางการ อัปเดตน้อยกว่า)
-sudo pacman -S codewright            # Arch Linux (Stable)
-paru -S codewright-bin               # Arch Linux (Latest from AUR)
-mise use -g codewright               # ระบบปฏิบัติการใดก็ได้
-nix run nixpkgs#codewright           # หรือ github:yoyo636/codewright สำหรับสาขาพัฒนาล่าสุด
+# no brew formula yet — build from source              # macOS และ Linux (brew formula อย่างเป็นทางการ อัปเดตน้อยกว่า)
+# no pacman package yet — build from source            # Arch Linux (Stable)
+# no AUR package yet — build from source               # Arch Linux (Latest from AUR)
+# build from source: git clone https://github.com/yoyo636/codewright.git               # ระบบปฏิบัติการใดก็ได้
+# no nix package yet — build from source           # หรือ github:yoyo636/codewright สำหรับสาขาพัฒนาล่าสุด
 ```
 
 > [!TIP]
