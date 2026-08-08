@@ -11,6 +11,7 @@ import PROMPT_INITIALIZE from "./template/initialize.txt"
 import PROMPT_REVIEW from "./template/review.txt"
 import PROMPT_MEMORY from "./template/memory.txt"
 import PROMPT_DOCTOR from "./template/doctor.txt"
+import PROMPT_CHECK from "./template/check.txt"
 import { LegacyEvent } from "@codewright-ai/schema/legacy-event"
 
 type State = {
@@ -101,6 +102,13 @@ const layer = Layer.effect(
         source: "command",
         template: PROMPT_DOCTOR,
         hints: hints(PROMPT_DOCTOR),
+      }
+      commands["check"] = {
+        name: "check",
+        description: "verify the completed project: references, compilation, and logic - two rounds, then a report",
+        source: "command",
+        template: PROMPT_CHECK,
+        hints: hints(PROMPT_CHECK),
       }
 
       for (const [name, command] of Object.entries(cfg.command ?? {})) {

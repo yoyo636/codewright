@@ -1,0 +1,68 @@
+Run a comprehensive project-completion verification. This is the final quality gate before declaring work done: you will verify that everything holds together, then submit a report. You MUST perform TWO independent rounds of verification.
+
+Optional focus: $ARGUMENTS
+
+---
+
+## Determine scope
+
+Identify the work to verify:
+- Run `git status --short` to enumerate changed and untracked (net-new) files.
+- Run `git diff` and `git diff --cached` to see the changes.
+- If a focus was given via $ARGUMENTS, narrow the deep checks to that area, but always run the global compile and reference checks.
+- Read each changed file in full. Code that looks right in isolation may be wrong in context, and vice versa.
+
+---
+
+## Round 1 - Comprehensive check
+
+Work through every category below. When you find an issue, fix it immediately, then continue. Round 1 is complete only when all four categories pass with no outstanding errors.
+
+### 1. References and imports
+- Every `import` / `require` / `from` path resolves to a real file or installed module.
+- Symbols referenced across files (functions, types, constants, components) are actually exported with the expected name and shape.
+- Asset and config references (file paths, route handlers, IDs, keys) point to real targets.
+- No dangling references to deleted, renamed, or never-created files.
+
+### 2. Functional connections
+- Calls between modules use correct signatures: arity, types, and argument order match.
+- Wiring is complete: handlers registered, routes mounted, events connected, configs loaded. No "planned but not wired" gaps.
+- Data and control flow are consistent end to end; no orphaned functions left unused or unreachable.
+
+### 3. Compilation and type-checking
+- Detect the project's build / typecheck / lint commands by reading `package.json` scripts, `AGENTS.md`, `turbo.json`, `Makefile`, `pyproject.toml`, or equivalent.
+- Run them (e.g. `bun turbo typecheck`, `bun run build`, `tsc --noEmit`, `npm run lint`, `ruff check`). Capture every error and warning.
+- Every error must be resolved before this category passes. If a command is genuinely unavailable or not applicable, state that explicitly rather than skipping silently.
+
+### 4. Logic vs. the user's request
+- Re-read the user's original request(s) from the conversation history.
+- Map each explicit requirement to the concrete code that implements it. Anything requested but not implemented is a failure, even if the code "looks done."
+- Flag partial implementations, misinterpreted requirements, and unintended scope changes.
+
+---
+
+## Round 2 - Independent re-verification
+
+Re-examine everything from a fresh angle, specifically hunting for what Round 1 missed:
+
+- Re-run the compile / typecheck / lint commands. A fix in Round 1 may have introduced a new error elsewhere.
+- Re-check imports and cross-file references on the files you modified in Round 1.
+- Sanity-check edge cases on the new code: empty / null / undefined inputs, error paths, boundary conditions.
+- Confirm the user's requirements are still fully met after the Round 1 fixes.
+
+If Round 2 finds anything, fix it and re-run the affected checks until clean. Round 2 is complete only when the full check passes again with zero errors.
+
+---
+
+## Report
+
+After both rounds, submit a concise report to the user:
+
+- **Scope**: the files and areas verified, and how scope was determined.
+- **Round 1**: issues found per category (references / connections / compile / logic) and how each was fixed. Write "None" for a clean category.
+- **Round 2**: anything Round 1 missed, and the fix. "None" if Round 2 was clean.
+- **Final build status**: the exact compile / typecheck / lint result - pass or fail, with the command that was run.
+- **Requirements coverage**: each user requirement mapped to its status (✅ done / ⚠️ partial / ❌ missing).
+- **Verdict**: one line stating whether the project is complete and verified, or exactly what remains.
+
+Be matter-of-fact. Do not overstate success: if something is unverified or partial, say so plainly. If you could not run a check (for example, no build tooling present), state that explicitly rather than implying it passed. Never echo or log any secret values.
