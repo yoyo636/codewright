@@ -6,6 +6,8 @@ export const Event = Schema.Literals([
   "UserPromptSubmit",
   "SessionStart",
   "Stop",
+  "BeforeCompaction",
+  "AfterCompaction",
 ])
 
 export const Spec = Schema.Struct({

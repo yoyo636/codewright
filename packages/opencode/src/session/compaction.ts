@@ -18,6 +18,7 @@ import { isOverflow as overflow, usable } from "./overflow"
 import { serviceUse } from "@codewright-ai/core/effect/service-use"
 import { RuntimeFlags } from "@/effect/runtime-flags"
 import { EventV2Bridge } from "@/event-v2-bridge"
+import { hook } from "@/hook"
 import { ProviderV2 } from "@codewright-ai/core/provider"
 import { ModelV2 } from "@codewright-ai/core/model"
 import { buildPrompt } from "@codewright-ai/core/session/compaction"
@@ -326,7 +327,7 @@ const layer = Layer.effect(
       }
 
       const agent = yield* agents.get("compaction")
-      const model = agent.model
+      const primaryModel = agent.model
         ? yield* provider.getModel(agent.model.providerID, agent.model.modelID).pipe(Effect.orDie)
         : yield* provider.getModel(userMessage.model.providerID, userMessage.model.modelID).pipe(Effect.orDie)
       const cfg = yield* config.get()
@@ -337,7 +338,7 @@ const layer = Layer.effect(
       const selected = yield* select({
         messages: history.filter((_, index) => !hidden.has(index)),
         cfg,
-        model,
+        model: primaryModel,
       })
       // Allow plugins to inject context or replace compaction prompt.
       const compacting = yield* plugin.trigger(
@@ -348,58 +349,91 @@ const layer = Layer.effect(
       const nextPrompt = compacting.prompt ?? buildPrompt({ previousSummary, context: compacting.context })
       const msgs = structuredClone(selected.head)
       yield* plugin.trigger("experimental.chat.messages.transform", {}, { messages: msgs })
-      const modelMessages = yield* MessageV2.toModelMessagesEffect(msgs, model, {
+      const modelMessages = yield* MessageV2.toModelMessagesEffect(msgs, primaryModel, {
         stripMedia: true,
         toolOutputMaxChars: TOOL_OUTPUT_MAX_CHARS,
       })
       const ctx = yield* InstanceState.context
-      const msg: SessionV1.Assistant = {
-        id: MessageID.ascending(),
-        role: "assistant",
-        parentID: input.parentID,
-        sessionID: input.sessionID,
-        mode: "compaction",
-        agent: "compaction",
-        variant: userMessage.model.variant,
-        summary: true,
-        path: {
-          cwd: ctx.directory,
-          root: ctx.worktree,
-        },
-        cost: 0,
-        tokens: {
-          output: 0,
-          input: 0,
-          reasoning: 0,
-          cache: { read: 0, write: 0 },
-        },
-        modelID: model.id,
-        providerID: model.providerID,
-        time: {
-          created: Date.now(),
-        },
+      yield* hook.run("BeforeCompaction", { sessionID: input.sessionID, cwd: ctx.directory }, config)
+
+      // Run the summarization with a given model. If the primary model call
+      // fails (provider error, rate limit, ...), fall back to the small model
+      // so the compaction still succeeds and the session keeps working.
+      const run = (model: Provider.Model) =>
+        Effect.gen(function* () {
+          const msg: SessionV1.Assistant = {
+            id: MessageID.ascending(),
+            role: "assistant",
+            parentID: input.parentID,
+            sessionID: input.sessionID,
+            mode: "compaction",
+            agent: "compaction",
+            variant: userMessage.model.variant,
+            summary: true,
+            path: {
+              cwd: ctx.directory,
+              root: ctx.worktree,
+            },
+            cost: 0,
+            tokens: {
+              output: 0,
+              input: 0,
+              reasoning: 0,
+              cache: { read: 0, write: 0 },
+            },
+            modelID: model.id,
+            providerID: model.providerID,
+            time: {
+              created: Date.now(),
+            },
+          }
+          yield* session.updateMessage(msg)
+          const processor = yield* processors.create({
+            assistantMessage: msg,
+            sessionID: input.sessionID,
+            model,
+          })
+          const result = yield* processor.process({
+            user: userMessage,
+            agent,
+            sessionID: input.sessionID,
+            tools: {},
+            system: [],
+            messages: [
+              ...modelMessages,
+              {
+                role: "user",
+                content: [{ type: "text", text: nextPrompt }],
+              },
+            ],
+            model,
+          })
+          return { processor, result }
+        })
+
+      const attempt = yield* run(primaryModel)
+      let processor = attempt.processor
+      let result = attempt.result
+
+      // Fall back to the small model if the primary summarization failed with a
+      // model/provider error. Context overflow ("compact") and user aborts are
+      // handled by the normal flow, so they are excluded from the fallback.
+      if (
+        result === "stop" &&
+        processor.message.error &&
+        !SessionV1.ContextOverflowError.isInstance(processor.message.error)
+      ) {
+        const fallbackModel = yield* provider.getSmallModel(primaryModel.providerID)
+        if (fallbackModel) {
+          yield* Effect.logWarning("compaction with primary model failed; retrying with small model", {
+            error: processor.message.error,
+          })
+          const retry = yield* run(fallbackModel)
+          processor = retry.processor
+          result = retry.result
+        }
       }
-      yield* session.updateMessage(msg)
-      const processor = yield* processors.create({
-        assistantMessage: msg,
-        sessionID: input.sessionID,
-        model,
-      })
-      const result = yield* processor.process({
-        user: userMessage,
-        agent,
-        sessionID: input.sessionID,
-        tools: {},
-        system: [],
-        messages: [
-          ...modelMessages,
-          {
-            role: "user",
-            content: [{ type: "text", text: nextPrompt }],
-          },
-        ],
-        model,
-      })
+      yield* hook.run("AfterCompaction", { sessionID: input.sessionID, cwd: ctx.directory }, config)
 
       if (result === "compact") {
         processor.message.error = new SessionV1.ContextOverflowError({

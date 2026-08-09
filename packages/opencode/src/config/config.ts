@@ -611,6 +611,25 @@ const layer = Layer.effect(
           result.compaction = { ...result.compaction, prune: false }
         }
 
+        // CLI `--auto` / `--yolo` overrides for the named approval preset and
+        // the safety-layer dangerous-command action. These are evaluated at
+        // access time so the CLI can set them before config is loaded.
+        if (Flag.CODEWRIGHT_APPROVAL_MODE) {
+          result.experimental = {
+            ...result.experimental,
+            approval_mode: Flag.CODEWRIGHT_APPROVAL_MODE as "suggest" | "auto-edit" | "full-auto",
+          }
+        }
+        if (Flag.CODEWRIGHT_SAFETY_DANGEROUS) {
+          result.experimental = {
+            ...result.experimental,
+            safety: {
+              ...result.experimental?.safety,
+              dangerous: Flag.CODEWRIGHT_SAFETY_DANGEROUS as "ask" | "allow" | "deny",
+            },
+          }
+        }
+
         return {
           config: result,
           directories,

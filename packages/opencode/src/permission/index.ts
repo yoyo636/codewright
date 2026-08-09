@@ -37,6 +37,30 @@ export function evaluate(permission: string, pattern: string, ...rulesets: Permi
   )
 }
 
+/**
+ * Evaluation for safety-layer asks (dangerous shell commands). Unlike
+ * `evaluate`, a `"*"` catch-all rule never matches: otherwise the default
+ * `"*": "allow"` policy would silently approve every dangerous command. Only
+ * an explicit rule keyed to the specific permission (e.g.
+ * `permission.bash_dangerous: "allow"`) can auto-allow.
+ */
+export function evaluateDangerous(
+  permission: string,
+  pattern: string,
+  ...rulesets: PermissionV1.Ruleset[]
+): PermissionV1.Rule {
+  return (
+    rulesets
+      .flat()
+      .filter((rule) => rule.permission !== "*")
+      .findLast((rule) => Wildcard.match(permission, rule.permission) && Wildcard.match(pattern, rule.pattern)) ?? {
+      action: "ask",
+      permission,
+      pattern: "*",
+    }
+  )
+}
+
 export class Service extends Context.Service<Service, Interface>()("@codewright/Permission") {}
 
 const layer = Layer.effect(
@@ -67,10 +91,11 @@ const layer = Layer.effect(
     const ask = Effect.fn("Permission.ask")(function* (input: PermissionV1.AskInput) {
       const { approved, pending } = yield* InstanceState.get(state)
       const { ruleset, ...request } = input
+      const matchRule = input.dangerous ? evaluateDangerous : evaluate
       let needsAsk = false
 
       for (const pattern of request.patterns) {
-        const rule = evaluate(request.permission, pattern, ruleset, approved)
+        const rule = matchRule(request.permission, pattern, ruleset, approved)
         yield* Effect.logInfo("evaluated", { permission: request.permission, pattern, action: rule })
         if (rule.action === "deny") {
           return yield* new PermissionV1.DeniedError({

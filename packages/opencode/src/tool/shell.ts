@@ -22,6 +22,7 @@ import { ChildProcessSpawner } from "effect/unstable/process/ChildProcessSpawner
 import { ShellPrompt, type Parameters } from "./shell/prompt"
 import * as BackgroundShell from "./shell/background"
 import { BashArity } from "@/permission/arity"
+import { classify, type PolicyVerdict } from "@/safety/exec-policy"
 
 export { Parameters } from "./shell/prompt"
 
@@ -309,6 +310,28 @@ function cmd(shell: string, command: string, cwd: string, env: NodeJS.ProcessEnv
     detached: process.platform !== "win32",
   })
 }
+
+function blocked(command: string, verdict: PolicyVerdict) {
+  return {
+    title: command,
+    metadata: {
+      output: `Command blocked by safety policy: ${verdict.reason}`,
+      exit: null as number | null,
+      truncated: false,
+    },
+    output:
+      `Command blocked by safety policy.\n\n${verdict.reason} (${verdict.pattern})\n\n` +
+      `This command was not executed. Use a safer equivalent, or ask the user to explicitly allow it ` +
+      `(e.g. "permission": { "bash_dangerous": "allow" }) before retrying.`,
+  }
+}
+
+/** First "human-understandable" words of a command, used for per-command approval caching. */
+function commandPrefix(command: string) {
+  const tokens = command.trim().split(/\s+/)
+  const prefix = BashArity.prefix(tokens).join(" ")
+  return prefix || tokens[0] || command
+}
 const parser = lazy(async () => {
   const { Parser } = await import("web-tree-sitter")
   const { default: treeWasm } = await import("web-tree-sitter/tree-sitter.wasm" as string, {
@@ -420,10 +443,21 @@ export const ShellTool = Tool.define(
         { cwd, sessionID: ctx.sessionID, callID: ctx.callID },
         { env: {} },
       )
-      return {
+      const cfg = yield* config.get()
+      let env: NodeJS.ProcessEnv = {
         ...process.env,
         ...extra.env,
       }
+      // Apply the shell environment policy (Codex `shell_environment_policy`):
+      // inject `set` vars into every command, and strip `unset` vars.
+      const shellEnvCfg = cfg.experimental?.shell_env
+      if (shellEnvCfg?.set) {
+        env = { ...env, ...shellEnvCfg.set }
+      }
+      if (shellEnvCfg?.unset) {
+        for (const key of shellEnvCfg.unset) delete env[key]
+      }
+      return env
     })
 
     const run = Effect.fn("ShellTool.run")(function* (
@@ -616,9 +650,38 @@ export const ShellTool = Tool.define(
               if (params.timeout !== undefined && params.timeout < 0) {
                 throw new Error(`Invalid timeout value: ${params.timeout}. Timeout must be a positive number.`)
               }
-              const timeout = params.timeout ?? defaultTimeoutMs
-              const ps = Shell.ps(shell)
-              yield* Effect.scoped(
+          const timeout = params.timeout ?? defaultTimeoutMs
+          const ps = Shell.ps(shell)
+
+          // Safety layer: classify the command before it runs.
+          const verdict = classify(params.command)
+          const safety = cfg.experimental?.safety
+          const dangerousAction = safety?.dangerous ?? "ask"
+          const bannedAction = safety?.banned ?? "block"
+
+          // Destructive commands are not executed (unless the user opted into
+          // being asked for them).
+          if (verdict.action === "banned" && bannedAction === "block") {
+            return blocked(params.command, verdict)
+          }
+
+          // Risky commands (and banned-ask) escalate to an explicit approval
+          // even when the session policy is "allow all". The ask carries
+          // `dangerous: true`, which a `"*"` catch-all rule never approves.
+          const needsEscalation = verdict.action === "risky" || (verdict.action === "banned" && bannedAction === "ask")
+          if (needsEscalation && dangerousAction !== "allow") {
+            if (dangerousAction === "deny") return blocked(params.command, verdict)
+            const prefix = commandPrefix(params.command)
+            yield* ctx.ask({
+              permission: "bash_dangerous",
+              patterns: [prefix + " *"],
+              always: [prefix + " *"],
+              dangerous: true,
+              metadata: { command: params.command, reason: verdict.reason, pattern: verdict.pattern },
+            })
+          }
+
+          yield* Effect.scoped(
                 Effect.gen(function* () {
                   const tree = yield* Effect.acquireRelease(parse(params.command, ps), (tree) =>
                     Effect.sync(() => tree.delete()),

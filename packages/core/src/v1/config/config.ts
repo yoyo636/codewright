@@ -194,6 +194,32 @@ export const Info = Schema.Struct({
       policies: Schema.optional(Schema.mutable(Schema.Array(ConfigExperimental.Policy))).annotate({
         description: "Policy statements applied to supported resources, such as provider access",
       }),
+      safety: Schema.optional(
+        Schema.Struct({
+          dangerous: Schema.optional(Schema.Literals(["ask", "allow", "deny"])).annotate({
+            description:
+              "Action for risky shell commands (sudo, force-push, destructive git, etc.) when no explicit permission rule exists (default: ask)",
+          }),
+          banned: Schema.optional(Schema.Literals(["block", "ask"])).annotate({
+            description:
+              "Action for destructive shell commands (rm -rf /, mkfs, dd to a device, fork bomb, etc.) (default: block)",
+          }),
+        }),
+      ),
+      approval_mode: Schema.optional(Schema.Literals(["suggest", "auto-edit", "full-auto"])).annotate({
+        description:
+          "Named approval preset: suggest (ask for edits and commands), auto-edit (auto-apply edits, ask for commands), full-auto (auto-approve; the safety layer still blocks destructive commands)",
+      }),
+      shell_env: Schema.optional(
+        Schema.Struct({
+          set: Schema.optional(Schema.Record(Schema.String, Schema.String)).annotate({
+            description: "Environment variables injected into every shell command",
+          }),
+          unset: Schema.optional(Schema.Array(Schema.String)).annotate({
+            description: "Environment variables removed from every shell command",
+          }),
+        }),
+      ),
     }),
   ),
 }).annotate({ identifier: "Config" })

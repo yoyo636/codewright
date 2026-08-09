@@ -75,4 +75,14 @@ export const Flag = {
   get CODEWRIGHT_CLIENT() {
     return process.env["CODEWRIGHT_CLIENT"] ?? "cli"
   },
+
+  // Approval-mode / safety overrides driven by the CLI `--auto` / `--yolo`
+  // flags. Evaluated at access time so the CLI can set them before the agent
+  // lazily loads config.
+  get CODEWRIGHT_APPROVAL_MODE() {
+    return process.env["CODEWRIGHT_APPROVAL_MODE"]
+  },
+  get CODEWRIGHT_SAFETY_DANGEROUS() {
+    return process.env["CODEWRIGHT_SAFETY_DANGEROUS"]
+  },
 }

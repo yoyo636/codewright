@@ -48,9 +48,15 @@ export const Approval = Schema.Struct({ projectID: Project.ID, patterns: Schema.
 })
 export type Approval = typeof Approval.Type
 
-export const AskInput = Schema.Struct({ ...Request.fields, id: Schema.optional(ID), ruleset: Ruleset }).annotate({
-  identifier: "PermissionAskInput",
-})
+export const AskInput = Schema.Struct({
+  ...Request.fields,
+  id: Schema.optional(ID),
+  ruleset: Ruleset,
+  // Safety-layer asks (e.g. dangerous shell commands) must not be silently
+  // approved by a `"*"` catch-all rule; only an explicit rule for the
+  // specific permission key may auto-allow them.
+  dangerous: Schema.optional(Schema.Boolean),
+}).annotate({ identifier: "PermissionAskInput" })
 export type AskInput = typeof AskInput.Type
 
 export const ReplyInput = Schema.Struct({ requestID: ID, ...ReplyBody.fields }).annotate({

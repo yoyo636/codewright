@@ -278,6 +278,10 @@ export const RunCommand = effectCmd({
       const rawMessage = [...args.message, ...(args["--"] || [])].join(" ")
       const interactive = args.mini
       const auto = args.auto || args.yolo || args["dangerously-skip-permissions"]
+      // `--auto` selects the full-auto approval preset; `--yolo` additionally
+      // tells the safety layer to auto-allow risky (destructive) commands.
+      if (auto) process.env["CODEWRIGHT_APPROVAL_MODE"] = "full-auto"
+      if (args.yolo) process.env["CODEWRIGHT_SAFETY_DANGEROUS"] = "allow"
       const thinking = interactive ? (args.thinking ?? true) : (args.thinking ?? false)
       const die = (message: string): never => {
         UI.error(message)

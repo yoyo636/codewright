@@ -1,0 +1,24 @@
+Revert the most recent change you made.
+
+This command undoes your last action so the project returns to its prior state. Be careful and verify the result. Only reverse what YOUR last action changed — never touch the user's own edits or anything outside the scope of your last turn.
+
+Optional scope hint: $ARGUMENTS
+
+## Steps
+
+1. Inspect the current state
+   - Run `git status --short` and `git diff` to see uncommitted changes.
+   - If a session diff/summary of your last turn is available, use it to identify exactly what changed.
+
+2. Revert working-tree changes you introduced this turn
+   - For uncommitted changes you made, reverse them with `git restore <file>` / `git checkout -- <file>`, or `git stash` if you want to preserve them for later.
+   - Leave the user's unrelated changes alone.
+
+3. Reverse edits already applied via your tools
+   - For files you edited or wrote this turn that are not yet tracked by git, open them and manually reverse the specific edits you made, or restore the prior content if it is available.
+
+4. Verify
+   - Re-run `git status --short` and `git diff` to confirm the working tree matches the intended prior state.
+   - If a build/typecheck is relevant, run it to confirm nothing is broken.
+
+If you cannot determine what your last action changed, say so explicitly rather than guessing.

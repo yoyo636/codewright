@@ -12,6 +12,7 @@ import PROMPT_REVIEW from "./template/review.txt"
 import PROMPT_MEMORY from "./template/memory.txt"
 import PROMPT_DOCTOR from "./template/doctor.txt"
 import PROMPT_CHECK from "./template/check.txt"
+import PROMPT_UNDO from "./template/undo.txt"
 import { LegacyEvent } from "@codewright-ai/schema/legacy-event"
 
 type State = {
@@ -109,6 +110,13 @@ const layer = Layer.effect(
         source: "command",
         template: PROMPT_CHECK,
         hints: hints(PROMPT_CHECK),
+      }
+      commands["undo"] = {
+        name: "undo",
+        description: "revert the agent's last change (working-tree edits and tool-applied edits)",
+        source: "command",
+        template: PROMPT_UNDO,
+        hints: hints(PROMPT_UNDO),
       }
 
       for (const [name, command] of Object.entries(cfg.command ?? {})) {

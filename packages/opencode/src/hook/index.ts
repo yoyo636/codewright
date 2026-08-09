@@ -2,7 +2,14 @@ import { Effect } from "effect"
 import type { Config } from "@/config/config"
 import { ConfigHooksV1 } from "@codewright-ai/core/v1/config/hooks"
 
-export type HookEvent = "PreToolUse" | "PostToolUse" | "UserPromptSubmit" | "SessionStart" | "Stop"
+export type HookEvent =
+  | "PreToolUse"
+  | "PostToolUse"
+  | "UserPromptSubmit"
+  | "SessionStart"
+  | "Stop"
+  | "BeforeCompaction"
+  | "AfterCompaction"
 
 export interface HookInput {
   toolName?: string
