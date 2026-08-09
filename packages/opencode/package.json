@@ -16,7 +16,7 @@
     "dev:temporary": "bun run --conditions=browser ./src/temporary.ts"
   },
   "bin": {
-    "yoyocode": "./bin/yoyocode"
+    "codewright": "./bin/codewright"
   },
   "exports": {
     "./*": "./src/*.ts"

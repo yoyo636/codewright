@@ -62,7 +62,7 @@ bun install
 
 # Build and run
 bun run --cwd packages/opencode build
-./packages/opencode/dist/yoyocode
+./packages/opencode/dist/codewright
 ```
 
 #### Requirements

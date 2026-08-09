@@ -89,7 +89,7 @@ export async function downloadCliToResources() {
   const dest = windowsify("resources/codewright-cli")
   const channel = resolveChannel()
   if (channel === "dev" && !Bun.env.CODEWRIGHT_FORCE_DOWNLOAD) {
-    const localWrapper = resolve(process.cwd(), "..", "opencode", "bin", "yoyocode")
+    const localWrapper = resolve(process.cwd(), "..", "opencode", "bin", "codewright")
     if (existsSync(localWrapper)) {
       await copyFile(localWrapper, dest)
       if (process.platform !== "win32") await chmod(dest, 0o755)

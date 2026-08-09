@@ -560,7 +560,7 @@
       "name": "codewright",
       "version": "1.1.2",
       "bin": {
-        "yoyocode": "./bin/yoyocode",
+        "codewright": "./bin/codewright",
       },
       "dependencies": {
         "@actions/core": "1.11.1",
