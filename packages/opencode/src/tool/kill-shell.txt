@@ -1,5 +1,0 @@
-Terminates a background shell process started with the bash tool's `run_in_background` parameter.
-
-Provide the `shell_id` returned when the background shell was started. The tool sends SIGTERM to the process (or SIGKILL after 3 seconds if it doesn't exit), then returns the final accumulated output.
-
-If the process has already completed or was already killed, this returns the final output without taking any action.

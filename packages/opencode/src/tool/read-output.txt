@@ -1,5 +1,0 @@
-Reads the current output from a background shell process. Use this to check the progress of a command started with the bash tool's `run_in_background` parameter.
-
-Provide the `shell_id` returned when the background shell was started. The output includes all accumulated stdout and stderr so far. If the process is still running, the status will indicate "still running". If it has completed, the exit code is shown.
-
-If the output is large, only the most recent portion is shown (older output is truncated). For long-running processes, call this tool periodically to monitor progress.
