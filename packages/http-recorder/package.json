@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "version": "1.1.2",
+  "version": "3.0.1-beta",
   "name": "@codewright-ai/http-recorder",
   "description": "Record and replay Effect HTTP client traffic with deterministic cassettes",
   "type": "module",

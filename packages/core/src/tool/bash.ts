@@ -10,6 +10,7 @@ import { FSUtil } from "../fs-util"
 import { LocationMutation } from "../location-mutation"
 import { AppProcess } from "../process"
 import { PermissionV2 } from "../permission"
+import { PermissionMode } from "../permission/hierarchy"
 import { PositiveInt } from "../schema"
 import { ToolRegistry } from "./registry"
 import { Tool } from "./tool"
@@ -102,6 +103,7 @@ const layer = Layer.effectDiscard(
     const appProcess = yield* AppProcess.Service
     const config = yield* Config.Service
     const permission = yield* PermissionV2.Service
+    const mode = yield* PermissionMode.Service
 
     yield* tools
       .register({
@@ -155,7 +157,14 @@ const layer = Layer.effectDiscard(
               const shell =
                 Object.assign({}, ...entries.flatMap((entry) => (entry.type === "document" ? [entry.info] : [])))
                   .shell ?? defaultShell()
-              const command = ChildProcess.make(input.command, [], {
+              // In super mode, auto-handle sudo via the configured NOPASSWD sudoers so the
+              // command runs non-interactively instead of hanging on a password prompt.
+              const currentMode = yield* mode.get()
+              const effectiveCommand =
+                currentMode === "super" && /\bsudo\b(?!\s*-\w)/.test(input.command)
+                  ? input.command.replace(/\bsudo\b/, "sudo -n")
+                  : input.command
+              const command = ChildProcess.make(effectiveCommand, [], {
                 cwd: target.canonical,
                 shell,
                 stdin: "ignore",
@@ -203,5 +212,5 @@ const layer = Layer.effectDiscard(
 export const node = makeLocationNode({
   name: "tool/bash",
   layer,
-  deps: [ToolRegistry.node, LocationMutation.node, FSUtil.node, AppProcess.node, Config.node, PermissionV2.node],
+  deps: [ToolRegistry.node, LocationMutation.node, FSUtil.node, AppProcess.node, Config.node, PermissionV2.node, PermissionMode.node],
 })

@@ -1,10 +1,10 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "version": "3.0.0-beta.0",
-  "name": "codewright",
+  "version": "3.0.1-beta",
+  "name": "@codewright-ai/codewright",
   "type": "module",
   "license": "MIT",
-  "private": true,
+  "private": false,
   "scripts": {
     "typecheck": "tsgo --noEmit",
     "test": "bun test --timeout 30000 --only-failures",

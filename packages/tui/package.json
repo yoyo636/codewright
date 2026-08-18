@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@codewright-ai/tui",
-  "version": "3.0.0-beta.0",
+  "version": "3.0.1-beta",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -51,7 +51,6 @@
     "@codewright-ai/core": "workspace:*",
     "@codewright-ai/plugin": "workspace:*",
     "@codewright-ai/sdk": "workspace:*",
-    "@codewright-ai/ui": "workspace:*",
     "@opentui/core": "catalog:",
     "@opentui/keymap": "catalog:",
     "@opentui/solid": "catalog:",

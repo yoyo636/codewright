@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@codewright-ai/plugin",
-  "version": "1.1.2",
+  "version": "3.0.1-beta",
   "type": "module",
   "license": "MIT",
   "scripts": {

@@ -1,6 +1,6 @@
 {
   "name": "@codewright-ai/function",
-  "version": "1.1.2",
+  "version": "3.0.1-beta",
   "$schema": "https://json.schemastore.org/package.json",
   "private": true,
   "type": "module",

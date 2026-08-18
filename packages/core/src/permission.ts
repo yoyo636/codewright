@@ -10,6 +10,7 @@ import { SessionV2 } from "./session"
 import { SessionStore } from "./session/store"
 import { Wildcard } from "./util/wildcard"
 import { PermissionSaved } from "./permission/saved"
+import { PermissionMode } from "./permission/hierarchy"
 
 export { Effect, Rule, Ruleset } from "@codewright-ai/schema/permission"
 const missingAgentPermissions: Permission.Ruleset = [{ action: "*", resource: "*", effect: "deny" }]
@@ -114,6 +115,7 @@ const layer = Layer.effect(
     const agents = yield* AgentV2.Service
     const sessions = yield* SessionStore.Service
     const saved = yield* PermissionSaved.Service
+    const mode = yield* PermissionMode.Service
     const pending = new Map<ID, Pending>()
 
     yield* EffectRuntime.addFinalizer(() =>
@@ -153,6 +155,7 @@ const layer = Layer.effect(
     }
 
     const evaluateInput = EffectRuntime.fnUntraced(function* (input: AssertInput) {
+      if ((yield* mode.get()) === "super") return { effect: "allow" as const, rules: [] as Permission.Ruleset }
       const rules = yield* configured(input.sessionID, input.agent)
       if (denied(input, rules)) return { effect: "deny" as const, rules }
       const all = [...rules, ...(yield* savedRules())]
@@ -306,5 +309,5 @@ export const locationLayer = layer.pipe(Layer.provideMerge(AgentV2.locationLayer
 export const node = makeLocationNode({
   service: Service,
   layer,
-  deps: [EventV2.node, Location.node, AgentV2.node, SessionStore.node, PermissionSaved.node],
+  deps: [EventV2.node, Location.node, AgentV2.node, SessionStore.node, PermissionSaved.node, PermissionMode.node],
 })

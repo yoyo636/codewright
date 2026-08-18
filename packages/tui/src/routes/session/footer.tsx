@@ -1,4 +1,4 @@
-import { createMemo, Match, onCleanup, onMount, Show, Switch } from "solid-js"
+import { createMemo, createSignal, Match, onCleanup, onMount, Show, Switch } from "solid-js"
 import type { AssistantMessage } from "@codewright-ai/sdk/v2"
 import { useTheme } from "../../context/theme"
 import { useSync } from "../../context/sync"
@@ -6,6 +6,7 @@ import { useDirectory } from "../../context/directory"
 import { useConnected } from "../../component/use-connected"
 import { createStore } from "solid-js/store"
 import { useRoute } from "../../context/route"
+import { readFileSync, existsSync } from "node:fs"
 
 const money = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -16,6 +17,39 @@ const money = new Intl.NumberFormat("en-US", {
 // Context usage thresholds (percentage of the model context window).
 const CONTEXT_WARN_PCT = 60
 const CONTEXT_DANGER_PCT = 80
+
+function ModeIndicator() {
+  const [mode, setMode] = createSignal<"normal" | "super">("normal")
+
+  const readMode = () => {
+    try {
+      const xdgConfig = process.env.XDG_CONFIG_HOME || `${process.env.HOME}/.config`
+      const file = `${xdgConfig}/codewright/mode`
+      if (existsSync(file)) {
+        const val = readFileSync(file, "utf8").trim()
+        setMode(val === "super" ? "super" : "normal")
+      } else {
+        setMode("normal")
+      }
+    } catch {
+      setMode("normal")
+    }
+  }
+
+  onMount(() => {
+    readMode()
+    const interval = setInterval(readMode, 5000)
+    onCleanup(() => clearInterval(interval))
+  })
+
+  return (
+    <Show when={mode() === "super"}>
+      <text fg="#ff6b35">
+        <b>[SUPER]</b>
+      </text>
+    </Show>
+  )
+}
 
 export function Footer() {
   const { theme } = useTheme()
@@ -129,6 +163,7 @@ export function Footer() {
             </text>
           </Match>
           <Match when={connected()}>
+            <ModeIndicator />
             <Show when={modelName()}>
               <text fg={theme.text}>
                 <span style={{ fg: theme.primary }}>◆</span> {modelName()}
