@@ -49,10 +49,13 @@ jobs:
           bun run build --skip-embed-web-ui
 
       - name: Publish to npm
-        if: ${{ secrets.NPM_TOKEN != '' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "NPM_TOKEN not set; skipping npm publish. Set the NPM_TOKEN repository secret to publish."
+            exit 0
+          fi
           cd packages/opencode
           echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
           bun run script/publish.ts
