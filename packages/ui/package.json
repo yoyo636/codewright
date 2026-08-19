@@ -34,7 +34,6 @@
   ],
   "exports": {
     "./package.json": "./package.json",
-    "./*": "./src/components/*.tsx",
     "./i18n/*": "./src/i18n/*.ts",
     "./hooks": "./src/hooks/index.ts",
     "./context": "./src/context/index.ts",
@@ -53,7 +52,8 @@
     "./audio/*": "./src/assets/audio/*",
     "./v2/*.css": "./src/v2/components/*.css",
     "./v2/*": "./src/v2/components/*.tsx",
-    "./v2/styles/*": "./src/v2/styles/*"
+    "./v2/styles/*": "./src/v2/styles/*",
+    "./*": "./src/components/*.tsx"
   },
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
