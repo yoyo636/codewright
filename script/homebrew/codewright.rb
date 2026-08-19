@@ -19,31 +19,31 @@ class Codewright < Formula
   license "MIT"
   version "3.0.1-beta"
 
-  # The SHA256 placeholders below must be updated for each release.
-  # You can compute them with:
-  #   shasum -a 256 <archive.tar.gz>
+  # SHA256 digests are taken from the GitHub release assets for this version.
+  # To update them for a new release, run:
+  #   shasum -a 256 <archive.zip|archive.tar.gz>
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/yoyo636/codewright/releases/download/v#{version}/codewright-darwin-x64.tar.gz"
-      sha256 "PLACEHOLDER_MACOS_X64_SHA256"
+      url "https://github.com/yoyo636/codewright/releases/download/v#{version}/codewright-darwin-x64.zip"
+      sha256 "b8faf9adcc36bb731defe1859f8958b30fceed733779d60b0f520c6e34ae642d"
     end
 
     if Hardware::CPU.arm?
-      url "https://github.com/yoyo636/codewright/releases/download/v#{version}/codewright-darwin-arm64.tar.gz"
-      sha256 "PLACEHOLDER_MACOS_ARM64_SHA256"
+      url "https://github.com/yoyo636/codewright/releases/download/v#{version}/codewright-darwin-arm64.zip"
+      sha256 "b966b04b86a98321b106ac09936471e46f14a883f44a6c0696a7dfe384d37d9b"
     end
   end
 
   on_linux do
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
       url "https://github.com/yoyo636/codewright/releases/download/v#{version}/codewright-linux-x64.tar.gz"
-      sha256 "PLACEHOLDER_LINUX_X64_SHA256"
+      sha256 "55d880c8dc10223ff717bf3e76a89744b0889c0e9c2e34f7280cbeced1862cb6"
     end
 
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
       url "https://github.com/yoyo636/codewright/releases/download/v#{version}/codewright-linux-arm64.tar.gz"
-      sha256 "PLACEHOLDER_LINUX_ARM64_SHA256"
+      sha256 "c216dd896e47eafbf476010b0bcda6de52b49d901822443448938bab0d133edf"
     end
   end
 
