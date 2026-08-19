@@ -25,24 +25,24 @@ class Codewright < Formula
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/yoyo636/codewright/releases/download/v#{version}/codewright-macos-x64.tar.gz"
+      url "https://github.com/yoyo636/codewright/releases/download/v#{version}/@codewright-ai/codewright-darwin-x64.tar.gz"
       sha256 "PLACEHOLDER_MACOS_X64_SHA256"
     end
 
     if Hardware::CPU.arm?
-      url "https://github.com/yoyo636/codewright/releases/download/v#{version}/codewright-macos-arm64.tar.gz"
+      url "https://github.com/yoyo636/codewright/releases/download/v#{version}/@codewright-ai/codewright-darwin-arm64.tar.gz"
       sha256 "PLACEHOLDER_MACOS_ARM64_SHA256"
     end
   end
 
   on_linux do
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
-      url "https://github.com/yoyo636/codewright/releases/download/v#{version}/codewright-linux-x64.tar.gz"
+      url "https://github.com/yoyo636/codewright/releases/download/v#{version}/@codewright-ai/codewright-linux-x64.tar.gz"
       sha256 "PLACEHOLDER_LINUX_X64_SHA256"
     end
 
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/yoyo636/codewright/releases/download/v#{version}/codewright-linux-arm64.tar.gz"
+      url "https://github.com/yoyo636/codewright/releases/download/v#{version}/@codewright-ai/codewright-linux-arm64.tar.gz"
       sha256 "PLACEHOLDER_LINUX_ARM64_SHA256"
     end
   end

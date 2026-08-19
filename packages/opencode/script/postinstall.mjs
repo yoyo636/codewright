@@ -24,7 +24,8 @@ const archMap = {
 
 const platform = platformMap[os.platform()] ?? os.platform()
 const arch = archMap[os.arch()] ?? os.arch()
-const base = `codewright-${platform}-${arch}`
+const scope = packageJson.name.includes("/") ? `${packageJson.name.split("/")[0]}/` : ""
+const base = `${scope}codewright-${platform}-${arch}`
 const sourceBinary = platform === "windows" ? "codewright.exe" : "codewright"
 const targetBinary = path.join(__dirname, "bin", "codewright.exe")
 
