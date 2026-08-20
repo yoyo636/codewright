@@ -9,7 +9,7 @@ on:
       tag:
         description: "Release tag to build (assets are uploaded to this tag's GitHub release)"
         required: false
-        default: "v3.0.1-beta"
+        default: "v3.0.2-beta"
 
 permissions:
   contents: write
@@ -22,7 +22,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     env:
-      CODEWRIGHT_VERSION: "3.0.1-beta"
+      CODEWRIGHT_VERSION: "3.0.2-beta"
       CODEWRIGHT_RELEASE: "1"
       CODEWRIGHT_CHANNEL: "beta"
       GH_REPO: "yoyo636/codewright"
