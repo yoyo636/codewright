@@ -7,6 +7,7 @@ import {
   type Model,
   type ProviderMetadata,
 } from "@codewright-ai/llm"
+import { LRU } from "../../util/lru"
 import { SessionMessage } from "../message"
 import type { FileAttachment } from "../prompt"
 
@@ -166,6 +167,32 @@ ${message.recent}
   }
 }
 
+// A message's conversion depends only on the immutable message and whether its
+// model matches the current model (the sameModel branch in `assistant`). Keying
+// by (messageId, modelKey) fully determines the output, so no explicit
+// invalidation is needed: a model switch changes the key (re-converting that
+// turn), and compaction simply stops querying old rows whose entries then idle
+// out of the cache. Message.make is idempotent and the parts are read-only
+// serialized downstream, so cached objects can be shared by reference.
+// Caveat: assistant/shell rows are mutated in place by the projector between
+// turns (failInterruptedTools flips pending tools to failed), so the runner
+// clears this cache after failInterruptedTools to avoid serving a stale
+// conversion of a since-mutated message.
+const conversionCache = LRU.make<string, Message[]>(2048)
+
+const modelKey = (model: Model) => `${model.provider}/${model.id}`
+
+export const clearConversionCache = () => conversionCache.clear()
+
 /** Translate projected V2 Session history into canonical @codewright-ai/llm context. */
-export const toLLMMessages = (messages: readonly SessionMessage.Message[], model: Model) =>
-  messages.flatMap((message) => toLLMMessage(message, model))
+export const toLLMMessages = (messages: readonly SessionMessage.Message[], model: Model) => {
+  const suffix = `\0${modelKey(model)}`
+  return messages.flatMap((message) => {
+    const cacheKey = message.id + suffix
+    const cached = conversionCache.get(cacheKey)
+    if (cached !== undefined) return cached
+    const converted = toLLMMessage(message, model)
+    conversionCache.set(cacheKey, converted)
+    return converted
+  })
+}

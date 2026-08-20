@@ -27,14 +27,14 @@ import { ToolOutputStore } from "../../tool-output-store"
 import { SessionContextEpoch } from "../context-epoch"
 import { SessionCompaction } from "../compaction"
 import { SessionEvent } from "../event"
-import { SessionHistory } from "../history"
+import { SessionHistory, clearDecodeCache } from "../history"
 import { SessionInput } from "../input"
 import { SessionSchema } from "../schema"
 import { SessionStore } from "../store"
 import { type RunError, Service } from "./index"
 import { SessionRunnerModel } from "./model"
 import { createLLMEventPublisher } from "./publish-llm-event"
-import { toLLMMessages } from "./to-llm-message"
+import { toLLMMessages, clearConversionCache } from "./to-llm-message"
 import { MAX_STEPS_PROMPT } from "./max-steps"
 import { Snapshot } from "../../snapshot"
 import { makeLocationNode } from "../../effect/app-node"
@@ -137,6 +137,7 @@ const layer = Layer.effect(
     const failInterruptedTools = Effect.fn("SessionRunner.failInterruptedTools")(function* (
       sessionID: SessionSchema.ID,
     ) {
+      let failed = false
       for (const message of yield* getContext(sessionID)) {
         if (message.type !== "assistant") continue
         for (const tool of message.content) {
@@ -152,7 +153,15 @@ const layer = Layer.effect(
               ...(tool.provider?.metadata === undefined ? {} : { metadata: tool.provider.metadata }),
             },
           })
+          failed = true
         }
+      }
+      // The decode and conversion caches were populated by getContext above
+      // with the pre-mutation state of any interrupted tools. Draining the
+      // caches ensures the next turn loads the freshly-projected (failed) state.
+      if (failed) {
+        clearDecodeCache()
+        clearConversionCache()
       }
     })
 

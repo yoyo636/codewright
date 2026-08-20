@@ -14,12 +14,12 @@ import { AttentionSoundName, type TuiConfig } from "./config"
 import { Schema } from "effect"
 import stripAnsi from "strip-ansi"
 import * as TuiAudio from "./audio"
-import defaultSoundPath from "@codewright-ai/ui/audio/bip-bop-01.mp3" with { type: "file" }
-import questionSoundPath from "@codewright-ai/ui/audio/bip-bop-03.mp3" with { type: "file" }
-import permissionSoundPath from "@codewright-ai/ui/audio/staplebops-06.mp3" with { type: "file" }
-import errorSoundPath from "@codewright-ai/ui/audio/nope-03.mp3" with { type: "file" }
-import doneSoundPath from "@codewright-ai/ui/audio/bip-bop-01.mp3" with { type: "file" }
-import subagentDoneSoundPath from "@codewright-ai/ui/audio/yup-01.mp3" with { type: "file" }
+import defaultSoundPath from "./assets/audio/bip-bop-01.mp3" with { type: "file" }
+import questionSoundPath from "./assets/audio/bip-bop-03.mp3" with { type: "file" }
+import permissionSoundPath from "./assets/audio/staplebops-06.mp3" with { type: "file" }
+import errorSoundPath from "./assets/audio/nope-03.mp3" with { type: "file" }
+import doneSoundPath from "./assets/audio/bip-bop-01.mp3" with { type: "file" }
+import subagentDoneSoundPath from "./assets/audio/yup-01.mp3" with { type: "file" }
 
 type FocusState = "unknown" | "focused" | "blurred"
 

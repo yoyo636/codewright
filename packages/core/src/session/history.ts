@@ -1,6 +1,7 @@
 import { and, asc, desc, eq, gt, gte, ne, or } from "drizzle-orm"
 import { Effect, Schema } from "effect"
 import { Database } from "../database/database"
+import { LRU } from "../util/lru"
 import { MessageDecodeError } from "./error"
 import { SessionMessage } from "./message"
 import { SessionSchema } from "./schema"
@@ -9,6 +10,18 @@ import { SessionContextEpochTable, SessionMessageTable } from "./sql"
 type DatabaseService = Database.Interface["db"]
 
 const decode = Schema.decodeUnknownEffect(SessionMessage.Message)
+
+// Decoded rows are immutable and append-only (event-sourced), so a decoded
+// message can be cached by its stable row id and reused across turns instead
+// of re-running the heavyweight union schema decode every provider turn.
+// Caveat: assistant/shell rows are updated in place by the projector (e.g.
+// failInterruptedTools flips a pending tool to failed), so any cache entries
+// populated before such a mutation must be dropped. The runner clears this
+// cache after failInterruptedTools; compaction inserts new rows and revert
+// deletes rows, neither of which mutates surviving rows.
+const decodeCache = LRU.make<string, SessionMessage.Message>(1024)
+
+export const clearDecodeCache = () => decodeCache.clear()
 
 export const latestCompaction = Effect.fnUntraced(function* (db: DatabaseService, sessionID: SessionSchema.ID) {
   return yield* db
@@ -52,8 +65,10 @@ const messageRows = Effect.fnUntraced(function* (
   return rows
 })
 
-const decodeMessageRow = (row: typeof SessionMessageTable.$inferSelect) =>
-  decode({ ...row.data, id: row.id, type: row.type }).pipe(
+const decodeMessageRow = (row: typeof SessionMessageTable.$inferSelect) => {
+  const cached = decodeCache.get(row.id)
+  if (cached !== undefined) return Effect.succeed(cached)
+  return decode({ ...row.data, id: row.id, type: row.type }).pipe(
     Effect.mapError(
       () =>
         new MessageDecodeError({
@@ -61,7 +76,9 @@ const decodeMessageRow = (row: typeof SessionMessageTable.$inferSelect) =>
           messageID: SessionMessage.ID.make(row.id),
         }),
     ),
+    Effect.tap((message) => Effect.sync(() => decodeCache.set(row.id, message))),
   )
+}
 
 export const load = Effect.fn("SessionHistory.load")(function* (db: DatabaseService, sessionID: SessionSchema.ID) {
   const [epoch, compaction] = yield* Effect.all(

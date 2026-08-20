@@ -1,6 +1,7 @@
 import type { TuiPlugin, TuiPluginModule } from "@codewright-ai/plugin/tui"
 import HomeFooter from "./home/footer"
 import HomeTips from "./home/tips"
+import HomeWizard from "./wizard/wizard"
 import SidebarContext from "./sidebar/context"
 import SidebarFiles from "./sidebar/files"
 import SidebarFooter from "./sidebar/footer"
@@ -22,6 +23,7 @@ export function createBuiltinPlugins(options: { experimentalEventSystem: boolean
   return [
     HomeFooter,
     HomeTips,
+    HomeWizard,
     SidebarContext,
     SidebarMcp,
     SidebarLsp,

@@ -16,18 +16,6 @@
     "@codewright-ai/core#test": {
       "dependsOn": ["^build"],
       "outputs": []
-    },
-    "@codewright-ai/app#test": {
-      "dependsOn": ["^build"],
-      "outputs": []
-    },
-    "@codewright-ai/ui#test": {
-      "dependsOn": ["^build"],
-      "outputs": []
-    },
-    "@codewright-ai/session-ui#test": {
-      "dependsOn": ["^build"],
-      "outputs": []
     }
   }
 }

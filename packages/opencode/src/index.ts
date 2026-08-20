@@ -29,6 +29,7 @@ import { DbCommand } from "./cli/cmd/db"
 import { LogsCommand } from "./cli/cmd/logs"
 import { errorMessage } from "./util/error"
 import { PluginCommand } from "./cli/cmd/plug"
+import { SuperCommand, NormalCommand } from "./cli/cmd/super"
 import { Heap } from "./cli/heap"
 
 const args = hideBin(process.argv)
@@ -98,6 +99,8 @@ const cli = yargs(args)
   .command(ConsoleCommand)
   .command(UpgradeCommand)
   .command(UninstallCommand)
+  .command(SuperCommand)
+  .command(NormalCommand)
   .command(GenerateCommand)
   .command(DebugCommand)
   .command(DbCommand)

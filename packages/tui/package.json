@@ -51,7 +51,6 @@
     "@codewright-ai/core": "workspace:*",
     "@codewright-ai/plugin": "workspace:*",
     "@codewright-ai/sdk": "workspace:*",
-    "@codewright-ai/ui": "workspace:*",
     "@opentui/core": "catalog:",
     "@opentui/keymap": "catalog:",
     "@opentui/solid": "catalog:",
