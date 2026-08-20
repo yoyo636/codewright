@@ -1,7 +1,0 @@
-[data-component="spinner"] {
-  color: inherit;
-  flex-shrink: 0;
-  width: 22px;
-  aspect-ratio: 1;
-  filter: drop-shadow(0 0 6px rgba(125, 211, 255, 0.4));
-}
