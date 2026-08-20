@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "version": "3.0.1-beta",
+  "version": "3.0.2-beta",
   "name": "@codewright-ai/llm",
   "type": "module",
   "license": "MIT",
