@@ -155,7 +155,7 @@ export function Footer() {
           </text>
         </Show>
       </box>
-      <box gap={2} flexDirection="row" flexShrink={0} alignItems="center">
+      <box gap={2} flexDirection="column" flexShrink={0} alignItems="flex-end">
         <Switch>
           <Match when={store.welcome}>
             <text fg={theme.text}>
