@@ -1,3 +1,7 @@
 export * as Trajectory from "./trajectory/schema"
 export * as TrajectoryStore from "./trajectory/store"
+export * as StateStore from "./trajectory/state-store"
+export * as SideEffect from "./trajectory/side-effect"
+export * as ToolTransaction from "./trajectory/tool-transaction"
+export * as NodeStepper from "./trajectory/stepper"
 export * from "./trajectory/sql"
