@@ -34,7 +34,7 @@ permissions:
 jobs:
   version:
     runs-on: blacksmith-4vcpu-ubuntu-2404
-    if: github.repository == 'anomalyco/opencode'
+    if: github.repository == 'yoyo636/codewright'
     steps:
       - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
         with:
@@ -46,8 +46,8 @@ jobs:
         id: committer
         uses: ./.github/actions/setup-git-committer
         with:
-          opencode-app-id: ${{ vars.CODEWRIGHT_APP_ID }}
-          opencode-app-secret: ${{ secrets.CODEWRIGHT_APP_SECRET }}
+          codewright-app-id: ${{ vars.CODEWRIGHT_APP_ID }}
+          codewright-app-secret: ${{ secrets.CODEWRIGHT_APP_SECRET }}
 
       - name: Install Codewright
         if: inputs.bump || inputs.version
@@ -71,7 +71,7 @@ jobs:
   build-cli:
     needs: version
     runs-on: blacksmith-4vcpu-ubuntu-2404
-    if: github.repository == 'anomalyco/opencode'
+    if: github.repository == 'yoyo636/codewright'
     steps:
       - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
         with:
@@ -83,13 +83,13 @@ jobs:
         id: committer
         uses: ./.github/actions/setup-git-committer
         with:
-          opencode-app-id: ${{ vars.CODEWRIGHT_APP_ID }}
-          opencode-app-secret: ${{ secrets.CODEWRIGHT_APP_SECRET }}
+          codewright-app-id: ${{ vars.CODEWRIGHT_APP_ID }}
+          codewright-app-secret: ${{ secrets.CODEWRIGHT_APP_SECRET }}
 
       - name: Build
         id: build
         run: |
-          ./packages/opencode/script/build.ts ${{ (github.ref_name == 'beta' && '--sourcemaps') || '' }}
+          ./packages/codewright/script/build.ts ${{ (github.ref_name == 'beta' && '--sourcemaps') || '' }}
           ./packages/cli/script/build.ts ${{ (github.ref_name == 'beta' && '--sourcemaps') || '' }}
         env:
           CODEWRIGHT_VERSION: ${{ needs.version.outputs.version }}
@@ -99,19 +99,19 @@ jobs:
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: opencode-cli
+          name: codewright-cli
           path: |
-            packages/opencode/dist/opencode-darwin*
-            packages/opencode/dist/opencode-linux*
+            packages/codewright/dist/codewright-darwin*
+            packages/codewright/dist/codewright-linux*
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: opencode-cli-windows
-          path: packages/opencode/dist/opencode-windows*
+          name: codewright-cli-windows
+          path: packages/codewright/dist/codewright-windows*
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: opencode-preview-cli
+          name: codewright-preview-cli
           path: packages/cli/dist/cli-*
 
     outputs:
@@ -122,7 +122,7 @@ jobs:
       - build-cli
       - version
     runs-on: blacksmith-4vcpu-windows-2025
-    if: github.repository == 'anomalyco/opencode'
+    if: github.repository == 'yoyo636/codewright'
     env:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
@@ -135,15 +135,15 @@ jobs:
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: opencode-cli-windows
-          path: packages/opencode/dist
+          name: codewright-cli-windows
+          path: packages/codewright/dist
 
       - name: Setup git committer
         id: committer
         uses: ./.github/actions/setup-git-committer
         with:
-          opencode-app-id: ${{ vars.CODEWRIGHT_APP_ID }}
-          opencode-app-secret: ${{ secrets.CODEWRIGHT_APP_SECRET }}
+          codewright-app-id: ${{ vars.CODEWRIGHT_APP_ID }}
+          codewright-app-secret: ${{ secrets.CODEWRIGHT_APP_SECRET }}
 
       - name: Azure login
         uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # v2.3.0
@@ -158,9 +158,9 @@ jobs:
           signing-account-name: ${{ env.AZURE_TRUSTED_SIGNING_ACCOUNT_NAME }}
           certificate-profile-name: ${{ env.AZURE_TRUSTED_SIGNING_CERTIFICATE_PROFILE }}
           files: |
-            ${{ github.workspace }}\packages\opencode\dist\opencode-windows-arm64\bin\opencode.exe
-            ${{ github.workspace }}\packages\opencode\dist\opencode-windows-x64\bin\opencode.exe
-            ${{ github.workspace }}\packages\opencode\dist\opencode-windows-x64-baseline\bin\opencode.exe
+            ${{ github.workspace }}\packages\codewright\dist\codewright-windows-arm64\bin\codewright.exe
+            ${{ github.workspace }}\packages\codewright\dist\codewright-windows-x64\bin\codewright.exe
+            ${{ github.workspace }}\packages\codewright\dist\codewright-windows-x64-baseline\bin\codewright.exe
           exclude-environment-credential: true
           exclude-workload-identity-credential: true
           exclude-managed-identity-credential: true
@@ -176,9 +176,9 @@ jobs:
         shell: pwsh
         run: |
           $files = @(
-            "${{ github.workspace }}\packages\opencode\dist\opencode-windows-arm64\bin\opencode.exe",
-            "${{ github.workspace }}\packages\opencode\dist\opencode-windows-x64\bin\opencode.exe",
-            "${{ github.workspace }}\packages\opencode\dist\opencode-windows-x64-baseline\bin\opencode.exe"
+            "${{ github.workspace }}\packages\codewright\dist\codewright-windows-arm64\bin\codewright.exe",
+            "${{ github.workspace }}\packages\codewright\dist\codewright-windows-x64\bin\codewright.exe",
+            "${{ github.workspace }}\packages\codewright\dist\codewright-windows-x64-baseline\bin\codewright.exe"
           )
 
           foreach ($file in $files) {
@@ -189,12 +189,12 @@ jobs:
           }
 
       - name: Repack Windows CLI archives
-        working-directory: packages/opencode/dist
+        working-directory: packages/codewright/dist
         shell: pwsh
         run: |
-          Compress-Archive -Path "opencode-windows-arm64\bin\*" -DestinationPath "opencode-windows-arm64.zip" -Force
-          Compress-Archive -Path "opencode-windows-x64\bin\*" -DestinationPath "opencode-windows-x64.zip" -Force
-          Compress-Archive -Path "opencode-windows-x64-baseline\bin\*" -DestinationPath "opencode-windows-x64-baseline.zip" -Force
+          Compress-Archive -Path "codewright-windows-arm64\bin\*" -DestinationPath "codewright-windows-arm64.zip" -Force
+          Compress-Archive -Path "codewright-windows-x64\bin\*" -DestinationPath "codewright-windows-x64.zip" -Force
+          Compress-Archive -Path "codewright-windows-x64-baseline\bin\*" -DestinationPath "codewright-windows-x64-baseline.zip" -Force
 
       - name: Upload signed Windows CLI release assets
         if: needs.version.outputs.release != ''
@@ -203,19 +203,19 @@ jobs:
           GH_TOKEN: ${{ steps.committer.outputs.token }}
         run: |
           gh release upload "v${{ needs.version.outputs.version }}" `
-            "${{ github.workspace }}\packages\opencode\dist\opencode-windows-arm64.zip" `
-            "${{ github.workspace }}\packages\opencode\dist\opencode-windows-x64.zip" `
-            "${{ github.workspace }}\packages\opencode\dist\opencode-windows-x64-baseline.zip" `
+            "${{ github.workspace }}\packages\codewright\dist\codewright-windows-arm64.zip" `
+            "${{ github.workspace }}\packages\codewright\dist\codewright-windows-x64.zip" `
+            "${{ github.workspace }}\packages\codewright\dist\codewright-windows-x64-baseline.zip" `
             --clobber `
             --repo "${{ needs.version.outputs.repo }}"
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: opencode-cli-signed-windows
+          name: codewright-cli-signed-windows
           path: |
-            packages/opencode/dist/opencode-windows-arm64
-            packages/opencode/dist/opencode-windows-x64
-            packages/opencode/dist/opencode-windows-x64-baseline
+            packages/codewright/dist/codewright-windows-arm64
+            packages/codewright/dist/codewright-windows-x64
+            packages/codewright/dist/codewright-windows-x64-baseline
 
   publish:
     needs:
@@ -249,22 +249,22 @@ jobs:
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: opencode-cli
-          path: packages/opencode/dist
+          name: codewright-cli
+          path: packages/codewright/dist
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: opencode-cli-windows
-          path: packages/opencode/dist
+          name: codewright-cli-windows
+          path: packages/codewright/dist
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: opencode-cli-signed-windows
-          path: packages/opencode/dist
+          name: codewright-cli-signed-windows
+          path: packages/codewright/dist
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: opencode-preview-cli
+          name: codewright-preview-cli
           path: packages/cli/dist
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -284,8 +284,8 @@ jobs:
         id: committer
         uses: ./.github/actions/setup-git-committer
         with:
-          opencode-app-id: ${{ vars.CODEWRIGHT_APP_ID }}
-          opencode-app-secret: ${{ secrets.CODEWRIGHT_APP_SECRET }}
+          codewright-app-id: ${{ vars.CODEWRIGHT_APP_ID }}
+          codewright-app-secret: ${{ secrets.CODEWRIGHT_APP_SECRET }}
 
       - name: Cache apt packages (AUR)
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
@@ -302,8 +302,8 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.AUR_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          git config --global user.email "opencode@sst.dev"
-          git config --global user.name "opencode"
+          git config --global user.email "codewright@sst.dev"
+          git config --global user.name "codewright"
           ssh-keyscan -H aur.archlinux.org >> ~/.ssh/known_hosts || true
 
       - name: Upload desktop release assets

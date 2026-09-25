@@ -1,6 +1,6 @@
 import { Context } from "effect"
 
-const opencodeOrigin = /^https:\/\/([a-z0-9-]+\.)*codewright\.ai$/
+const codewrightOrigin = /^https:\/\/([a-z0-9-]+\.)*codewright\.ai$/
 
 export type CorsOptions = { readonly cors?: ReadonlyArray<string> }
 
@@ -15,7 +15,7 @@ export function isAllowedCorsOrigin(input: string | undefined, opts?: CorsOption
   if (input.startsWith("oc://renderer")) return true
   if (input === "tauri://localhost" || input === "http://tauri.localhost" || input === "https://tauri.localhost")
     return true
-  if (opencodeOrigin.test(input)) return true
+  if (codewrightOrigin.test(input)) return true
   return opts?.cors?.includes(input) ?? false
 }
 

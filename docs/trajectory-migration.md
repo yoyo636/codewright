@@ -33,7 +33,7 @@
 | Session 运行时状态（prompt inbox、projector 游标、context epoch） | `core/src/session/`（`input.ts`、`projector.ts`、`context-epoch.ts`、`sql.ts`） | 定义 `StateStore` 接口（`core/src/trajectory/state-store.ts`），`snapshot()` 序列化到 Node.state_snapshot；恢复时由 Node Stepper 沿父链反序列化重建 |
 | System Context 快照 | `core/src/system-context/`（registry、snapshot） | 作为 Context Source 写入 state_snapshot 的 `system_context` 键 |
 | 工具注册表/权限（运行时内存态） | `core/src/tool/`、`core/src/permission/` | 声明性配置已持久化；仅迁移"运行时叠加状态" |
-| 全局/实例缓存（`Global`、`InstanceState`） | `core/src/global.ts`、`opencode/src/effect/instance-state.ts` | 识别启动期配置类缓存（保留）与执行期状态（迁移） |
+| 全局/实例缓存（`Global`、`InstanceState`） | `core/src/global.ts`、`codewright/src/effect/instance-state.ts` | 识别启动期配置类缓存（保留）与执行期状态（迁移） |
 
 **验收**：`kill -9` 后从最后节点 fork 恢复，上下文与崩溃前一致。
 
@@ -64,7 +64,7 @@
 
 迁移：
 - `TrajectoryStore.fork` 已实现：`fork --at <node_id>` → 新 branch_id + 分叉头节点（继承祖先链、state_snapshot）；原轨迹零改动。
-- 新增 API/CLI：`core/src/trajectory/fork.ts` 暴露 `ForkRequest` 模型；`protocol/src/groups/trajectory.ts` + `server/src/handlers/trajectory.ts` 暴露 `fork` / `merge` / `replay` 端点；`opencode` CLI 加 `trajectory fork --at <node_id>` 命令。
+- 新增 API/CLI：`core/src/trajectory/fork.ts` 暴露 `ForkRequest` 模型；`protocol/src/groups/trajectory.ts` + `server/src/handlers/trajectory.ts` 暴露 `fork` / `merge` / `replay` 端点；`codewright` CLI 加 `trajectory fork --at <node_id>` 命令。
 - 因果冲突检测已实现（`merge` 基线哈希比较 + `MergeConflict`）：冲突时要求 resolution 脚本或覆盖策略。
 - 异常路径：执行失败 → 当前节点标记为 orphan（`metadata.annotations.orphan = true`）→ 提示用户选择分叉点，禁止自动回溯。
 
@@ -89,7 +89,7 @@
 | # | 清单项 | 落点 |
 |---|---|---|
 | 1 | 扫描状态持有者 → StateStore | Phase 1（表见上） |
-| 2 | 入口拆分为「初始化轨迹」+「循环步进」 | `packages/opencode/src/index.ts` / `cli/` 启动流程；`opencode/src/session` |
+| 2 | 入口拆分为「初始化轨迹」+「循环步进」 | `packages/codewright/src/index.ts` / `cli/` 启动流程；`codewright/src/session` |
 | 3 | 工具装饰器 → Node Context / Node Result | `core/src/tool/*` + `llm/src/tool-runtime.ts`（Phase 3） |
 | 4 | 历史记录批量转 `.traj` 归档 | `core/script/` 新增 `export-trajectories.ts`：读取 `session`/`session_message`/`session_input` 表 → `TrajectoryStore.append` 逐条重建 |
 | 5 | 注释线性循环单测，重写分叉/回放集成测试 | `core/src/session/runner/*.test.ts` → `test/trajectory-*.test.ts`（已开始） |

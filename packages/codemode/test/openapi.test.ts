@@ -14,7 +14,7 @@ type Recorded = {
   readonly body: unknown
 }
 
-const opencodeSpec = async (): Promise<Document> => {
+const codewrightSpec = async (): Promise<Document> => {
   return Bun.file(new URL("./fixtures/codewright-v2-openapi.json", import.meta.url)).json() as Promise<Document>
 }
 
@@ -174,7 +174,7 @@ describe("OpenAPI.fromSpec", () => {
   })
 
   test("converts representative codewright operations into the expected tool shape", async () => {
-    const spec = await opencodeSpec()
+    const spec = await codewrightSpec()
     const result = OpenAPI.fromSpec({ spec, baseUrl })
 
     expect(result.skipped).toHaveLength(5)
@@ -356,7 +356,7 @@ describe("OpenAPI.fromSpec", () => {
   })
 
   test("documents that the codewright fixture is unauthenticated", async () => {
-    const spec = await opencodeSpec()
+    const spec = await codewrightSpec()
     const components = isRecord(spec.components) ? spec.components : {}
     const result = OpenAPI.fromSpec({ spec, baseUrl })
 
@@ -372,7 +372,7 @@ describe("OpenAPI.fromSpec", () => {
   test("exposes real codewright operations through CodeMode discovery", async () => {
     const { layer } = recordingClient(() => json({}))
     const runtime = CodeMode.make({
-      tools: { codewright: OpenAPI.fromSpec({ spec: await opencodeSpec(), baseUrl }).tools },
+      tools: { codewright: OpenAPI.fromSpec({ spec: await codewrightSpec(), baseUrl }).tools },
     })
     const result = await Effect.runPromise(
       runtime
@@ -403,7 +403,7 @@ describe("OpenAPI.fromSpec", () => {
       return json({ id: "ses_456" })
     })
     const runtime = CodeMode.make({
-      tools: { codewright: OpenAPI.fromSpec({ spec: await opencodeSpec(), baseUrl }).tools },
+      tools: { codewright: OpenAPI.fromSpec({ spec: await codewrightSpec(), baseUrl }).tools },
     })
 
     const result = await Effect.runPromise(
@@ -431,7 +431,7 @@ describe("OpenAPI.fromSpec", () => {
 
   test("serializes deep-object query parameters from the codewright fixture", async () => {
     const client = recordingClient(() => json({ directory: "/tmp" }))
-    const location = toolAt(OpenAPI.fromSpec({ spec: await opencodeSpec(), baseUrl }).tools, "v2.location.get")
+    const location = toolAt(OpenAPI.fromSpec({ spec: await codewrightSpec(), baseUrl }).tools, "v2.location.get")
     if (!Tool.isDefinition(location)) throw new Error("v2.location.get was not generated")
 
     await Effect.runPromise(
@@ -806,7 +806,7 @@ describe("OpenAPI.fromSpec", () => {
   test("fails missing required parameters before auth and network", async () => {
     const { requests, layer } = recordingClient(() => json({}))
     const runtime = CodeMode.make({
-      tools: { codewright: OpenAPI.fromSpec({ spec: await opencodeSpec(), baseUrl }).tools },
+      tools: { codewright: OpenAPI.fromSpec({ spec: await codewrightSpec(), baseUrl }).tools },
     })
 
     const result = await Effect.runPromise(

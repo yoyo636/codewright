@@ -30,8 +30,8 @@ import { TestLLMServer } from "./llm-server"
 import { testProviderConfig } from "./test-provider"
 import { it } from "./effect"
 
-const opencodeRoot = path.resolve(import.meta.dir, "../../")
-const cliEntry = path.join(opencodeRoot, "src/index.ts")
+const codewrightRoot = path.resolve(import.meta.dir, "../../")
+const cliEntry = path.join(codewrightRoot, "src/index.ts")
 
 export const testModelID = "test/test-model"
 

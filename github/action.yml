@@ -66,7 +66,7 @@ runs:
 
     - name: Run codewright
       shell: bash
-      id: run_opencode
+      id: run_codewright
       run: codewright github run
       env:
         MODEL: ${{ inputs.model }}

@@ -7,7 +7,7 @@ Investigate and report on the following, using the tools available:
 - Check the current repository status: branch, and whether the working tree is clean (run `git status` / `git branch --show-current`).
 
 ## Configuration
-- Check for a project config file (`codewright.json`, `opencode.json`) and note any configured provider or hooks.
+- Check for a project config file (`codewright.json`) and note any configured provider or hooks.
 - Note the current working directory and whether it is a git repository.
 
 ## Provider connectivity

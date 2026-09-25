@@ -24,6 +24,6 @@ jobs:
 
       - name: Release
         run: |
-          git config --global user.email "opencode@sst.dev"
-          git config --global user.name "opencode"
+          git config --global user.email "codewright@sst.dev"
+          git config --global user.name "codewright"
           ./github/script/release

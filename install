@@ -220,7 +220,7 @@ print_message() {
 
 check_version() {
     if command -v codewright >/dev/null 2>&1; then
-        opencode_path=$(which codewright)
+        codewright_path=$(which codewright)
 
         ## Check the installed version
         installed_version=$(codewright --version 2>/dev/null || echo "")

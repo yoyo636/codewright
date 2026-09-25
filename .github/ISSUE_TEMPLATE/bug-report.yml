@@ -19,7 +19,7 @@ body:
       required: false
 
   - type: input
-    id: opencode-version
+    id: codewright-version
     attributes:
       label: Codewright version
       description: What version of Codewright are you using?

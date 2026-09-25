@@ -45,7 +45,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          cd packages/opencode
+          cd packages/codewright
           bun run build --skip-embed-web-ui
 
       - name: Publish to npm
@@ -56,6 +56,6 @@ jobs:
             echo "NPM_TOKEN not set; skipping npm publish. Set the NPM_TOKEN repository secret to publish."
             exit 0
           fi
-          cd packages/opencode
+          cd packages/codewright
           echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
           bun run script/publish.ts

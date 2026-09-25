@@ -2718,7 +2718,7 @@ describe("ProviderTransform.message - strip openai metadata when store=false", (
   })
 
   test("preserves metadata using providerID key when store is false", () => {
-    const opencodeModel = {
+    const codewrightModel = {
       ...openaiModel,
       providerID: "codewright",
       api: {
@@ -2745,14 +2745,14 @@ describe("ProviderTransform.message - strip openai metadata when store=false", (
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, opencodeModel, { store: false }) as any[]
+    const result = ProviderTransform.message(msgs, codewrightModel, { store: false }) as any[]
 
     expect(result[0].content[0].providerOptions?.codewright?.itemId).toBe("msg_123")
     expect(result[0].content[0].providerOptions?.codewright?.otherOption).toBe("value")
   })
 
   test("preserves itemId across all providerOptions keys", () => {
-    const opencodeModel = {
+    const codewrightModel = {
       ...openaiModel,
       providerID: "codewright",
       api: {
@@ -2766,7 +2766,7 @@ describe("ProviderTransform.message - strip openai metadata when store=false", (
         role: "assistant",
         providerOptions: {
           openai: { itemId: "msg_root" },
-          codewright: { itemId: "msg_opencode" },
+          codewright: { itemId: "msg_codewright" },
           extra: { itemId: "msg_extra" },
         },
         content: [
@@ -2775,7 +2775,7 @@ describe("ProviderTransform.message - strip openai metadata when store=false", (
             text: "Hello",
             providerOptions: {
               openai: { itemId: "msg_openai_part" },
-              codewright: { itemId: "msg_opencode_part" },
+              codewright: { itemId: "msg_codewright_part" },
               extra: { itemId: "msg_extra_part" },
             },
           },
@@ -2783,13 +2783,13 @@ describe("ProviderTransform.message - strip openai metadata when store=false", (
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, opencodeModel, { store: false }) as any[]
+    const result = ProviderTransform.message(msgs, codewrightModel, { store: false }) as any[]
 
     expect(result[0].providerOptions?.openai?.itemId).toBe("msg_root")
-    expect(result[0].providerOptions?.codewright?.itemId).toBe("msg_opencode")
+    expect(result[0].providerOptions?.codewright?.itemId).toBe("msg_codewright")
     expect(result[0].providerOptions?.extra?.itemId).toBe("msg_extra")
     expect(result[0].content[0].providerOptions?.openai?.itemId).toBe("msg_openai_part")
-    expect(result[0].content[0].providerOptions?.codewright?.itemId).toBe("msg_opencode_part")
+    expect(result[0].content[0].providerOptions?.codewright?.itemId).toBe("msg_codewright_part")
     expect(result[0].content[0].providerOptions?.extra?.itemId).toBe("msg_extra_part")
   })
 

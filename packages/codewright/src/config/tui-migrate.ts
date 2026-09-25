@@ -27,7 +27,7 @@ interface MigrateInput {
  * skips only locations where a tui.json already exists.
  */
 export async function migrateTuiConfig(input: MigrateInput) {
-  const codewright = await opencodeFiles(input)
+  const codewright = await codewrightFiles(input)
   for (const file of codewright) {
     const source = await Filesystem.readText(file).catch(() => undefined)
     if (!source) continue
@@ -112,7 +112,7 @@ async function backupAndStripLegacy(file: string, source: string) {
     .catch(() => false)
 }
 
-async function opencodeFiles(input: { directories: string[]; cwd: string }) {
+async function codewrightFiles(input: { directories: string[]; cwd: string }) {
   const files = [
     ...ConfigPaths.fileInDirectory(Global.Path.config, "codewright"),
     ...(await Filesystem.findUp(["codewright.json", "codewright.jsonc"], input.cwd, undefined, { rootFirst: true })),

@@ -52,7 +52,7 @@ jobs:
       - name: Configure git identity
         run: |
           git config --global user.email "bot@codewright.dev"
-          git config --global user.name "opencode"
+          git config --global user.name "codewright"
 
       - name: Cache Turbo
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
@@ -76,5 +76,5 @@ jobs:
 
       - name: Run HttpApi exerciser gates
         if: runner.os == 'Linux'
-        working-directory: packages/opencode
+        working-directory: packages/codewright
         run: bun run test:httpapi

@@ -61,8 +61,8 @@ cd codewright
 bun install
 
 # Build and run
-bun run --cwd packages/opencode build
-./packages/opencode/dist/codewright
+bun run --cwd packages/codewright build
+./packages/codewright/dist/codewright
 ```
 
 #### Requirements

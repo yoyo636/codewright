@@ -22,8 +22,8 @@ jobs:
         id: committer
         uses: ./.github/actions/setup-git-committer
         with:
-          opencode-app-id: ${{ vars.CODEWRIGHT_APP_ID }}
-          opencode-app-secret: ${{ secrets.CODEWRIGHT_APP_SECRET }}
+          codewright-app-id: ${{ vars.CODEWRIGHT_APP_ID }}
+          codewright-app-secret: ${{ secrets.CODEWRIGHT_APP_SECRET }}
 
       - name: Generate
         run: ./script/generate.ts

@@ -47,7 +47,7 @@
 git clone https://github.com/yoyo636/codewright.git
 cd codewright
 bun install
-bun run --cwd packages/opencode build
+bun run --cwd packages/codewright build
 
 # Менеджери пакетів
 

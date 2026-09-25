@@ -784,9 +784,9 @@ function defaultModelFromConfig(
   // First-session ACP startup must not scan historical sessions just to infer
   // a default. Configured model, codewright provider, then sorted best model keep
   // the protocol response deterministic without extra session/message reads.
-  const opencodeProvider = providers[ProviderV2.ID.make("codewright")]
-  const opencodeModel = opencodeProvider ? Provider.sort(Object.values(opencodeProvider.models))[0] : undefined
-  if (opencodeProvider && opencodeModel) return { providerID: opencodeProvider.id, modelID: opencodeModel.id }
+  const codewrightProvider = providers[ProviderV2.ID.make("codewright")]
+  const codewrightModel = codewrightProvider ? Provider.sort(Object.values(codewrightProvider.models))[0] : undefined
+  if (codewrightProvider && codewrightModel) return { providerID: codewrightProvider.id, modelID: codewrightModel.id }
 
   const best = Provider.sort(Object.values(providers).flatMap((provider) => Object.values(provider.models)))[0]
   if (best) return { providerID: best.providerID, modelID: best.id }
