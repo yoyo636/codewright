@@ -24,6 +24,8 @@ import { EOL } from "os"
 import { Filesystem } from "@/util/filesystem"
 import { errorMessage } from "@/util/error"
 import { createCodewrightClient, type CodewrightClient, type ToolPart } from "@codewright-ai/sdk/v2"
+import { Flag } from "@codewright-ai/core/flag/flag"
+import { createBackend } from "@/session/backend"
 import { FormatError, FormatUnknownError } from "../error"
 import { INTERACTIVE_INPUT_ERROR, resolveInteractiveStdin } from "./run/runtime.stdin"
 
@@ -829,6 +831,7 @@ export const RunCommand = effectCmd({
         }
         const cwd = args.attach ? (directory ?? sess.directory ?? (await current(sdk))) : (directory ?? root)
         const client = args.attach ? attachSDK(cwd) : sdk
+        const backend = createBackend(client, Flag.CODEWRIGHT_SESSION_V2_RUN ? "v2" : "v1")
 
         // Validate agent if specified
         const agent = await pickAgent(client)
@@ -866,7 +869,7 @@ export const RunCommand = effectCmd({
           }
 
           const model = pick(args.model)
-          const result = await client.session.prompt({
+          const result = await backend.prompt({
             sessionID,
             agent,
             model,

@@ -12,6 +12,16 @@ function enabledByExperimental(key: string) {
   return process.env[key] === undefined ? truthy("CODEWRIGHT_EXPERIMENTAL") : truthy(key)
 }
 
+// Session V2 kernel selection. A per-path key (CODEWRIGHT_SESSION_V2_RUN and
+// friends) overrides the global key so one entry point can be moved to V2
+// without moving the others. Falls back to the experimental master switch.
+function sessionV2(scope?: "RUN" | "ACP" | "TUI") {
+  const scoped = scope ? process.env[`CODEWRIGHT_SESSION_V2_${scope}`] : undefined
+  const value = scoped ?? process.env["CODEWRIGHT_SESSION_V2"]
+  if (value === undefined) return truthy("CODEWRIGHT_EXPERIMENTAL")
+  return truthy(value)
+}
+
 export const Flag = {
   OTEL_EXPORTER_OTLP_ENDPOINT: process.env["OTEL_EXPORTER_OTLP_ENDPOINT"],
   OTEL_EXPORTER_OTLP_HEADERS: process.env["OTEL_EXPORTER_OTLP_HEADERS"],
@@ -48,6 +58,20 @@ export const Flag = {
 
   CODEWRIGHT_WORKSPACE_ID: process.env["CODEWRIGHT_WORKSPACE_ID"],
   CODEWRIGHT_EXPERIMENTAL_WORKSPACES: enabledByExperimental("CODEWRIGHT_EXPERIMENTAL_WORKSPACES"),
+
+  // Session kernel selection: V1 legacy prompt loop vs V2 core session.
+  get CODEWRIGHT_SESSION_V2() {
+    return sessionV2()
+  },
+  get CODEWRIGHT_SESSION_V2_RUN() {
+    return sessionV2("RUN")
+  },
+  get CODEWRIGHT_SESSION_V2_ACP() {
+    return sessionV2("ACP")
+  },
+  get CODEWRIGHT_SESSION_V2_TUI() {
+    return sessionV2("TUI")
+  },
 
   // Evaluated at access time (not module load) because tests, the CLI, and
   // external tooling set these env vars at runtime.
