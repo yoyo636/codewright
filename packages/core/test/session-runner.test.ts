@@ -3376,4 +3376,73 @@ describe("SessionRunnerLLM", () => {
       )
     }),
   )
+
+  it.effect("publishes busy and idle status around a completed drain", () =>
+    Effect.gen(function* () {
+      yield* setup
+      const session = yield* SessionV2.Service
+      const events = yield* EventV2.Service
+      response = [LLMEvent.finish({ reason: "stop" })]
+      const statuses: Array<{ sessionID: string; status: { type: string } }> = []
+      const unsubscribe = yield* events.listen((event) =>
+        Effect.sync(() => {
+          if (event.type === "session.status") statuses.push(event.data as (typeof statuses)[number])
+        }),
+      )
+      yield* Effect.yieldNow
+
+      yield* session.prompt({ sessionID, prompt: Prompt.make({ text: "Say hi" }) })
+      yield* Effect.yieldNow
+
+      expect(statuses.map((item) => item.status.type)).toEqual(["busy", "idle"])
+      expect(statuses.every((item) => item.sessionID === sessionID)).toBe(true)
+      yield* unsubscribe
+    }),
+  )
+
+  it.effect("publishes idle after a provider failure", () =>
+    Effect.gen(function* () {
+      yield* setup
+      const session = yield* SessionV2.Service
+      const events = yield* EventV2.Service
+      yield* session.prompt({ sessionID, prompt: Prompt.make({ text: "Start working" }), resume: false })
+      streamFailure = providerUnavailable()
+      const types: string[] = []
+      const unsubscribe = yield* events.listen((event) =>
+        Effect.sync(() => {
+          if (event.type === "session.status") types.push((event.data as { status: { type: string } }).status.type)
+        }),
+      )
+
+      yield* session.resume(sessionID).pipe(Effect.flip)
+      expect(types).toEqual(["busy", "idle"])
+
+      streamFailure = undefined
+      yield* unsubscribe
+    }),
+  )
+
+  it.effect("stays idle when woken with no prompt pending", () =>
+    Effect.gen(function* () {
+      yield* setup
+      const session = yield* SessionV2.Service
+      const events = yield* EventV2.Service
+      const types: string[] = []
+      const unsubscribe = yield* events.listen((event) =>
+        Effect.sync(() => {
+          if (event.type === "session.status") types.push((event.data as { status: { type: string } }).status.type)
+        }),
+      )
+
+      // wake with an empty inbox must not fabricate a busy/idle pair
+      yield* Effect.gen(function* () {
+        const execution = yield* SessionExecution.Service
+        yield* execution.wake(sessionID)
+      })
+      yield* Effect.yieldNow
+
+      expect(types).toEqual([])
+      yield* unsubscribe
+    }),
+  )
 })

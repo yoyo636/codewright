@@ -37,6 +37,7 @@ import { createLLMEventPublisher } from "./publish-llm-event"
 import { toLLMMessages, clearConversionCache } from "./to-llm-message"
 import { MAX_STEPS_PROMPT } from "./max-steps"
 import { Snapshot } from "../../snapshot"
+import { SessionStatusEvent } from "@codewright-ai/schema/session-status-event"
 import { makeLocationNode } from "../../effect/app-node"
 import { llmClient } from "../../effect/app-node-platform"
 
@@ -418,21 +419,36 @@ const layer = Layer.effect(
       const hasQueue = hasSteer ? false : yield* SessionInput.hasPending(db, input.sessionID, "queue")
       if (!input.force && !hasSteer && !hasQueue) return
       yield* failInterruptedTools(input.sessionID)
-      let promotion: SessionInput.Delivery | undefined = hasSteer ? "steer" : hasQueue ? "queue" : undefined
-      let shouldRun = input.force || hasSteer || hasQueue
-      while (shouldRun) {
-        let needsContinuation = true
-        let step = 1
-        while (needsContinuation) {
-          const result = yield* runTurn(input.sessionID, promotion, step)
-          needsContinuation = result.needsContinuation
-          step = result.step + 1
-          promotion = "steer"
-          if (!needsContinuation) needsContinuation = yield* SessionInput.hasPending(db, input.sessionID, "steer")
+      // Busy is published only after the early-exit gate: a queued prompt that
+      // never reaches a provider turn stays idle, and the run coordinator's
+      // single-drain-per-session guarantee keeps busy/idle pairs un-nested.
+      yield* events.publish(SessionStatusEvent.Status, { sessionID: input.sessionID, status: { type: "busy" } })
+      yield* Effect.gen(function* () {
+        let promotion: SessionInput.Delivery | undefined = hasSteer ? "steer" : hasQueue ? "queue" : undefined
+        let shouldRun = input.force || hasSteer || hasQueue
+        while (shouldRun) {
+          let needsContinuation = true
+          let step = 1
+          while (needsContinuation) {
+            const result = yield* runTurn(input.sessionID, promotion, step)
+            needsContinuation = result.needsContinuation
+            step = result.step + 1
+            promotion = "steer"
+            if (!needsContinuation) needsContinuation = yield* SessionInput.hasPending(db, input.sessionID, "steer")
+          }
+          shouldRun = yield* SessionInput.hasPending(db, input.sessionID, "queue")
+          promotion = shouldRun ? "queue" : undefined
         }
-        shouldRun = yield* SessionInput.hasPending(db, input.sessionID, "queue")
-        promotion = shouldRun ? "queue" : undefined
-      }
+      }).pipe(
+        // ensuring (not just a trailing publish) so failure and interruption
+        // exits still report idle; a publish failure must not mask the
+        // original exit. Only the non-deprecated session.status is published.
+        Effect.ensuring(
+          events
+            .publish(SessionStatusEvent.Status, { sessionID: input.sessionID, status: { type: "idle" } })
+            .pipe(Effect.ignore),
+        ),
+      )
     })
 
     return Service.of({
