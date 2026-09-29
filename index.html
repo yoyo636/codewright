@@ -24,7 +24,7 @@
   <meta name="twitter:description" content="The open source AI coding agent that runs everywhere. 183+ providers, Claude-style TUI, persistent memory, fine-grained permissions, and an extensible hook system." />
   <meta name="twitter:image" content="https://opengraph.githubassets.com/yoyo636/codewright" />
 
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2300d4ff'/%3E%3Cpath d='M10 12L6 16L10 20' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M22 12L26 16L22 20' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M19 9L13 23' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%20fill%3D%22none%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20stop-color%3D%22%23FF5A3C%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23C81E2E%22%2F%3E%0A%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%3C%2Fdefs%3E%0A%20%20%3Cpolygon%20points%3D%222%2C6%202%2C26%2013%2C16%22%20fill%3D%22url%28%23g%29%22%20stroke%3D%22%231A1A1A%22%20stroke-width%3D%221%22%20stroke-linejoin%3D%22round%22%2F%3E%0A%20%20%3Crect%20x%3D%2213%22%20y%3D%2215%22%20width%3D%229%22%20height%3D%222%22%20rx%3D%221%22%20fill%3D%22%23FFFFFF%22%20opacity%3D%220.92%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M%2022%206%20V%2026%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20opacity%3D%220.92%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M%2022%206%20H%2027%20A%205%205%200%200%201%2027%2016%20H%2022%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20fill%3D%22none%22%20opacity%3D%220.92%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M%2027%2016%20L%2030%2026%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20opacity%3D%220.92%22%2F%3E%0A%3C%2Fsvg%3E%0A" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" media="print" onload="this.media='all'" />
@@ -452,11 +452,20 @@
     <div class="nav-inner">
       <a href="#" class="nav-logo">
         <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="32" height="32" rx="8" fill="url(#nav-grad)"/>
-          <path d="M10 12L6 16L10 20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M22 12L26 16L22 20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M19 9L13 23" stroke="white" stroke-width="2" stroke-linecap="round"/>
-          <defs><linearGradient id="nav-grad" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#00d4ff"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs>
+          <defs>
+            <linearGradient id="nav-grad" x1="0" y1="0" x2="1" y2="1">
+              <stop stop-color="#FF5A3C"/>
+              <stop offset="1" stop-color="#C81E2E"/>
+            </linearGradient>
+          </defs>
+          <!-- sharp triangle: forward arrowhead -->
+          <polygon points="2,6 2,26 13,16" fill="url(#nav-grad)" stroke="#1A1A1A" stroke-width="1" stroke-linejoin="round"/>
+          <!-- horizontal bar: trailing shaft -->
+          <rect x="13" y="15" width="9" height="2" rx="1" fill="#FFFFFF" opacity="0.92"/>
+          <!-- letter R: stem + bowl + leg -->
+          <path d="M 22 6 V 26" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity="0.92"/>
+          <path d="M 22 6 H 27 A 5 5 0 0 1 27 16 H 22" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.92"/>
+          <path d="M 27 16 L 30 26" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity="0.92"/>
         </svg>
         <span>Codewright</span>
       </a>
@@ -465,7 +474,7 @@
         <li><a href="#features">Features</a></li>
         <li><a href="#how">How it works</a></li>
         <li><a href="#providers">Providers</a></li>
-        <li><a href="#v3">v3.0.0</a></li>
+        <li><a href="#v3">v3.0.3</a></li>
         <li><a href="#extend">Extend</a></li>
         <li><a href="#themes">Themes</a></li>
         <li><a href="#faq">FAQ</a></li>
@@ -482,13 +491,13 @@
   <section class="hero">
     <div class="hero-badge">
       <span class="dot"></span>
-      <strong>v3.0.0 Beta</strong> — Claude-style UI · Memory · 183+ providers
+      <strong>v3.0.3-beta</strong> · V2 execution kernel · Claude-style UI · Memory · 183+ providers
     </div>
     <h1>
       Code at the speed<br />of <span class="gradient-text">thought</span>
     </h1>
     <p class="hero-subtitle">
-      Codewright is the open source AI coding agent that <strong>understands your codebase</strong>, <strong>executes complex tasks</strong>, and <strong>ships features</strong> — from your terminal, desktop, browser, or CI. Now with a <strong>Claude-style interface</strong>, <strong>persistent memory</strong>, <strong>fine-grained permissions</strong>, and <strong>183+ providers</strong>.
+      Codewright is the open source AI coding agent that <strong>understands your codebase</strong>, <strong>executes complex tasks</strong>, and <strong>ships features</strong> — from your terminal, desktop, browser, or CI. Built on a <strong>V2 execution kernel</strong>: every turn is a persistent, resumable graph, so interrupted work picks up exactly where it stopped. Now with a <strong>Claude-style interface</strong>, <strong>persistent memory</strong>, <strong>fine-grained permissions</strong>, and <strong>183+ providers</strong>.
     </p>
     <div class="hero-actions">
       <a href="https://github.com/yoyo636/codewright" class="btn-primary" target="_blank" rel="noopener">
@@ -638,7 +647,7 @@
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
         </div>
         <h3>Runs Everywhere</h3>
-        <p>Terminal TUI, desktop app (macOS/Windows/Linux), web interface, and headless mode for CI/CD pipelines.</p>
+        <p>Terminal TUI, web interface (<code>codewright web</code>), headless mode for CI/CD pipelines, and <code>codewright serve</code> to self-host the server API. Desktop app (Electron) coming soon.</p>
       </div>
       <div class="feature-card reveal reveal-delay-1">
         <div class="feature-icon">
@@ -779,42 +788,43 @@
   <!-- V3.0.0 Highlights -->
   <section class="section" id="v3">
     <div class="reveal">
-      <span class="section-label warm">What's new in v3.0.0</span>
-      <h2 class="section-title">The Claude-style<br />upgrade</h2>
+      <span class="section-label warm">What's new in v3.0.3</span>
+      <h2 class="section-title">The V2<br />execution kernel</h2>
       <p class="section-desc">A major release that reimagines the interface and adds long-requested capabilities.</p>
     </div>
     <div class="highlights-grid" style="margin-top: 2.5rem;">
       <div class="highlight-card reveal reveal-delay-1">
+        <span class="highlight-tag tui">KERNEL</span>
+        <h3>Persistent execution graph</h3>
+        <p>Every turn is built as an immutable graph of steps — input, output, and state snapshot — persisted as it runs. Interrupt a task and resume it from exactly where it stopped; no replay, no lost work.</p>
+        <span class="highlight-cmd">trajectory · NodeStepper</span>
+      </div>
+      <div class="highlight-card reveal reveal-delay-2">
         <span class="highlight-tag tui">INTERFACE</span>
         <h3>Claude-style TUI</h3>
         <p>A clean, full-width terminal interface with a single status line showing model, context usage, and cost. Warm Claude-inspired theme by default, plus 30+ themes to choose from.</p>
       </div>
-      <div class="highlight-card reveal reveal-delay-2">
+      <div class="highlight-card reveal reveal-delay-3">
         <span class="highlight-tag">MEMORY</span>
         <h3>Persistent memory</h3>
         <p>Remember preferences and decisions across sessions. Automatically injected into every conversation's system prompt.</p>
         <span class="highlight-cmd">/memory</span>
       </div>
-      <div class="highlight-card reveal reveal-delay-3">
+      <div class="highlight-card reveal reveal-delay-1">
         <span class="highlight-tag">HEALTH</span>
         <h3>Environment doctor</h3>
         <p>One command checks your git setup, configuration, provider keys, and model connectivity — and tells you how to fix problems.</p>
         <span class="highlight-cmd">/doctor</span>
       </div>
-      <div class="highlight-card reveal reveal-delay-1">
+      <div class="highlight-card reveal reveal-delay-2">
         <span class="highlight-tag tui">SMARTER</span>
         <h3>Context awareness</h3>
         <p>The status bar warns as you approach your context limit (60% / 80%), and long conversations auto-compact to stay on track.</p>
       </div>
-      <div class="highlight-card reveal reveal-delay-2">
+      <div class="highlight-card reveal reveal-delay-3">
         <span class="highlight-tag">MORE MODELS</span>
         <h3>Token River &amp; Volcano</h3>
         <p>New providers with dozens of models, including the latest Kimi, GLM, Qwen, DeepSeek, and Doubao releases.</p>
-      </div>
-      <div class="highlight-card reveal reveal-delay-3">
-        <span class="highlight-tag tui">STABLE</span>
-        <h3>Zero-compile-error build</h3>
-        <p>All 30 typecheck targets pass cleanly, with graceful degradation when services are unreachable.</p>
       </div>
     </div>
   </section>
@@ -1048,8 +1058,8 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
         </div>
         <div>
-          <div class="platform-name">Desktop App</div>
-          <div class="platform-desc">macOS / Windows / Linux</div>
+          <div class="platform-name">Desktop App <span style="color:var(--text-muted);font-weight:400;">· coming soon</span></div>
+          <div class="platform-desc">Electron · macOS / Windows / Linux</div>
         </div>
       </div>
       <div class="platform-card reveal reveal-delay-3">
@@ -1079,49 +1089,49 @@
   <section class="section" id="install">
     <div class="reveal" style="text-align:center;">
       <span class="section-label">Install</span>
-      <h2 class="section-title" style="margin-left:auto;margin-right:auto;">Build from source</h2>
-      <p class="section-desc" style="margin-left:auto;margin-right:auto;">Codewright is currently distributed as source. Clone, install with Bun, and link the <code style="color:var(--accent);font-family:'IBM Plex Mono',monospace;font-size:0.85rem;">codewright</code> command. Prebuilt binaries will follow on GitHub Releases.</p>
+      <h2 class="section-title" style="margin-left:auto;margin-right:auto;">One command, anywhere</h2>
+      <p class="section-desc" style="margin-left:auto;margin-right:auto;">Install globally with npm. A prebuilt binary is fetched for your platform when available (darwin, linux, windows — x64 &amp; arm64). If your platform isn't covered yet, install from source instead — see "From source" below.</p>
     </div>
     <div class="install-grid" style="margin-top: 3rem;">
       <div class="install-card reveal reveal-delay-1">
-        <h4>1 · Clone</h4>
-        <div class="install-cmd" data-command="git clone https://github.com/yoyo636/codewright.git">
-          <code><span>$ </span><span class="hl">git clone</span> https://github.com/yoyo636/codewright.git</code>
+        <h4>1 · Install</h4>
+        <div class="install-cmd" data-command="npm install -g @codewright-ai/codewright">
+          <code><span>$ </span><span class="hl">npm install -g</span> @codewright-ai/codewright</code>
           <span class="install-copy"><svg class="copy" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></span>
         </div>
       </div>
       <div class="install-card reveal reveal-delay-2">
-        <h4>2 · Install deps</h4>
-        <div class="install-cmd" data-command="cd codewright && bun install">
-          <code><span>$ </span><span class="hl">cd codewright && bun install</span></code>
+        <h4>2 · Pick a model</h4>
+        <div class="install-cmd" data-command="codewright models">
+          <code><span>$ </span><span class="hl">codewright models</span></code>
           <span class="install-copy"><svg class="copy" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></span>
         </div>
       </div>
       <div class="install-card reveal reveal-delay-3">
-        <h4>3 · Link globally</h4>
-        <div class="install-cmd" data-command="cd packages/opencode && bun link">
-          <code><span>$ </span><span class="hl">cd packages/opencode && bun link</span></code>
+        <h4>3 · Run</h4>
+        <div class="install-cmd" data-command='codewright "Refactor auth to use JWT tokens"'>
+          <code><span>$ </span><span class="hl">codewright</span> "Refactor auth to use JWT tokens"</code>
           <span class="install-copy"><svg class="copy" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></span>
         </div>
       </div>
       <div class="install-card reveal reveal-delay-4">
-        <h4>4 · Run</h4>
-        <div class="install-cmd" data-command="codewright">
-          <code><span>$ </span><span class="hl">codewright</span></code>
+        <h4>From source</h4>
+        <div class="install-cmd" data-command="git clone https://github.com/yoyo636/codewright.git && cd codewright && bun install && bun run build && ./script/install-bin.sh">
+          <code><span class="hl">git clone</span> · bun install · bun run build</code>
           <span class="install-copy"><svg class="copy" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></span>
         </div>
       </div>
       <div class="install-card reveal reveal-delay-1">
         <h4>Prebuilt binaries</h4>
-        <div class="install-cmd" data-command="echo 'Prebuilt binaries coming soon to GitHub Releases'">
-          <code><span class="hl">GitHub Releases</span> · coming soon</code>
+        <div class="install-cmd" data-command="echo 'Prebuilt binaries shipped for macOS / Linux / Windows x64'">
+          <code><span class="hl">darwin · linux · windows</span> · x64 &amp; arm64</code>
           <span class="install-copy"><svg class="copy" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></span>
         </div>
       </div>
       <div class="install-card reveal reveal-delay-2">
         <h4>Requirements</h4>
-        <div class="install-cmd" data-command="echo 'Requires Bun 1.3.14+ and a provider API key'">
-          <code><span class="hl">Bun 1.3.14+</span> · Node 18+ · provider key</code>
+        <div class="install-cmd" data-command="echo 'Node 18+ or Bun 1.3.14+ and a provider API key'">
+          <code><span class="hl">Node 18+</span> · Bun 1.3.14+ · provider key</code>
           <span class="install-copy"><svg class="copy" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></span>
         </div>
       </div>
@@ -1147,8 +1157,8 @@
         <div class="faq-a"><div class="faq-a-inner">Anthropic, OpenAI, Google, DeepSeek, OpenRouter, local models, and much more. Recent additions include <strong>Token River</strong> (20 models) and <strong>Volcano Engine</strong> (agent &amp; coding plans). Bring your own API key — Codewright never proxies your traffic.</div></div>
       </div>
       <div class="faq-item reveal">
-        <button class="faq-q">What's new in v3.0.0 Beta?<span class="faq-icon">+</span></button>
-        <div class="faq-a"><div class="faq-a-inner">A full Claude-style TUI redesign with a warm default theme, persistent memory via <code>/memory</code>, an environment health check via <code>/doctor</code>, context-usage warnings, and 183+ providers with dozens of new models.</div></div>
+        <button class="faq-q">What's new in v3.0.3?<span class="faq-icon">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">A full Claude-style TUI redesign with a warm default theme, persistent memory via <code>/memory</code>, an environment health check via <code>/doctor</code>, context-usage warnings, and 183+ providers with dozens of new models. The new <strong>V2 execution kernel</strong> persists every turn as a resumable graph — interrupt a task and pick it up exactly where it stopped.</div></div>
       </div>
       <div class="faq-item reveal">
         <button class="faq-q">Can I control what Codewright is allowed to do?<span class="faq-icon">+</span></button>
@@ -1160,7 +1170,7 @@
       </div>
       <div class="faq-item reveal">
         <button class="faq-q">Is it available on npm?<span class="faq-icon">+</span></button>
-        <div class="faq-a"><div class="faq-a-inner">No. Codewright is currently distributed as <strong>source code</strong> — clone the repo and build with Bun (the <code>codewright</code> command). It is not published to npm, and the name <code>codewright</code> on npm belongs to a different, unrelated project. Prebuilt binaries are planned for GitHub Releases.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Yes — install globally with <code>npm install -g @codewright-ai/codewright</code>. A prebuilt binary is fetched for your platform when available; otherwise the CLI runs from source via Bun, so it still works. It is MIT-licensed and free; the <code>codewright</code> name on npm belongs to a different, unrelated project, which is why the scoped package is <code>@codewright-ai/codewright</code>.</div></div>
       </div>
       <div class="faq-item reveal">
         <button class="faq-q">Is it free and open source?<span class="faq-icon">+</span></button>
@@ -1206,7 +1216,7 @@
   <section class="cta-section" id="cta">
     <div class="cta-box reveal">
       <h2>Ready to code at lightspeed?</h2>
-      <p>Clone the repo, install with Bun, and start building with AI in seconds. v3.0.0 Beta is here.</p>
+      <p>Install globally with npm and start building with AI in seconds. v3.0.3 with the V2 execution kernel is here.</p>
       <div class="cta-buttons">
         <a href="https://github.com/yoyo636/codewright" class="btn-primary" target="_blank" rel="noopener">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
@@ -1224,13 +1234,19 @@
     <div class="footer-inner">
       <div class="footer-brand">
         <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="32" height="32" rx="8" fill="url(#fg)"/>
-          <path d="M10 12L6 16L10 20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M22 12L26 16L22 20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M19 9L13 23" stroke="white" stroke-width="2" stroke-linecap="round"/>
-          <defs><linearGradient id="fg" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#00d4ff"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs>
+          <defs>
+            <linearGradient id="fg" x1="0" y1="0" x2="1" y2="1">
+              <stop stop-color="#FF5A3C"/>
+              <stop offset="1" stop-color="#C81E2E"/>
+            </linearGradient>
+          </defs>
+          <polygon points="2,6 2,26 13,16" fill="url(#fg)" stroke="#1A1A1A" stroke-width="1" stroke-linejoin="round"/>
+          <rect x="13" y="15" width="9" height="2" rx="1" fill="#FFFFFF" opacity="0.92"/>
+          <path d="M 22 6 V 26" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity="0.92"/>
+          <path d="M 22 6 H 27 A 5 5 0 0 1 27 16 H 22" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.92"/>
+          <path d="M 27 16 L 30 26" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity="0.92"/>
         </svg>
-        <span>Codewright &copy; 2026 · v3.0.0 Beta</span>
+        <span>Codewright &copy; 2026 · v3.0.3-beta</span>
       </div>
       <ul class="footer-links">
         <li><a href="https://github.com/yoyo636/codewright" target="_blank" rel="noopener">GitHub</a></li>
