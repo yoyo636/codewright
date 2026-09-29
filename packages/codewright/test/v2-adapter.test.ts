@@ -13,7 +13,7 @@ describe("adaptV2Event", () => {
       },
     }
     const v1 = adaptV2Event(v2)
-    expect(v1).toEqual({
+    expect(v1 as any).toEqual({
       type: "message.part.updated",
       properties: {
         sessionID: "ses_1",
@@ -41,7 +41,7 @@ describe("adaptV2Event", () => {
       },
     }
     const v1 = adaptV2Event(v2)
-    expect(v1).toEqual({
+    expect(v1 as any).toEqual({
       type: "message.part.delta",
       properties: {
         sessionID: "ses_1",
@@ -65,7 +65,7 @@ describe("adaptV2Event", () => {
       },
     }
     const v1 = adaptV2Event(v2)
-    expect(v1).toEqual({
+    expect(v1 as any).toEqual({
       type: "message.part.updated",
       properties: {
         sessionID: "ses_1",
@@ -94,7 +94,7 @@ describe("adaptV2Event", () => {
       },
     }
     const v1 = adaptV2Event(v2)
-    expect(v1).toEqual({
+    expect(v1 as any).toEqual({
       type: "message.updated",
       properties: {
         sessionID: "ses_1",
@@ -123,7 +123,7 @@ describe("adaptV2Event", () => {
       },
     }
     const v1 = adaptV2Event(v2)
-    expect(v1).toEqual({
+    expect(v1 as any).toEqual({
       type: "message.part.updated",
       properties: {
         sessionID: "ses_1",
@@ -155,7 +155,7 @@ describe("adaptV2Event", () => {
       },
     }
     const v1 = adaptV2Event(v2)
-    expect(v1).toEqual({
+    expect(v1 as any).toEqual({
       type: "message.part.updated",
       properties: {
         sessionID: "ses_1",
@@ -213,7 +213,7 @@ describe("adaptV2Event", () => {
       },
     }
     const v1 = adaptV2Event(v2)
-    expect(v1).toEqual({
+    expect(v1 as any).toEqual({
       type: "permission.asked",
       properties: {
         id: "per_1",
@@ -238,7 +238,7 @@ describe("adaptV2Event", () => {
       },
     }
     const v1 = adaptV2Event(v2)
-    expect(v1).toEqual({
+    expect(v1 as any).toEqual({
       type: "session.error",
       properties: {
         sessionID: "ses_1",
@@ -253,7 +253,7 @@ describe("adaptV2Event", () => {
       data: { sessionID: "ses_1", status: { type: "busy" } },
     }
     const v1 = adaptV2Event(v2)
-    expect(v1).toEqual({
+    expect(v1 as any).toEqual({
       type: "session.status",
       properties: { sessionID: "ses_1", status: { type: "busy" } },
     })
@@ -265,7 +265,7 @@ describe("adaptV2Event", () => {
       data: { sessionID: "ses_1", callID: "call_1", command: "ls", timestamp: 1000 },
     }
     const v1 = adaptV2Event(v2)
-    expect(v1).toEqual({
+    expect(v1 as any).toEqual({
       type: "session.next.shell.started",
       properties: { sessionID: "ses_1", callID: "call_1", command: "ls", timestamp: 1000 },
     })
