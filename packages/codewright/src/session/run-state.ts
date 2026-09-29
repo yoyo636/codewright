@@ -148,4 +148,5 @@ function busyError(sessionID: SessionID) {
 
 export const node = LayerNode.make({ service: Service, layer: layer, deps: [BackgroundJob.node, SessionStatus.node] })
 
+/** @deprecated V1 session run state. Retained for legacy server compatibility; V2 run state lives in the trajectory. */
 export * as SessionRunState from "./run-state"

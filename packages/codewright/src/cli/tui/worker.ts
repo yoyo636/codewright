@@ -1,4 +1,5 @@
 import { Server } from "@/server/server"
+import { V2 } from "@/server/v2"
 import { InstanceRuntime } from "@/project/instance-runtime"
 import { Rpc } from "@/util/rpc"
 import { upgrade } from "@/cli/upgrade"
@@ -39,7 +40,7 @@ export const rpc = {
       headers,
       body: input.body,
     })
-    const response = await Server.Default().app.fetch(request)
+    const response = await V2().app.fetch(request)
     const body = await response.text()
     return {
       status: response.status,

@@ -260,6 +260,61 @@ describe("TrajectoryStore", () => {
       expect(replayed[0]!.id).toBe(trajectory.root_node_id)
     }))
 
+  it.live("lists every edge in write order, including semantic retry/shortcut edges", () =>
+    Effect.gen(function* () {
+      const store = yield* TrajectoryStore.Service
+      const trajectory = yield* store.create()
+      const [, second] = yield* makeChain(store, trajectory.id, "root", 2, trajectory.root_node_id)
+
+      // A failed node is re-attempted from the prior state: the retry edge is
+      // written at append time as an extra_edge on the retrying node.
+      const failed = yield* store.append({
+        trajectory_id: trajectory.id,
+        branch_id: "root",
+        parent_ids: [second.id],
+        input_payload: { step: 2, request: "call-2" },
+        output_payload: { step: 2, result: "error" },
+        tool_name: "bash",
+        state_snapshot: { env: { cwd: "/tmp", step: 2 } },
+        metadata: { annotations: { status: "failed" } },
+      })
+      const retry = yield* store.append({
+        trajectory_id: trajectory.id,
+        branch_id: "root",
+        parent_ids: [second.id],
+        input_payload: { step: 2, request: "call-2" },
+        output_payload: { step: 2, result: "ok-2" },
+        tool_name: "bash",
+        state_snapshot: { env: { cwd: "/tmp", step: 2 } },
+        step_index: 4,
+        extra_edges: [{ from_node_id: failed.id, kind: "retry" }],
+      })
+
+      // A validated prefix is promoted to a shortcut so a later run can skip it.
+      const resume = yield* store.append({
+        trajectory_id: trajectory.id,
+        branch_id: "root",
+        parent_ids: [retry.id],
+        input_payload: { step: 3, request: "call-3" },
+        output_payload: { step: 3, result: "ok-3" },
+        tool_name: "bash",
+        extra_edges: [{ from_node_id: second.id, kind: "shortcut" }],
+      })
+
+      const edges = yield* store.edges(trajectory.id)
+      const byTo = new Map(edges.map((edge) => [edge.to_node_id, edge]))
+      expect(byTo.get(retry.id)?.kind).toBe("retry")
+      expect(byTo.get(retry.id)?.from_node_id).toBe(failed.id)
+      expect(byTo.get(resume.id)?.kind).toBe("shortcut")
+      expect(byTo.get(resume.id)?.from_node_id).toBe(second.id)
+
+      // Structural edges are still present alongside the semantic ones.
+      const kinds = new Set(edges.map((edge) => edge.kind))
+      expect(kinds.has("control")).toBe(true)
+      expect(kinds.has("retry")).toBe(true)
+      expect(kinds.has("shortcut")).toBe(true)
+    }))
+
   test("canonicalJson is stable under key order", () => {
     expect(TrajectoryStore.canonicalJson({ b: 1, a: { d: 2, c: 3 } })).toBe(
       TrajectoryStore.canonicalJson({ a: { c: 3, d: 2 }, b: 1 }),

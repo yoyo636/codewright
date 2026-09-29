@@ -280,10 +280,26 @@ export default {
           \`version\` integer DEFAULT 1 NOT NULL,
           \`title\` text,
           \`metadata\` text,
+          \`session_id\` text,
           \`time_created\` integer NOT NULL,
           \`time_updated\` integer NOT NULL
         );
       `)
+      yield* tx.run(`
+        CREATE TABLE \`policy\` (
+          \`id\` text PRIMARY KEY,
+          \`state_hash\` text NOT NULL,
+          \`task_class\` text NOT NULL,
+          \`tool_sequence\` text NOT NULL,
+          \`validated\` integer NOT NULL DEFAULT 0,
+          \`generation\` integer,
+          \`trajectory_id\` text,
+          \`time_created\` integer NOT NULL
+        );
+      `)
+      yield* tx.run(`CREATE UNIQUE INDEX \`policy_state_task_idx\` ON \`policy\` (\`state_hash\`, \`task_class\`);`)
+      yield* tx.run(`CREATE INDEX \`policy_state_hash_idx\` ON \`policy\` (\`state_hash\`);`)
+      yield* tx.run(`CREATE INDEX \`policy_task_class_idx\` ON \`policy\` (\`task_class\`);`)
       yield* tx.run(`CREATE UNIQUE INDEX \`event_aggregate_seq_idx\` ON \`event\` (\`aggregate_id\`,\`seq\`);`)
       yield* tx.run(`CREATE INDEX \`event_aggregate_type_seq_idx\` ON \`event\` (\`aggregate_id\`,\`type\`,\`seq\`);`)
       yield* tx.run(
@@ -336,6 +352,7 @@ export default {
         `CREATE INDEX \`trajectory_node_input_fingerprint_idx\` ON \`trajectory_node\` (\`input_fingerprint\`);`,
       )
       yield* tx.run(`CREATE INDEX \`trajectory_node_time_ms_idx\` ON \`trajectory_node\` (\`time_ms\`);`)
+      yield* tx.run(`CREATE INDEX \`trajectory_session_id_idx\` ON \`trajectory\` (\`session_id\`);`)
     })
   },
 } satisfies Omit<DatabaseMigration.Migration, "id">

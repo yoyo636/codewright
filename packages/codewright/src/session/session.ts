@@ -1015,4 +1015,5 @@ export const node = LayerNode.make({
   deps: [BackgroundJob.node, RuntimeFlags.node, Database.node, EventV2Bridge.node],
 })
 
+/** @deprecated V1 session service. Retained for legacy server compatibility; V2 uses SessionV2 in @codewright-ai/core. */
 export * as Session from "./session"

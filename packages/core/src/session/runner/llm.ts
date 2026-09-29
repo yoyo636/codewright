@@ -9,6 +9,7 @@ import {
   type ProviderErrorEvent,
 } from "@codewright-ai/llm"
 import { Cause, DateTime, Effect, FiberSet, Layer, Option, Semaphore, Stream } from "effect"
+import { eq } from "drizzle-orm"
 import { AgentV2 } from "../../agent"
 import { Config } from "../../config"
 import { Database } from "../../database/database"
@@ -25,6 +26,7 @@ import { ReferenceGuidance } from "../../reference/guidance"
 import { ToolRegistry } from "../../tool/registry"
 import { ToolOutputStore } from "../../tool-output-store"
 import { SessionContextEpoch } from "../context-epoch"
+import { SessionContextEpochTable } from "../sql"
 import { SessionCompaction } from "../compaction"
 import { SessionEvent } from "../event"
 import { SessionHistory, clearDecodeCache } from "../history"
@@ -36,10 +38,12 @@ import { SessionRunnerModel } from "./model"
 import { createLLMEventPublisher } from "./publish-llm-event"
 import { toLLMMessages, clearConversionCache } from "./to-llm-message"
 import { MAX_STEPS_PROMPT } from "./max-steps"
+import { Hash } from "../../util/hash"
 import { Snapshot } from "../../snapshot"
 import { SessionStatusEvent } from "@codewright-ai/schema/session-status-event"
 import { makeLocationNode } from "../../effect/app-node"
 import { llmClient } from "../../effect/app-node-platform"
+import { NodeStepper, PolicyStore, Trajectory, ToolTransaction, TrajectoryStore, Evolution } from "../../trajectory"
 
 /**
  * Runs one durable coding-agent Session until it settles.
@@ -125,6 +129,11 @@ const layer = Layer.effect(
     const config = yield* Config.Service
     const snapshots = yield* Snapshot.Service
     const db = (yield* Database.Service).db
+    const trajectory = yield* TrajectoryStore.Service
+    const stepper = yield* NodeStepper.Service
+    const toolTransaction = yield* ToolTransaction.Service
+    const policyStore = yield* PolicyStore.Service
+    const evolution = yield* Evolution.Service
     const compaction = SessionCompaction.make({ events, llm, config: yield* config.entries() })
     const getSession = Effect.fn("SessionRunner.getSession")(function* (sessionID: SessionSchema.ID) {
       const session = yield* store.get(sessionID)
@@ -134,6 +143,24 @@ const layer = Layer.effect(
 
     const getContext = Effect.fn("SessionRunner.getContext")(function* (sessionID: SessionSchema.ID) {
       return yield* store.context(sessionID)
+    })
+    /**
+     * A task class is the stable intent of a session: agent + title. Two
+     * sessions attempting the same task share a class, which is what makes
+     * convergence (cross-graph strategy overlap) measurable.
+     */
+    const resolveTaskClass = Effect.fn("SessionRunner.resolveTaskClass")(function* (sessionID: SessionSchema.ID) {
+      const session = yield* getSession(sessionID)
+      return Hash.sha256(`${session.agent ?? "default"}:${session.title ?? ""}`)
+    })
+    const readEpoch = Effect.fn("SessionRunner.readEpoch")(function* (sessionID: SessionSchema.ID) {
+      const row = yield* db
+        .select({ baselineSeq: SessionContextEpochTable.baseline_seq })
+        .from(SessionContextEpochTable)
+        .where(eq(SessionContextEpochTable.session_id, sessionID))
+        .get()
+        .pipe(Effect.orDie)
+      return row?.baselineSeq ?? 0
     })
     const failInterruptedTools = Effect.fn("SessionRunner.failInterruptedTools")(function* (
       sessionID: SessionSchema.ID,
@@ -203,6 +230,7 @@ const layer = Layer.effect(
       promotion: SessionInput.Delivery | undefined,
       step: number,
       recoverOverflow?: typeof compaction.compactAfterOverflow,
+      policyTools?: readonly string[],
     ) {
       const session = yield* getSession(sessionID)
       if (session.location.directory !== location.directory || session.location.workspaceID !== location.workspaceID)
@@ -235,9 +263,18 @@ const layer = Layer.effect(
       const request = LLM.request({
         model,
         providerOptions: { openai: { promptCacheKey } },
-        system: [agent.info?.system, system.baseline]
-          .filter((part): part is string => part !== undefined && part.length > 0)
-          .map(SystemPart.make),
+        system: (() => {
+          const parts = [agent.info?.system, system.baseline].filter(
+            (part): part is string => part !== undefined && part.length > 0,
+          )
+          if (policyTools && policyTools.length > 0) {
+            parts.push(
+              `Preferred tool order for this task class: ${policyTools.join(" -> ")}. ` +
+                "Follow it when it fits the current step; deviate only when the step genuinely requires a different tool.",
+            )
+          }
+          return parts.map(SystemPart.make)
+        })(),
         messages: [...toLLMMessages(context, model), ...(isLastStep ? [Message.assistant(MAX_STEPS_PROMPT)] : [])],
         tools: toolMaterialization?.definitions ?? [],
         toolChoice: isLastStep ? "none" : undefined,
@@ -381,34 +418,109 @@ const layer = Layer.effect(
       sessionID: SessionSchema.ID,
       promotion: SessionInput.Delivery | undefined,
       step: number,
+      policyTools?: readonly string[],
     ) => Effect.Effect<{ readonly needsContinuation: boolean; readonly step: number }, RunError>
 
-    const runAfterOverflowCompaction: RunTurn = Effect.fnUntraced(function* (sessionID, promotion, step) {
-      return yield* runTurnAttempt(sessionID, promotion, step).pipe(
+    const runAfterOverflowCompaction: RunTurn = Effect.fnUntraced(function* (sessionID, promotion, step, policyTools) {
+      return yield* runTurnAttempt(sessionID, promotion, step, undefined, policyTools).pipe(
         Effect.catchDefect(
           Effect.fnUntraced(function* (defect) {
             if (!(defect instanceof TurnTransitionError)) return yield* Effect.die(defect)
             if (defect.transition._tag === "ContinueAfterOverflowCompaction")
               return yield* Effect.die("Post-compaction provider attempt cannot recover another overflow")
             yield* Effect.yieldNow
-            return yield* runAfterOverflowCompaction(sessionID, undefined, defect.transition.step)
+            return yield* runAfterOverflowCompaction(sessionID, undefined, defect.transition.step, policyTools)
           }),
         ),
       )
     })
 
-    const runTurn: RunTurn = Effect.fnUntraced(function* (sessionID, promotion, step) {
-      return yield* runTurnAttempt(sessionID, promotion, step, compaction.compactAfterOverflow).pipe(
+    const runTurn: RunTurn = Effect.fnUntraced(function* (sessionID, promotion, step, policyTools) {
+      return yield* runTurnAttempt(sessionID, promotion, step, compaction.compactAfterOverflow, policyTools).pipe(
         Effect.catchDefect(
           Effect.fnUntraced(function* (defect) {
             if (!(defect instanceof TurnTransitionError)) return yield* Effect.die(defect)
             yield* Effect.yieldNow
             if (defect.transition._tag === "ContinueAfterOverflowCompaction")
-              return yield* runAfterOverflowCompaction(sessionID, undefined, defect.transition.step)
-            return yield* runTurn(sessionID, undefined, defect.transition.step)
+              return yield* runAfterOverflowCompaction(sessionID, undefined, defect.transition.step, policyTools)
+            return yield* runTurn(sessionID, undefined, defect.transition.step, policyTools)
           }),
         ),
       )
+    })
+
+    /**
+     * Runs one provider turn and records it as an immutable trajectory node.
+     *
+     * The node's parent is the previous step node on the root branch, so the
+     * execution graph is a chain that `restoreState` can walk to rebuild
+     * context. The turn logic itself is unchanged; the append captures the
+     * input (delivery + step), output (settlement), and the state snapshot
+     * (context epoch) needed to resume from this node.
+     */
+    type StepPayload = {
+      readonly sessionID: SessionSchema.ID
+      readonly step: number
+      readonly promotion: SessionInput.Delivery | undefined
+    }
+    type StepResult = { readonly needsContinuation: boolean; readonly step: number; readonly nodeId: string; readonly stepIndex: number }
+    const recordStep = Effect.fn("SessionRunner.recordStep")(function* (
+      input: {
+        readonly sessionID: SessionSchema.ID
+        readonly graphID: string
+        readonly parentID: string | undefined
+        readonly parentStep: number
+        readonly promotion: SessionInput.Delivery | undefined
+        readonly step: number
+      },
+    ) {
+      // Look up a validated policy for the state this step enters from. When
+      // one hits, the runner follows the distilled tool sequence (softly, via
+      // the system prompt) and marks the appended node with a `shortcut` edge
+      // so the graph-differential self-evolution can measure convergence.
+      const preEpoch = yield* readEpoch(input.sessionID)
+      const taskClass = yield* resolveTaskClass(input.sessionID)
+      const stateHash = Hash.sha256(
+        TrajectoryStore.canonicalJson({
+          session_id: input.sessionID,
+          step: input.step,
+          context_epoch: preEpoch,
+        }),
+      )
+      const policy = yield* policyStore.lookup(stateHash, taskClass)
+      const result = yield* runTurn(input.sessionID, input.promotion, input.step, policy?.tool_sequence)
+      const epoch = yield* readEpoch(input.sessionID)
+      const payload: StepPayload = { sessionID: input.sessionID, step: input.step, promotion: input.promotion }
+      const fingerprint = yield* toolTransaction.fingerprint({
+        tool_name: "session.step",
+        input_payload: payload as unknown as Trajectory.JSONValue,
+      })
+      const node = yield* trajectory
+        .append({
+          trajectory_id: input.graphID,
+          branch_id: "root",
+          parent_ids: input.parentID ? [input.parentID] : [],
+          input_payload: payload as unknown as Trajectory.JSONValue,
+          output_payload: result as unknown as Trajectory.JSONValue,
+          state_snapshot: {
+            session_id: input.sessionID,
+            step: result.step,
+            context_epoch: epoch,
+          },
+          step_index: input.parentStep + 1,
+          extra_edges:
+            policy && input.parentID ? [evolution.markShortcut(input.parentID)] : undefined,
+          metadata: {
+            annotations: {
+              fingerprint,
+              ...(policy
+                ? { policy_id: policy.id, task_class: taskClass, policy_validated: policy.validated }
+                : {}),
+            },
+          },
+        })
+        .pipe(Effect.orDie)
+      return { needsContinuation: result.needsContinuation, step: result.step, nodeId: node.id, stepIndex: node.step_index }
     })
 
     const run = Effect.fn("SessionRunner.run")(function* (input: {
@@ -424,13 +536,31 @@ const layer = Layer.effect(
       // single-drain-per-session guarantee keeps busy/idle pairs un-nested.
       yield* events.publish(SessionStatusEvent.Status, { sessionID: input.sessionID, status: { type: "busy" } })
       yield* Effect.gen(function* () {
+        // Rebuild execution state from the durable trajectory before draining,
+        // so a resumed session picks up where it left off. The runner derives
+        // its immediate context from the EventV2 store; this restores the
+        // trajectory-side snapshot that future state-externalized resumes use.
+        const graph = yield* trajectory.forSession(input.sessionID)
+        let last = yield* trajectory.lastNode(graph.id, "root")
+        if (last) yield* stepper.restoreState(graph.id, last.id).pipe(Effect.ignore)
+        let parentID = last?.id
+        let parentStep = last?.step_index ?? -1
         let promotion: SessionInput.Delivery | undefined = hasSteer ? "steer" : hasQueue ? "queue" : undefined
         let shouldRun = input.force || hasSteer || hasQueue
         while (shouldRun) {
           let needsContinuation = true
           let step = 1
           while (needsContinuation) {
-            const result = yield* runTurn(input.sessionID, promotion, step)
+            const result = yield* recordStep({
+              sessionID: input.sessionID,
+              graphID: graph.id,
+              parentID,
+              parentStep,
+              promotion,
+              step,
+            })
+            parentID = result.nodeId
+            parentStep = result.stepIndex
             needsContinuation = result.needsContinuation
             step = result.step + 1
             promotion = "steer"
@@ -474,5 +604,10 @@ export const node = makeLocationNode({
     Config.node,
     Snapshot.node,
     Database.node,
+    TrajectoryStore.node,
+    NodeStepper.node,
+    ToolTransaction.node,
+    PolicyStore.node,
+    Evolution.node,
   ],
 })

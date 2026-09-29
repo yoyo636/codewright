@@ -593,4 +593,5 @@ export const node = LayerNode.make({
   ],
 })
 
+/** @deprecated V1 session compaction. Retained for legacy server compatibility; V2 uses SessionV2 compaction in @codewright-ai/core. */
 export * as SessionCompaction from "./compaction"

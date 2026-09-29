@@ -715,4 +715,5 @@ export const node = LayerNode.make({
   ],
 })
 
+/** @deprecated V1 session processor. Retained for legacy server compatibility; V2 uses SessionRunner in @codewright-ai/core. */
 export * as SessionProcessor from "./processor"

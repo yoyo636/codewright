@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, mock, spyOn, test } from "bun:test"
-import { CodewrightClient, type Provider } from "@codewright-ai/sdk/v2"
+import { CodewrightClient } from "@codewright-ai/sdk/v2"
 import type { Resolved } from "@codewright-ai/tui/config"
 import { TuiConfig } from "@/config/tui"
 import { resolveDiffStyle, resolveModelInfo, resolveRunTuiConfig } from "@/cli/cmd/run/runtime.boot"
@@ -9,50 +9,37 @@ function model(id: string, providerID: string, context: number, variants?: Recor
   return {
     id,
     providerID,
+    name: id,
     api: {
       id: providerID,
+      type: "aisdk" as const,
+      package: `@ai-sdk/${providerID}`,
       url: `https://${providerID}.test`,
-      npm: `@ai-sdk/${providerID}`,
     },
-    name: id,
     capabilities: {
       temperature: true,
       reasoning: true,
       attachment: true,
       toolcall: true,
-      input: {
-        text: true,
-        audio: false,
-        image: false,
-        video: false,
-        pdf: false,
-      },
-      output: {
-        text: true,
-        audio: false,
-        image: false,
-        video: false,
-        pdf: false,
-      },
-      interleaved: false,
+      input: { text: true, audio: false, image: false, video: false, pdf: false },
+      output: { text: true, audio: false, image: false, video: false, pdf: false },
     },
-    cost: {
-      input: 0,
-      output: 0,
-      cache: {
-        read: 0,
-        write: 0,
-      },
-    },
-    limit: {
-      context,
-      output: 8192,
-    },
+    request: { headers: {}, body: {} },
+    variants: Object.entries(variants ?? {}).map(([vid]) => ({ id: vid, headers: {}, body: {} })),
+    time: { released: 0 },
+    cost: [],
     status: "active" as const,
-    options: {},
-    headers: {},
-    release_date: "2026-01-01",
-    variants,
+    enabled: true,
+    limit: { context, output: 8192 },
+  }
+}
+
+function provider(id: string, name: string) {
+  return {
+    id,
+    name,
+    api: { type: "aisdk" as const, package: `@ai-sdk/${id}` },
+    request: { headers: {}, body: {} },
   }
 }
 
@@ -160,124 +147,94 @@ describe("run runtime boot", () => {
     await expect(resolveDiffStyle()).resolves.toBe("auto")
   })
 
-  test("prefers configured providers for model selector data", async () => {
+  test("projects provider and model lists into the model selector data", async () => {
     const sdk = new CodewrightClient()
-    const data: {
-      all: Provider[]
-      default: Record<string, string>
-      connected: string[]
-    } = {
-      all: [
+    const providers = [provider("openai", "OpenAI"), provider("anthropic", "Anthropic")]
+    const models = [
+      model("gpt-5", "openai", 128000, { high: {}, minimal: {} }),
+      model("sonnet", "anthropic", 200000),
+    ]
+    const location = { directory: "/workspace", project: { id: "p", directory: "/workspace" } }
+    spyOn(sdk.v2.provider, "list").mockImplementation(() =>
+      Promise.resolve({
+        data: { location, data: providers },
+        error: undefined,
+        request: new Request("https://codewright.test"),
+        response: new Response(),
+      } as any),
+    )
+    spyOn(sdk.v2.model, "list").mockImplementation(() =>
+      Promise.resolve({
+        data: { location, data: models },
+        error: undefined,
+        request: new Request("https://codewright.test"),
+        response: new Response(),
+      } as any),
+    )
+
+    await expect(resolveModelInfo(sdk, "/workspace", { providerID: "openai", modelID: "gpt-5" })).resolves.toEqual({
+      providers: [
         {
           id: "openai",
           name: "OpenAI",
-          source: "api",
-          env: [],
-          options: {},
           models: {
-            "gpt-5": model("gpt-5", "openai", 128000, {
-              high: {},
-              minimal: {},
-            }),
+            "gpt-5": {
+              id: "gpt-5",
+              name: "gpt-5",
+              status: "active",
+              limit: { context: 128000 },
+              variants: { high: { headers: {}, body: {} }, minimal: { headers: {}, body: {} } },
+              cost: undefined,
+            },
           },
         },
         {
           id: "anthropic",
           name: "Anthropic",
-          source: "api",
-          env: [],
-          options: {},
           models: {
-            sonnet: model("sonnet", "anthropic", 200000),
+            sonnet: {
+              id: "sonnet",
+              name: "sonnet",
+              status: "active",
+              limit: { context: 200000 },
+              variants: {},
+              cost: undefined,
+            },
           },
         },
       ],
-      default: {},
-      connected: [],
-    }
-    const configured = {
-      providers: [data.all[0]!],
-      default: {},
-    }
-    const list = spyOn(sdk.provider, "list").mockImplementation(() =>
-      Promise.resolve({
-        data,
-        error: undefined,
-        request: new Request("https://codewright.test"),
-        response: new Response(),
-      }),
-    )
-    spyOn(sdk.config, "providers").mockImplementation(() =>
-      Promise.resolve({
-        data: configured,
-        error: undefined,
-        request: new Request("https://codewright.test"),
-        response: new Response(),
-      }),
-    )
-
-    await expect(resolveModelInfo(sdk, "/workspace", { providerID: "openai", modelID: "gpt-5" })).resolves.toEqual({
-      providers: configured.providers,
-      variants: ["high", "minimal"],
-      limits: {
-        "openai/gpt-5": 128000,
-      },
-    })
-    expect(list).not.toHaveBeenCalled()
-  })
-
-  test("falls back to provider list when configured providers are unavailable", async () => {
-    const sdk = new CodewrightClient()
-    const data: {
-      all: Provider[]
-      default: Record<string, string>
-      connected: string[]
-    } = {
-      all: [
-        {
-          id: "openai",
-          name: "OpenAI",
-          source: "api",
-          env: [],
-          options: {},
-          models: {
-            "gpt-5": model("gpt-5", "openai", 128000, {
-              high: {},
-              minimal: {},
-            }),
-          },
-        },
-        {
-          id: "anthropic",
-          name: "Anthropic",
-          source: "api",
-          env: [],
-          options: {},
-          models: {
-            sonnet: model("sonnet", "anthropic", 200000),
-          },
-        },
-      ],
-      default: {},
-      connected: [],
-    }
-    spyOn(sdk.config, "providers").mockRejectedValue(new Error("boom"))
-    spyOn(sdk.provider, "list").mockImplementation(() =>
-      Promise.resolve({
-        data,
-        error: undefined,
-        request: new Request("https://codewright.test"),
-        response: new Response(),
-      }),
-    )
-
-    await expect(resolveModelInfo(sdk, "/workspace", { providerID: "openai", modelID: "gpt-5" })).resolves.toEqual({
-      providers: data.all,
       variants: ["high", "minimal"],
       limits: {
         "openai/gpt-5": 128000,
         "anthropic/sonnet": 200000,
       },
+    })
+  })
+
+  test("falls back to an empty catalog when the model list is unavailable", async () => {
+    const sdk = new CodewrightClient()
+    const providers = [provider("openai", "OpenAI")]
+    const location = { directory: "/workspace", project: { id: "p", directory: "/workspace" } }
+    spyOn(sdk.v2.provider, "list").mockImplementation(() =>
+      Promise.resolve({
+        data: { location, data: providers },
+        error: undefined,
+        request: new Request("https://codewright.test"),
+        response: new Response(),
+      } as any),
+    )
+    spyOn(sdk.v2.model, "list").mockRejectedValue(new Error("boom"))
+
+    await expect(resolveModelInfo(sdk, "/workspace", { providerID: "openai", modelID: "gpt-5" })).resolves.toEqual({
+      providers: [
+        {
+          id: "openai",
+          name: "OpenAI",
+          models: {},
+        },
+      ],
+      variants: [],
+      limits: {},
     })
   })
 })

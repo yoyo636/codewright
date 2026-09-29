@@ -166,4 +166,5 @@ export const node = LayerNode.make({
   deps: [Skill.node, MCP.node, FSUtil.node, locationServiceMapNode],
 })
 
+/** @deprecated V1 system prompt. Retained for legacy server compatibility; V2 uses SystemContext in @codewright-ai/core. */
 export * as SystemPrompt from "./system"

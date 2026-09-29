@@ -27,6 +27,10 @@ const arch = archMap[os.arch()] ?? os.arch()
 const scope = packageJson.name.includes("/") ? `${packageJson.name.split("/")[0]}/` : ""
 const base = `${scope}codewright-${platform}-${arch}`
 const sourceBinary = platform === "windows" ? "codewright.exe" : "codewright"
+// The published meta package ships a placeholder error script at
+// `bin/codewright.exe`; postinstall overwrites it with the real binary for
+// the current platform. (In a source checkout no binary is present, so this
+// path is never written and the dev launcher at `bin/codewright` is untouched.)
 const targetBinary = path.join(__dirname, "bin", "codewright.exe")
 
 function supportsAvx2() {
@@ -175,10 +179,11 @@ function main() {
     }
   }
 
-  throw new Error(
-    `It seems your package manager failed to install the right codewright CLI package. Try manually installing ${packageNames()
-      .map((name) => JSON.stringify(name))
-      .join(" or ")}.`,
+  // No prebuilt binary is available for this platform. This is not fatal: the
+  // `bin/codewright` launcher falls back to running from source via Bun, so the
+  // CLI still works — it just starts a little slower on first launch.
+  console.warn(
+    "codewright: could not locate or fetch a prebuilt binary for this platform; the CLI will run from source via Bun.",
   )
 }
 

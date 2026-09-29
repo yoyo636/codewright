@@ -89,4 +89,5 @@ export const apply = Effect.fn("SessionReminders.apply")(function* (input: {
   return input.messages
 })
 
+/** @deprecated V1 session reminders. Retained for legacy server compatibility; V2 uses SystemContext reminders in @codewright-ai/core. */
 export * as SessionReminders from "./reminders"

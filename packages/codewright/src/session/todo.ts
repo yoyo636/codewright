@@ -71,4 +71,5 @@ const layer = Layer.effect(
 
 export const node = LayerNode.make({ service: Service, layer: layer, deps: [EventV2Bridge.node, Database.node] })
 
+/** @deprecated V1 session todo. Retained for legacy server compatibility; V2 todo is not yet implemented. */
 export * as Todo from "./todo"

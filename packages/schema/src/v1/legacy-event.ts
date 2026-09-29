@@ -1,3 +1,4 @@
+/** @deprecated V1 legacy event schema. Retained for legacy server compatibility; new code uses the V2 event model. */
 export * as LegacyEvent from "./legacy-event"
 
 import { Schema } from "effect"

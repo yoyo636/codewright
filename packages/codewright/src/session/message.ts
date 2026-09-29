@@ -145,4 +145,5 @@ export const Info = Schema.Struct({
 }).annotate({ identifier: "Message" })
 export type Info = Schema.Schema.Type<typeof Info>
 
+/** @deprecated V1 session message schema. Retained for legacy server compatibility; new code uses MessageV2. */
 export * as Message from "./message"

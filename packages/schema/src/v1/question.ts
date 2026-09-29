@@ -1,3 +1,4 @@
+/** @deprecated V1 question schema. Retained for legacy server compatibility; new code uses QuestionV2. */
 export * as QuestionV1 from "./question"
 
 import { Schema } from "effect"

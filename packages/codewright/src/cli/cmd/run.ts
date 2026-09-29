@@ -466,8 +466,17 @@ export const RunCommand = effectCmd({
       }
 
       async function session(sdk: CodewrightClient): Promise<SessionInfo | undefined> {
+        const v2 = Flag.CODEWRIGHT_SESSION_V2_RUN
+        const api = v2 ? sdk.v2.session : sdk.session
+        const anyApi = api as any
+        const toInfo = (data: any): SessionInfo => ({
+          id: data.id,
+          title: data.title,
+          directory: data.directory ?? data.location?.directory,
+        })
+
         if (args.session) {
-          const current = await sdk.session
+          const current = await api
             .get({
               sessionID: args.session,
             })
@@ -479,6 +488,10 @@ export const RunCommand = effectCmd({
           }
 
           if (args.fork) {
+            if (v2) {
+              UI.error("session.fork is not available on the V2 kernel yet")
+              process.exit(1)
+            }
             const forked = await sdk.session.fork({
               sessionID: args.session,
             })
@@ -489,21 +502,23 @@ export const RunCommand = effectCmd({
 
             return {
               id,
-              title: forked.data?.title ?? current.data.title,
-              directory: forked.data?.directory ?? current.data.directory,
+              title: forked.data?.title ?? (current.data as any).title,
+              directory: forked.data?.directory ?? (current.data as any).directory,
             }
           }
 
-          return {
-            id: current.data.id,
-            title: current.data.title,
-            directory: current.data.directory,
-          }
+          return toInfo(current.data)
         }
 
-        const base = args.continue ? (await sdk.session.list()).data?.find((item) => !item.parentID) : undefined
+        const base = args.continue
+          ? (await anyApi.list(v2 ? { directory } : {})).data?.find((item: any) => !item.parentID)
+          : undefined
 
         if (base && args.fork) {
+          if (v2) {
+            UI.error("session.fork is not available on the V2 kernel yet")
+            process.exit(1)
+          }
           const forked = await sdk.session.fork({
             sessionID: base.id,
           })
@@ -514,37 +529,38 @@ export const RunCommand = effectCmd({
 
           return {
             id,
-            title: forked.data?.title ?? base.title,
-            directory: forked.data?.directory ?? base.directory,
+            title: forked.data?.title ?? (base as any).title,
+            directory: forked.data?.directory ?? (base as any).directory,
           }
         }
 
         if (base) {
-          return {
-            id: base.id,
-            title: base.title,
-            directory: base.directory,
-          }
+          return toInfo(base)
         }
 
         const name = title()
-        const result = await sdk.session.create({
-          title: name,
-          permission: [...rules],
-        })
-        const id = result.data?.id
+        const result = await anyApi.create(
+          v2
+            ? {
+                id: args.session,
+                agent: undefined,
+                model: undefined,
+              }
+            : {
+                title: name,
+                permission: [...rules],
+              },
+        )
+        const id = (result as any).data?.id
         if (!id) {
           return
         }
 
-        return {
-          id,
-          title: result.data?.title ?? name,
-          directory: result.data?.directory,
-        }
+        return toInfo((result as any).data)
       }
 
       async function share(sdk: CodewrightClient, sessionID: string) {
+        if (Flag.CODEWRIGHT_SESSION_V2_RUN) return
         const cfg = await sdk.config.get()
         if (!cfg.data) return
         if (cfg.data.share !== "auto" && !flags.autoShare && !args.share) return
@@ -563,27 +579,43 @@ export const RunCommand = effectCmd({
         sdk: CodewrightClient,
         input: { agent: string | undefined; model: ModelInput | undefined; variant: string | undefined },
       ): Promise<SessionInfo> {
-        const result = await sdk.session.create({
-          title: args.title !== undefined && args.title !== "" ? args.title : undefined,
-          agent: input.agent,
-          model: input.model
+        const v2 = Flag.CODEWRIGHT_SESSION_V2_RUN
+        const api = v2 ? sdk.v2.session : sdk.session
+        const anyApi = api as any
+        const result = await anyApi.create(
+          v2
             ? {
-                providerID: input.model.providerID,
-                id: input.model.modelID,
-                variant: input.variant,
+                agent: input.agent,
+                model: input.model
+                  ? {
+                      providerID: input.model.providerID,
+                      id: input.model.modelID,
+                      variant: input.variant,
+                    }
+                  : undefined,
               }
-            : undefined,
-          permission: [...rules],
-        })
-        const id = result.data?.id
+            : {
+                title: args.title !== undefined && args.title !== "" ? args.title : undefined,
+                agent: input.agent,
+                model: input.model
+                  ? {
+                      providerID: input.model.providerID,
+                      id: input.model.modelID,
+                      variant: input.variant,
+                    }
+                  : undefined,
+                permission: [...rules],
+              },
+        )
+        const id = (result as any).data?.id
         if (!id) {
           throw new Error("Failed to create session")
         }
 
-        void share(sdk, id).catch(() => {})
+        if (!v2) void share(sdk, id).catch(() => {})
         return {
           id,
-          title: result.data?.title,
+          title: (result as any).data?.title,
         }
       }
 
@@ -706,92 +738,128 @@ export const RunCommand = effectCmd({
         // to stdout/UI. `client` is passed explicitly because attach mode may
         // rebind the SDK to the session's directory after the subscription is
         // created, and replies issued from inside the loop must use that client.
-        async function loop(client: CodewrightClient, events: Awaited<ReturnType<typeof sdk.event.subscribe>>) {
+        async function loop(client: CodewrightClient, events: Awaited<ReturnType<typeof client.v2.event.subscribe>>) {
           const toggles = new Map<string, boolean>()
+          const tools = new Map<string, string>()
           let error: string | undefined
 
           for await (const event of events.stream) {
             if (
-              event.type === "message.updated" &&
-              event.properties.sessionID === sessionID &&
-              event.properties.info.role === "assistant" &&
+              event.type === "session.next.agent.switched" &&
+              event.data.sessionID === sessionID &&
               args.format !== "json" &&
               toggles.get("start") !== true
             ) {
               UI.empty()
-              UI.println(`> ${event.properties.info.agent} · ${event.properties.info.modelID}`)
+              UI.println(`> ${event.data.agent}`)
               UI.empty()
               toggles.set("start", true)
             }
 
-            if (event.type === "message.part.updated") {
-              const part = event.properties.part
-              if (part.sessionID !== sessionID) continue
-
-              if (part.type === "tool" && (part.state.status === "completed" || part.state.status === "error")) {
-                if (emit("tool_use", { part })) continue
-                if (part.state.status === "completed") {
-                  await tool(part)
-                  continue
-                }
-                await toolError(part)
-                UI.error(part.state.error)
+            if (event.type === "session.next.text.ended") {
+              const props = event.data
+              if (props.sessionID !== sessionID) continue
+              if (emit("text", { text: props.text })) continue
+              const text = props.text.trim()
+              if (!text) continue
+              if (!process.stdout.isTTY) {
+                process.stdout.write(text + EOL)
+                continue
               }
-
-              if (
-                part.type === "tool" &&
-                part.tool === "task" &&
-                part.state.status === "running" &&
-                args.format !== "json"
-              ) {
-                if (toggles.get(part.id) === true) continue
-                await tool(part)
-                toggles.set(part.id, true)
-              }
-
-              if (part.type === "step-start") {
-                if (emit("step_start", { part })) continue
-              }
-
-              if (part.type === "step-finish") {
-                if (emit("step_finish", { part })) continue
-              }
-
-              if (part.type === "text" && part.time?.end) {
-                if (emit("text", { part })) continue
-                const text = part.text.trim()
-                if (!text) continue
-                if (!process.stdout.isTTY) {
-                  process.stdout.write(text + EOL)
-                  continue
-                }
-                UI.empty()
-                UI.println(text)
-                UI.empty()
-              }
-
-              if (part.type === "reasoning" && part.time?.end && thinking) {
-                if (emit("reasoning", { part })) continue
-                const text = part.text.trim()
-                if (!text) continue
-                const line = `Thinking: ${text}`
-                if (process.stdout.isTTY) {
-                  UI.empty()
-                  UI.println(`${UI.Style.TEXT_DIM}\u001b[3m${line}\u001b[0m${UI.Style.TEXT_NORMAL}`)
-                  UI.empty()
-                  continue
-                }
-                process.stdout.write(line + EOL)
-              }
+              UI.empty()
+              UI.println(text)
+              UI.empty()
             }
 
-            if (event.type === "session.error") {
-              const props = event.properties
-              if (props.sessionID !== sessionID || !props.error) continue
-              let err = String(props.error.name)
-              if ("data" in props.error && props.error.data && "message" in props.error.data) {
-                err = String(props.error.data.message)
+            if (event.type === "session.next.reasoning.ended" && thinking) {
+              const props = event.data
+              if (props.sessionID !== sessionID) continue
+              if (emit("reasoning", { text: props.text })) continue
+              const text = props.text.trim()
+              if (!text) continue
+              const line = `Thinking: ${text}`
+              if (process.stdout.isTTY) {
+                UI.empty()
+                UI.println(`${UI.Style.TEXT_DIM}\u001b[3m${line}\u001b[0m${UI.Style.TEXT_NORMAL}`)
+                UI.empty()
+                continue
               }
+              process.stdout.write(line + EOL)
+            }
+
+            if (event.type === "session.next.tool.called") {
+              const props = event.data
+              if (props.sessionID === sessionID) tools.set(props.callID, props.tool)
+            }
+
+            if (event.type === "session.next.tool.success") {
+              const props = event.data
+              if (props.sessionID !== sessionID) continue
+              if (emit("tool_use", { callID: props.callID, tool: tools.get(props.callID) ?? props.callID, content: props.content })) continue
+              const part: ToolPart = {
+                id: props.callID,
+                sessionID: props.sessionID,
+                messageID: props.assistantMessageID,
+                type: "tool",
+                callID: props.callID,
+                tool: tools.get(props.callID) ?? props.callID,
+                state: {
+                  status: "completed",
+                  input: props.structured,
+                  output: props.content
+                    .map((c: { type: string; text?: string }) => (c.type === "text" ? (c.text ?? "") : ""))
+                    .join(""),
+                  title: tools.get(props.callID) ?? props.callID,
+                  metadata: {},
+                  time: { start: 0, end: 0 },
+                },
+              }
+              await tool(part)
+              continue
+            }
+
+            if (event.type === "session.next.tool.failed") {
+              const props = event.data
+              if (props.sessionID !== sessionID) continue
+              const err = typeof props.error === "object" && props.error && "message" in props.error
+                ? String(props.error.message)
+                : String(props.error)
+              if (emit("tool_use", { callID: props.callID, tool: tools.get(props.callID) ?? props.callID, error: err })) continue
+              const part: ToolPart = {
+                id: props.callID,
+                sessionID: props.sessionID,
+                messageID: props.assistantMessageID,
+                type: "tool",
+                callID: props.callID,
+                tool: tools.get(props.callID) ?? props.callID,
+                state: {
+                  status: "error",
+                  input: (props.result as Record<string, unknown> | undefined) ?? {},
+                  error: err,
+                  time: { start: 0, end: 0 },
+                },
+              }
+              await toolError(part)
+              UI.error(err)
+              continue
+            }
+
+            if (event.type === "session.next.step.started") {
+              const props = event.data
+              if (props.sessionID !== sessionID) continue
+              if (emit("step_start", { agent: props.agent, model: props.model })) continue
+            }
+
+            if (event.type === "session.next.step.ended") {
+              const props = event.data
+              if (props.sessionID !== sessionID) continue
+              if (emit("step_finish", { finish: props.finish, cost: props.cost, tokens: props.tokens })) continue
+            }
+
+            if (event.type === "session.next.step.failed") {
+              const props = event.data
+              if (props.sessionID !== sessionID || !props.error) continue
+              let err = String(props.error.message)
               error = error ? error + EOL + err : err
               if (emit("error", { error: props.error })) continue
               UI.error(err)
@@ -799,18 +867,19 @@ export const RunCommand = effectCmd({
 
             if (
               event.type === "session.status" &&
-              event.properties.sessionID === sessionID &&
-              event.properties.status.type === "idle"
+              event.data.sessionID === sessionID &&
+              event.data.status.type === "idle"
             ) {
               break
             }
 
-            if (event.type === "permission.asked") {
-              const permission = event.properties
+            if (event.type === "permission.v2.asked") {
+              const permission = event.data
               if (permission.sessionID !== sessionID) continue
 
               if (auto) {
-                await client.permission.reply({
+                await client.v2.session.permission.reply({
+                  sessionID,
                   requestID: permission.id,
                   reply: "once",
                 })
@@ -818,9 +887,10 @@ export const RunCommand = effectCmd({
                 UI.println(
                   UI.Style.TEXT_WARNING_BOLD + "!",
                   UI.Style.TEXT_NORMAL +
-                    `permission requested: ${permission.permission} (${permission.patterns.join(", ")}); auto-rejecting`,
+                    `permission requested: ${permission.action} (${permission.resources.join(", ")}); auto-rejecting`,
                 )
-                await client.permission.reply({
+                await client.v2.session.permission.reply({
+                  sessionID,
                   requestID: permission.id,
                   reply: "reject",
                 })
@@ -831,7 +901,11 @@ export const RunCommand = effectCmd({
         }
         const cwd = args.attach ? (directory ?? sess.directory ?? (await current(sdk))) : (directory ?? root)
         const client = args.attach ? attachSDK(cwd) : sdk
-        const backend = createBackend(client, Flag.CODEWRIGHT_SESSION_V2_RUN ? "v2" : "v1")
+        const backend = createBackend(
+          client,
+          Flag.CODEWRIGHT_SESSION_V2_RUN ? "v2" : "v1",
+          Flag.CODEWRIGHT_SESSION_V2_RUN ? v2Fetch : fetchFn,
+        )
 
         // Validate agent if specified
         const agent = await pickAgent(client)
@@ -839,7 +913,7 @@ export const RunCommand = effectCmd({
         await share(client, sessionID)
 
         if (!interactive) {
-          const events = await client.event.subscribe()
+          const events = await client.v2.event.subscribe()
           const completed = loop(client, events).catch((e) => {
             console.error(e)
             process.exitCode = 1
@@ -851,6 +925,11 @@ export const RunCommand = effectCmd({
           }
 
           if (args.command) {
+            if (Flag.CODEWRIGHT_SESSION_V2_RUN) {
+              UI.error("session.command is not available on the V2 kernel yet")
+              process.exitCode = 1
+              return
+            }
             const result = await client.session.command({
               sessionID,
               agent,
@@ -869,14 +948,21 @@ export const RunCommand = effectCmd({
           }
 
           const model = pick(args.model)
-          const result = await backend.prompt({
-            sessionID,
-            agent,
-            model,
-            variant: args.variant,
-            parts: [...files, { type: "text", text: message }],
-          })
-          if (result.error) {
+          let result: Awaited<ReturnType<typeof backend.prompt>>
+          try {
+            result = await backend.prompt({
+              sessionID,
+              agent,
+              model,
+              variant: args.variant,
+              parts: [...files, { type: "text", text: message }],
+            })
+          } catch (error) {
+            if (!emit("error", { error })) UI.error(errorMessage(error))
+            process.exitCode = 1
+            return
+          }
+          if (result && "error" in result && result.error) {
             if (!emit("error", { error: result.error })) UI.error(formatRunError(result.error))
             process.exitCode = 1
             return
@@ -916,12 +1002,12 @@ export const RunCommand = effectCmd({
         const model = pick(args.model)
         const { runInteractiveLocalMode } = await import("./run/runtime")
         const fetchFn = (async (input: RequestInfo | URL, init?: RequestInit) => {
-          const { Server } = await import("@/server/server")
+          const { V2 } = await import("@/server/v2")
           const request = new Request(input, init)
           const headers = new Headers(request.headers)
           const auth = ServerAuth.header()
           if (auth) headers.set("Authorization", auth)
-          return Server.Default().app.fetch(new Request(request, { headers }))
+          return V2().app.fetch(new Request(request, { headers }))
         }) as typeof globalThis.fetch
 
         try {
@@ -953,17 +1039,29 @@ export const RunCommand = effectCmd({
         return await execute(sdk)
       }
 
-      const fetchFn = (async (input: RequestInfo | URL, init?: RequestInit) => {
-        const { Server } = await import("@/server/server")
-        const request = new Request(input, init)
-        const headers = new Headers(request.headers)
-        const auth = ServerAuth.header()
-        if (auth) headers.set("Authorization", auth)
-        return Server.Default().app.fetch(new Request(request, { headers }))
-      }) as typeof globalThis.fetch
+      const serverFetch =
+        (kind: "v1" | "v2") =>
+        (async (input: RequestInfo | URL, init?: RequestInit) => {
+          const { Server } = await import("@/server/server")
+          const { V2 } = await import("@/server/v2")
+          const request = new Request(input, init)
+          const headers = new Headers(request.headers)
+          const auth = ServerAuth.header()
+          if (auth) headers.set("Authorization", auth)
+          const app = kind === "v2" ? V2().app : Server.Default().app
+          return app.fetch(new Request(request, { headers }))
+        }) as typeof globalThis.fetch
+      const fetchFn = serverFetch("v1")
+      const v2Fetch = serverFetch("v2")
+      // The SDK client is a hybrid: its `v2.*` namespace speaks the V2
+      // protocol (`/api/*`), while a few legacy-shaped methods (`session.fork`,
+      // `session.share`, `app.agents`) still exist for paths that have not yet
+      // migrated. When the RUN path is on V2 (the default), point the client at
+      // the V2 server so `sdk.v2.*` calls resolve; legacy-shaped calls that
+      // survive are all guarded by V2-error exits or `.catch` fallbacks.
       const sdk = createCodewrightClient({
         baseUrl: "http://codewright.internal",
-        fetch: fetchFn,
+        fetch: Flag.CODEWRIGHT_SESSION_V2_RUN ? v2Fetch : fetchFn,
         directory,
       })
       await execute(sdk)

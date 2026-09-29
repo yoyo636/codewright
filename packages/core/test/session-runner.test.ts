@@ -34,6 +34,7 @@ import { SessionExecution } from "@codewright-ai/core/session/execution"
 import { SessionRunCoordinator } from "@codewright-ai/core/session/run-coordinator"
 import { SessionRunner } from "@codewright-ai/core/session/runner"
 import * as SessionRunnerLLM from "@codewright-ai/core/session/runner/llm"
+import { NodeStepper, PolicyStore, Evolution, ToolTransaction, TrajectoryStore } from "@codewright-ai/core/trajectory"
 import { SessionRunnerModel } from "@codewright-ai/core/session/runner/model"
 import { ToolRegistry } from "@codewright-ai/core/tool/registry"
 import { ApplicationTools } from "@codewright-ai/core/tool/application-tools"
@@ -41,6 +42,7 @@ import { AgentV2 } from "@codewright-ai/core/agent"
 import { Config } from "@codewright-ai/core/config"
 import { ConfigCompaction } from "@codewright-ai/core/config/compaction"
 import { Tool } from "@codewright-ai/core/tool/tool"
+import { Hash } from "@codewright-ai/core/util/hash"
 import {
   SessionContextEpochTable,
   SessionInputTable,
@@ -284,6 +286,11 @@ const it = testEffect(
       SessionRunnerLLM.node,
       SessionExecution.node,
       SessionV2.node,
+      TrajectoryStore.node,
+      NodeStepper.node,
+      ToolTransaction.node,
+      PolicyStore.node,
+      Evolution.node,
     ]),
     [
       [LayerNodePlatform.llmClient, client],
@@ -3443,6 +3450,140 @@ describe("SessionRunnerLLM", () => {
 
       expect(types).toEqual([])
       yield* unsubscribe
+    }),
+  )
+
+  it.effect("records a trajectory node per completed provider turn", () =>
+    Effect.gen(function* () {
+      yield* setup
+      const session = yield* SessionV2.Service
+      const store = yield* TrajectoryStore.Service
+      response = [LLMEvent.finish({ reason: "stop" })]
+      yield* session.prompt({ sessionID, prompt: Prompt.make({ text: "Say hi" }) })
+      yield* Effect.yieldNow
+
+      const graph = yield* store.forSession(sessionID)
+      const head = yield* store.lastNode(graph.id, "root")
+      expect(head).toBeDefined()
+      expect(head!.trajectory_id).toBe(graph.id)
+      expect(head!.branch_id).toBe("root")
+      // The root node (step 0) is created with the trajectory; the first provider
+      // turn is step 1 and chains off it.
+      expect(head!.step_index).toBe(1)
+      expect(head!.parent_ids.length).toBe(1)
+      const step = yield* store.getNode(head!.id)
+      expect(step).toBeDefined()
+      // The node's input carries the delivery that produced it.
+      expect((step!.input_payload as { step: number }).step).toBe(1)
+      // The node's state snapshot records the context epoch used for the turn.
+      expect((step!.state_snapshot as { session_id: string; context_epoch: number }).session_id).toBe(sessionID)
+      expect(typeof (step!.state_snapshot as { context_epoch: number }).context_epoch).toBe("number")
+      // The step input fingerprint is recorded for determinism checks.
+      expect(step!.metadata?.annotations).toBeDefined()
+    }),
+  )
+
+  it.effect("consumes a validated policy and marks the step with a shortcut edge", () =>
+    Effect.gen(function* () {
+      yield* setup
+      const session = yield* SessionV2.Service
+      const store = yield* TrajectoryStore.Service
+      const policyStore = yield* PolicyStore.Service
+      const evolution = yield* Evolution.Service
+      const { db } = yield* Database.Service
+
+      // First turn establishes the context epoch and records the step-1 node.
+      response = [LLMEvent.finish({ reason: "stop" })]
+      yield* session.prompt({ sessionID, prompt: Prompt.make({ text: "First" }) })
+
+      // The state hash the runner computes for the next turn is derived from
+      // the epoch baseline recorded during the first prompt; the task class is
+      // the stable intent of the session (agent + title).
+      const epochRow = yield* db
+        .select({ baselineSeq: SessionContextEpochTable.baseline_seq })
+        .from(SessionContextEpochTable)
+        .where(eq(SessionContextEpochTable.session_id, sessionID))
+        .get()
+        .pipe(Effect.orDie)
+      const sessionRow = yield* db
+        .select({ agent: SessionTable.agent, title: SessionTable.title })
+        .from(SessionTable)
+        .where(eq(SessionTable.id, sessionID))
+        .get()
+        .pipe(Effect.orDie)
+      const stateHash = Hash.sha256(
+        TrajectoryStore.canonicalJson({
+          session_id: sessionID,
+          step: 1,
+          context_epoch: epochRow?.baselineSeq ?? 0,
+        }),
+      )
+      const taskClass = Hash.sha256(`${sessionRow?.agent ?? "default"}:${sessionRow?.title ?? ""}`)
+      yield* policyStore.put({
+        state_hash: stateHash,
+        task_class: taskClass,
+        tool_sequence: ["echo"],
+        validated: true,
+      })
+
+      // Second turn: the runner looks up the policy, follows the distilled
+      // sequence, and appends the node with a shortcut edge + policy metadata.
+      response = [LLMEvent.finish({ reason: "stop" })]
+      yield* session.prompt({ sessionID, prompt: Prompt.make({ text: "Second" }) })
+
+      const graph = yield* store.forSession(sessionID)
+      const head = yield* store.lastNode(graph.id, "root")
+      expect(head).toBeDefined()
+      expect(head!.step_index).toBe(2)
+      expect(head!.parent_ids).toHaveLength(1)
+      // The policy that fired is recorded on the node that consumed it.
+      const annotations = (head!.metadata as { annotations?: Record<string, unknown> } | undefined)?.annotations
+      expect(annotations?.policy_id).toBeDefined()
+      expect(annotations?.policy_validated).toBe(true)
+
+      // A shortcut edge bridges the validated prefix tail to the resumed node.
+      const edges = yield* evolution.edges(graph.id)
+      const shortcut = edges.find((edge) => edge.kind === "shortcut" && edge.to_node_id === head!.id)
+      expect(shortcut).toBeDefined()
+      expect(shortcut?.from_node_id).toBe(head!.parent_ids[0])
+    }),
+  )
+
+  it.effect("records a chain of nodes across continuation steps", () =>
+    Effect.gen(function* () {
+      yield* setup
+      const session = yield* SessionV2.Service
+      const store = yield* TrajectoryStore.Service
+      // First turn issues a tool call; the second turn (continuation) finishes.
+      yield* session.prompt({ sessionID, prompt: Prompt.make({ text: "Echo hello" }), resume: false })
+      responses = [
+        [
+          LLMEvent.stepStart({ index: 0 }),
+          LLMEvent.toolCall({ id: "call-echo", name: "echo", input: { text: "hello" } }),
+          LLMEvent.stepFinish({ index: 0, reason: "tool-calls" }),
+          LLMEvent.finish({ reason: "tool-calls" }),
+        ],
+        [
+          LLMEvent.stepStart({ index: 0 }),
+          LLMEvent.textStart({ id: "text-final" }),
+          LLMEvent.textDelta({ id: "text-final", text: "Done" }),
+          LLMEvent.textEnd({ id: "text-final" }),
+          LLMEvent.stepFinish({ index: 0, reason: "stop" }),
+          LLMEvent.finish({ reason: "stop" }),
+        ],
+      ]
+      yield* session.resume(sessionID)
+
+      const graph = yield* store.forSession(sessionID)
+      // lastNode returns the highest step_index node on the branch (the continuation turn).
+      const last = yield* store.lastNode(graph.id, "root")
+      expect(last).toBeDefined()
+      expect(last!.step_index).toBe(2)
+      // The first turn's node is the parent of the last node.
+      const first = yield* store.getNode(last!.parent_ids[0]!)
+      expect(first).toBeDefined()
+      expect(first!.step_index).toBe(1)
+      expect(last!.parent_ids).toEqual([first!.id])
     }),
   )
 })

@@ -1,3 +1,4 @@
+/** @deprecated V1 event schema. Retained for legacy server compatibility; new code uses the V2 schema. */
 export * as SessionV1 from "./session"
 
 import { Effect, Schema, Types } from "effect"

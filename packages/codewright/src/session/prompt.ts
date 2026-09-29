@@ -1664,4 +1664,5 @@ export const node = LayerNode.make({
   ],
 })
 
+/** @deprecated V1 session prompt loop. Retained for legacy server compatibility; new code uses the V2 SessionRunner. */
 export * as SessionPrompt from "./prompt"

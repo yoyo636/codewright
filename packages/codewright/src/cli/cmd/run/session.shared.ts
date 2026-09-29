@@ -4,11 +4,13 @@
 // the prompt history ring. Also finds the most recently used variant for
 // the current model so the footer can pre-select it.
 import { promptCopy, promptSame } from "./prompt.shared"
+import { projectV2Messages } from "./v2-adapter"
+import type { Message, Part } from "@codewright-ai/sdk/v2"
 import type { RunInput, RunPrompt } from "./types"
 
 const LIMIT = 200
 
-export type SessionMessages = NonNullable<Awaited<ReturnType<RunInput["sdk"]["session"]["messages"]>>["data"]>
+export type SessionMessages = Array<{ info: Message; parts: Part[] }>
 
 type Turn = {
   prompt: RunPrompt
@@ -153,11 +155,11 @@ export function createSession(messages: SessionMessages): RunSession {
 }
 
 export async function resolveSession(sdk: RunInput["sdk"], sessionID: string, limit = LIMIT): Promise<RunSession> {
-  const response = await sdk.session.messages({
+  const response = await sdk.v2.session.messages({
     sessionID,
     limit,
   })
-  return createSession(response.data ?? [])
+  return createSession(projectV2Messages(response.data?.data ?? [], sessionID))
 }
 
 export function sessionHistory(session: RunSession, limit = LIMIT): RunPrompt[] {

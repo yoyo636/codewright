@@ -259,4 +259,5 @@ export const node = LayerNode.make({
   deps: [Config.node, FSUtil.node, Global.node, RuntimeFlags.node, httpClient],
 })
 
+/** @deprecated V1 session instructions. Retained for legacy server compatibility; V2 uses SystemContext instructions in @codewright-ai/core. */
 export * as Instruction from "./instruction"

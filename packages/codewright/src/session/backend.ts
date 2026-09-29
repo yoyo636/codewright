@@ -1,4 +1,5 @@
 import type { CodewrightClient } from "@codewright-ai/sdk/v2"
+import { v2Calls, type FetchLike } from "./backend-fetch"
 
 export type SessionKernel = "v1" | "v2"
 
@@ -36,8 +37,9 @@ export const V1_CAPABILITIES: Capabilities = {
 // Core V2 ships twelve location-scoped built-in tools and still lacks task,
 // LSP, plan, repo, code mode, and the MCP/plugin transforms
 // (core/src/tool/builtins.ts). SessionV2 declares shell, skill, compact, and
-// wait unavailable, and the runner does not persist status yet
-// (core/src/session/runner/llm.ts).
+// wait unavailable (they return OperationUnavailableError until wired).
+// status is published by the runner (session.status busy/idle) and each turn
+// is persisted to the trajectory graph, so resume/rollback are real.
 export const V2_CAPABILITIES: Capabilities = {
   task: false,
   lsp: false,
@@ -48,7 +50,7 @@ export const V2_CAPABILITIES: Capabilities = {
   command: false,
   compact: false,
   wait: false,
-  status: false,
+  status: true,
 }
 
 export type SessionPromptInput = Parameters<CodewrightClient["session"]["prompt"]>[0]
@@ -59,11 +61,8 @@ export type SessionForkInput = Parameters<CodewrightClient["session"]["fork"]>[0
 // SDK declares `prompt<ThrowOnError extends boolean = false>`, and annotating
 // with `ReturnType<...>` instantiates that parameter with `unknown`, which
 // drops the `error` field callers rely on. Inference keeps it.
-export function createBackend(client: CodewrightClient, kind: SessionKernel) {
-  // The V2 backend arrives with the run switch; until then selecting it is a
-  // hard error rather than a silent fallback to V1, because the two kernels
-  // project session history differently and must never be mixed mid-session.
-  if (kind === "v2") throw new Error("V2 session backend is not wired yet")
+export function createBackend(client: CodewrightClient, kind: SessionKernel, fetch: FetchLike) {
+  if (kind === "v2") return { kind, caps: V2_CAPABILITIES, ...v2Calls(fetch) }
   const calls = {
     create: (input: SessionCreateInput) => client.session.create(input),
     list: () => client.session.list(),

@@ -41,6 +41,15 @@ export interface StepInput {
   readonly parent_ids: readonly string[]
   readonly input_payload: TrajectorySchema.JSONValue
   readonly executor: StepExecutor
+  /**
+   * Semantic edges written with this step (retry / shortcut). The runner never
+   * writes these — the self-evolution loop does, after distilling a bad graph.
+   */
+  readonly extra_edges?: readonly {
+    readonly from_node_id: string
+    readonly kind: TrajectorySchema.EdgeKind
+    readonly data_key?: string
+  }[]
 }
 
 export interface Interface {

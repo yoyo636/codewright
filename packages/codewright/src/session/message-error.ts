@@ -11,4 +11,5 @@ export const AuthError = NamedError.create("ProviderAuthError", {
 export const Shared = [AuthError.EffectSchema, NamedError.Unknown.EffectSchema, OutputLengthError.EffectSchema] as const
 export const SharedSchema = Schema.Union(Shared)
 
+/** @deprecated V1 message error types. Retained for legacy server compatibility; V2 uses @codewright-ai/core session error types. */
 export * as MessageError from "./message-error"

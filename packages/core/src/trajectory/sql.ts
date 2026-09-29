@@ -15,6 +15,7 @@ export const TrajectoryTable = sqliteTable("trajectory", {
   version: integer().notNull().default(1),
   title: text(),
   metadata: text({ mode: "json" }).$type<Record<string, unknown>>(),
+  session_id: text(),
   ...Timestamps,
 })
 
@@ -75,5 +76,31 @@ export const TrajectoryEdgeTable = sqliteTable(
     index("trajectory_edge_trajectory_idx").on(table.trajectory_id),
     index("trajectory_edge_from_idx").on(table.trajectory_id, table.from_node_id),
     index("trajectory_edge_to_idx").on(table.trajectory_id, table.to_node_id),
+  ],
+)
+
+/**
+ * A policy is the unit of self-evolution: "in state S on task class T, prefer
+ * this tool sequence". Produced by `Evolution.distill` from a good/bad graph
+ * pair and consumed by the runner before each step to skip a validated prefix.
+ * Unique on (state_hash, task_class) so re-distilling the same state refreshes
+ * the sequence instead of duplicating it.
+ */
+export const PolicyTable = sqliteTable(
+  "policy",
+  {
+    id: text().primaryKey().$type<TrajectorySchema.ID>(),
+    state_hash: text().notNull(),
+    task_class: text().notNull(),
+    tool_sequence: text({ mode: "json" }).$type<readonly string[]>(),
+    validated: integer().notNull().default(0),
+    generation: integer(),
+    trajectory_id: text(),
+    time_created: integer().notNull().$default(() => Date.now()),
+  },
+  (table) => [
+    uniqueIndex("policy_state_task_idx").on(table.state_hash, table.task_class),
+    index("policy_state_hash_idx").on(table.state_hash),
+    index("policy_task_class_idx").on(table.task_class),
   ],
 )

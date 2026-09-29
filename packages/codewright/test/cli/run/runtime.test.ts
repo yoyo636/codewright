@@ -8,56 +8,14 @@ type SessionMessage = NonNullable<Awaited<ReturnType<CodewrightClient["session"]
 const provider: RunProvider = {
   id: "openai",
   name: "OpenAI",
-  source: "api",
-  env: [],
-  options: {},
   models: {
     "gpt-5": {
       id: "gpt-5",
-      providerID: "openai",
-      api: {
-        id: "openai",
-        url: "https://openai.test",
-        npm: "@ai-sdk/openai",
-      },
       name: "Little Frank",
-      capabilities: {
-        temperature: true,
-        reasoning: true,
-        attachment: true,
-        toolcall: true,
-        input: {
-          text: true,
-          audio: false,
-          image: false,
-          video: false,
-          pdf: false,
-        },
-        output: {
-          text: true,
-          audio: false,
-          image: false,
-          video: false,
-          pdf: false,
-        },
-        interleaved: false,
-      },
-      cost: {
-        input: 0,
-        output: 0,
-        cache: {
-          read: 0,
-          write: 0,
-        },
-      },
-      limit: {
-        context: 128000,
-        output: 8192,
-      },
       status: "active",
-      options: {},
-      headers: {},
-      release_date: "2026-01-01",
+      limit: { context: 128000 },
+      variants: {},
+      cost: { input: 0 },
     },
   },
 }
@@ -141,11 +99,40 @@ describe("run interactive runtime", () => {
     const providers = defer<void>()
 
     const sdk = new CodewrightClient()
-    spyOn(sdk.config, "providers").mockImplementation(async () => {
+    const location = { directory: "/tmp", project: { id: "p", directory: "/tmp" } }
+    const v2Provider = {
+      id: "openai",
+      name: "OpenAI",
+      api: { type: "aisdk" as const, package: "@ai-sdk/openai" },
+      request: { headers: {}, body: {} },
+    }
+    const v2Model = {
+      id: "gpt-5",
+      providerID: "openai",
+      name: "Little Frank",
+      api: { id: "openai", type: "aisdk" as const, package: "@ai-sdk/openai", url: "https://openai.test" },
+      capabilities: {
+        temperature: true,
+        reasoning: true,
+        attachment: true,
+        toolcall: true,
+        input: { text: true, audio: false, image: false, video: false, pdf: false },
+        output: { text: true, audio: false, image: false, video: false, pdf: false },
+      },
+      request: { headers: {}, body: {} },
+      variants: [],
+      time: { released: 0 },
+      cost: [{ input: 0, output: 0, cache: { read: 0, write: 0 } }],
+      status: "active" as const,
+      enabled: true,
+      limit: { context: 128000, output: 8192 },
+    }
+    spyOn(sdk.v2.provider, "list").mockImplementation(async () => {
       providersStarted.resolve()
       await providers.promise
-      return ok({ providers: [provider], default: {} })
+      return ok({ location, data: [v2Provider] }) as any
     })
+    spyOn(sdk.v2.model, "list").mockImplementation(() => ok({ location, data: [v2Model] }) as any)
     spyOn(sdk.session, "messages").mockImplementation(() =>
       ok([
         {
@@ -175,6 +162,7 @@ describe("run interactive runtime", () => {
         } satisfies SessionMessage,
       ]),
     )
+    spyOn(sdk.v2.session, "messages").mockImplementation(() => ok([]) as any)
     spyOn(sdk.session, "get").mockRejectedValue(new Error("not needed"))
     spyOn(sdk.app, "agents").mockImplementation(() => ok([]))
     spyOn(sdk.experimental.resource, "list").mockImplementation(() => ok({}))

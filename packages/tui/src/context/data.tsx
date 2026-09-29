@@ -22,7 +22,7 @@ import { createStore, produce } from "solid-js/store"
 import { createSimpleContext } from "./helper"
 import { useSDK } from "./sdk"
 import { useEvent } from "./event"
-import { createSignal, onCleanup, onMount } from "solid-js"
+import { createSignal, onCleanup, onMount, batch } from "solid-js"
 
 type LocationData = {
   agent?: AgentV2Info[]
@@ -48,7 +48,7 @@ type Data = {
 }
 
 function locationKey(location: LocationRef) {
-  return JSON.stringify([location.directory, location.workspaceID])
+  return location.directory + "\0" + (location.workspaceID ?? "")
 }
 
 function locationQuery(ref?: LocationRef) {
@@ -119,6 +119,65 @@ export const { use: useData, provider: DataProvider } = createSimpleContext({
           (item): item is SessionMessageAssistantReasoning => item.type === "reasoning" && item.id === reasoningID,
         )
       },
+    }
+
+    // Delta batching for smooth streaming rendering. Token deltas arrive far
+    // faster than the display can repaint; buffering them and flushing on the
+    // next animation frame collapses hundreds of store transactions into one.
+    type PendingDelta = {
+      sessionID: string
+      assistantMessageID: string
+      contentID: string
+      kind: "text" | "reasoning" | "tool"
+      delta: string
+    }
+    const deltaBuffer = new Map<string, PendingDelta>()
+    let flushScheduled = false
+
+    function flushDeltas() {
+      if (deltaBuffer.size === 0) return
+      flushScheduled = false
+      const entries = [...deltaBuffer.values()]
+      deltaBuffer.clear()
+      // Group by (session, assistant) so each produce call covers every delta
+      // for the active assistant in this frame.
+      const groups = new Map<string, { sessionID: string; assistantMessageID: string; items: PendingDelta[] }>()
+      for (const entry of entries) {
+        const key = entry.sessionID + "\0" + entry.assistantMessageID
+        let group = groups.get(key)
+        if (!group) {
+          group = { sessionID: entry.sessionID, assistantMessageID: entry.assistantMessageID, items: [] }
+          groups.set(key, group)
+        }
+        group.items.push(entry)
+      }
+      batch(() => {
+        for (const group of groups.values()) {
+          message.update(group.sessionID, (draft) => {
+            const assistant = message.assistant(draft, group.assistantMessageID)
+            if (!assistant) return
+            for (const item of group.items) {
+              if (item.kind === "text") {
+                const match = message.latestText(assistant, item.contentID)
+                if (match) match.text += item.delta
+              } else if (item.kind === "reasoning") {
+                const match = message.latestReasoning(assistant, item.contentID)
+                if (match) match.text += item.delta
+              } else {
+                const match = message.latestTool(assistant, item.contentID)
+                if (match?.state.status === "pending") match.state.input += item.delta
+              }
+            }
+          })
+        }
+      })
+      if (deltaBuffer.size > 0) scheduleFlush()
+    }
+
+    function scheduleFlush() {
+      if (flushScheduled || deltaBuffer.size === 0) return
+      flushScheduled = true
+      requestAnimationFrame(flushDeltas)
     }
 
     function handleEvent(event: V2Event) {
@@ -251,13 +310,16 @@ export const { use: useData, provider: DataProvider } = createSimpleContext({
             })
           })
           break
-        case "session.next.text.delta":
-          message.update(event.data.sessionID, (draft) => {
-            const match = message.latestText(message.assistant(draft, event.data.assistantMessageID), event.data.textID)
-            if (match) match.text += event.data.delta
-          })
+        case "session.next.text.delta": {
+          const key = `${event.data.sessionID}\0${event.data.assistantMessageID}\0${event.data.textID}\0text`
+          const existing = deltaBuffer.get(key)
+          if (existing) existing.delta += event.data.delta
+          else deltaBuffer.set(key, { sessionID: event.data.sessionID, assistantMessageID: event.data.assistantMessageID, contentID: event.data.textID, kind: "text", delta: event.data.delta })
+          scheduleFlush()
           break
+        }
         case "session.next.text.ended":
+          flushDeltas()
           message.update(event.data.sessionID, (draft) => {
             const match = message.latestText(message.assistant(draft, event.data.assistantMessageID), event.data.textID)
             if (match) match.text = event.data.text
@@ -274,13 +336,16 @@ export const { use: useData, provider: DataProvider } = createSimpleContext({
             })
           })
           break
-        case "session.next.tool.input.delta":
-          message.update(event.data.sessionID, (draft) => {
-            const match = message.latestTool(message.assistant(draft, event.data.assistantMessageID), event.data.callID)
-            if (match?.state.status === "pending") match.state.input += event.data.delta
-          })
+        case "session.next.tool.input.delta": {
+          const key = `${event.data.sessionID}\0${event.data.assistantMessageID}\0${event.data.callID}\0tool`
+          const existing = deltaBuffer.get(key)
+          if (existing) existing.delta += event.data.delta
+          else deltaBuffer.set(key, { sessionID: event.data.sessionID, assistantMessageID: event.data.assistantMessageID, contentID: event.data.callID, kind: "tool", delta: event.data.delta })
+          scheduleFlush()
           break
+        }
         case "session.next.tool.input.ended":
+          flushDeltas()
           message.update(event.data.sessionID, (draft) => {
             const match = message.latestTool(message.assistant(draft, event.data.assistantMessageID), event.data.callID)
             if (match?.state.status === "pending") match.state.input = event.data.text
@@ -352,16 +417,16 @@ export const { use: useData, provider: DataProvider } = createSimpleContext({
             })
           })
           break
-        case "session.next.reasoning.delta":
-          message.update(event.data.sessionID, (draft) => {
-            const match = message.latestReasoning(
-              message.assistant(draft, event.data.assistantMessageID),
-              event.data.reasoningID,
-            )
-            if (match) match.text += event.data.delta
-          })
+        case "session.next.reasoning.delta": {
+          const key = `${event.data.sessionID}\0${event.data.assistantMessageID}\0${event.data.reasoningID}\0reasoning`
+          const existing = deltaBuffer.get(key)
+          if (existing) existing.delta += event.data.delta
+          else deltaBuffer.set(key, { sessionID: event.data.sessionID, assistantMessageID: event.data.assistantMessageID, contentID: event.data.reasoningID, kind: "reasoning", delta: event.data.delta })
+          scheduleFlush()
           break
+        }
         case "session.next.reasoning.ended":
+          flushDeltas()
           message.update(event.data.sessionID, (draft) => {
             const match = message.latestReasoning(
               message.assistant(draft, event.data.assistantMessageID),

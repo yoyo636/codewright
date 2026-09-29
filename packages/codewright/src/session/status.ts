@@ -53,4 +53,5 @@ const layer = Layer.effect(
 
 export const node = LayerNode.make({ service: Service, layer: layer, deps: [EventV2Bridge.node] })
 
+/** @deprecated V1 session status. Retained for legacy server compatibility; V2 status is published via SessionStatusEvent. */
 export * as SessionStatus from "./status"

@@ -9,4 +9,5 @@ export function build<A, E>(root: LayerNode.Node<A, E, any>, replacements: Layer
   return AppNodeBuilder.build(root, replacements.concat([bootstrapReplacement]))
 }
 
+/** @deprecated V1 app-node builder. Thin wrapper over the V2 AppNodeBuilder that injects legacy bootstrap replacements. */
 export * as AppNodeBuilderV1 from "./app-node-builder-v1"

@@ -13,6 +13,7 @@
 //      local sessions,
 //   4. runs the prompt queue until the footer closes.
 import { createCodewrightClient } from "@codewright-ai/sdk/v2"
+import type { AgentV2Info, CommandV2Info } from "@codewright-ai/sdk/v2"
 import { Flag } from "@codewright-ai/core/flag/flag"
 import { MessageID } from "@/session/schema"
 import { createRunDemo } from "./demo"
@@ -20,13 +21,48 @@ import { resolveModelInfo, resolveRunTuiConfig, resolveSessionInfo } from "./run
 import { createRuntimeLifecycle } from "./runtime.lifecycle"
 import { trace } from "./trace"
 import { cycleVariant, formatModelLabel, resolveSavedVariant, resolveVariant, saveVariant } from "./variant.shared"
-import type { LocalReplayAnchor, LocalReplayRow, RunInput, RunPrompt, RunProvider, StreamCommit } from "./types"
+import type { LocalReplayAnchor, LocalReplayRow, RunAgent, RunCommand, RunInput, RunPrompt, RunProvider, StreamCommit } from "./types"
 
 /** @internal Exported for testing */
 export { pickVariant, resolveVariant } from "./variant.shared"
 
 /** @internal Exported for testing */
 export { runPromptQueue } from "./runtime.queue"
+
+// The V2 agent/command catalog shapes differ from the legacy ones the
+// interactive footer expects (V2 uses `id` where legacy uses `name`, and
+// AgentV2Info carries a different permission/tool model). These projections
+// translate the V2 list responses into the Agent/Command shapes the footer
+// reducers already understand. Only the fields the footer actually consumes
+// (name/mode/hidden/description for agents, name/description for commands)
+// are meaningful; permission/hints are fabricated as empty arrays because
+// the interactive footer never reads them.
+function projectAgent(item: AgentV2Info): RunAgent {
+  return {
+    name: item.id,
+    description: item.description,
+    mode: item.mode,
+    hidden: item.hidden,
+    color: item.color,
+    permission: [],
+    model: item.model ? { modelID: item.model.id, providerID: item.model.providerID } : undefined,
+    prompt: item.system,
+    options: {},
+    steps: item.steps,
+  }
+}
+
+function projectCommand(item: CommandV2Info): RunCommand {
+  return {
+    name: item.name,
+    description: item.description,
+    agent: item.agent,
+    model: item.model?.id,
+    template: item.template,
+    subtask: item.subtask,
+    hints: [],
+  }
+}
 
 type BootContext = Pick<
   RunInput,
@@ -164,11 +200,11 @@ async function resolveExitTitle(
     return undefined
   }
 
-  return ctx.sdk.session
+  return ctx.sdk.v2.session
     .get({
       sessionID: state.sessionID,
     })
-    .then((x) => x.data?.title)
+    .then((x) => x.data?.data?.title)
     .catch(() => undefined)
 }
 
@@ -228,9 +264,9 @@ async function runInteractiveRuntime(input: RunRuntimeInput, deps: RunRuntimeDep
   const shell = await (deps.createRuntimeLifecycle ?? createRuntimeLifecycle)({
     directory: ctx.directory,
     findFiles: (query) =>
-      ctx.sdk.find
-        .files({ query, directory: ctx.directory })
-        .then((x) => x.data ?? [])
+      ctx.sdk.v2.fs
+        .find({ location: { directory: ctx.directory }, query })
+        .then((x) => (x.data?.data ?? []).map((entry) => entry.path))
         .catch(() => []),
     agents: [],
     resources: [],
@@ -250,21 +286,33 @@ async function runInteractiveRuntime(input: RunRuntimeInput, deps: RunRuntimeDep
       }
 
       log?.write("send.permission.reply", next)
-      await ctx.sdk.permission.reply(next)
+      await ctx.sdk.v2.session.permission.reply({
+        sessionID: state.sessionID,
+        requestID: next.requestID,
+        reply: next.reply,
+        message: next.message,
+      })
     },
     onQuestionReply: async (next) => {
       if (state.demo?.questionReply(next)) {
         return
       }
 
-      await ctx.sdk.question.reply(next)
+      await ctx.sdk.v2.session.question.reply({
+        sessionID: state.sessionID,
+        requestID: next.requestID,
+        questionV2Reply: { answers: next.answers ?? [] },
+      })
     },
     onQuestionReject: async (next) => {
       if (state.demo?.questionReject(next)) {
         return
       }
 
-      await ctx.sdk.question.reject(next)
+      await ctx.sdk.v2.session.question.reject({
+        sessionID: state.sessionID,
+        requestID: next.requestID,
+      })
     },
     onCycleVariant: () => {
       if (!state.model || state.variants.length === 0) {
@@ -343,8 +391,8 @@ async function runInteractiveRuntime(input: RunRuntimeInput, deps: RunRuntimeDep
       }
 
       state.aborting = true
-      void ctx.sdk.session
-        .abort({
+      void ctx.sdk.v2.session
+        .interrupt({
           sessionID: state.sessionID,
         })
         .catch(() => {})
@@ -374,17 +422,17 @@ async function runInteractiveRuntime(input: RunRuntimeInput, deps: RunRuntimeDep
     }
 
     const [agents, resources, commands] = await Promise.all([
-      ctx.sdk.app
-        .agents({ directory: ctx.directory })
-        .then((x) => x.data ?? [])
+      ctx.sdk.v2.agent
+        .list({ location: { directory: ctx.directory } })
+        .then((x) => (x.data?.data ?? []).map(projectAgent))
         .catch(() => []),
       ctx.sdk.experimental.resource
         .list({ directory: ctx.directory })
         .then((x) => Object.values(x.data ?? {}))
         .catch(() => []),
-      ctx.sdk.command
-        .list({ directory: ctx.directory })
-        .then((x) => x.data ?? [])
+      ctx.sdk.v2.command
+        .list({ location: { directory: ctx.directory } })
+        .then((x) => (x.data?.data ?? []).map(projectCommand))
         .catch(() => []),
     ])
     if (footer.isClosed) {

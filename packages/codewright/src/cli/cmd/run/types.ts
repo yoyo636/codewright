@@ -28,7 +28,24 @@ export type RunPromptPart = NonNullable<PromptInput["parts"]>[number]
 
 export type RunCommand = NonNullable<Awaited<ReturnType<CodewrightClient["command"]["list"]>>["data"]>[number]
 
-export type RunProvider = NonNullable<Awaited<ReturnType<CodewrightClient["provider"]["list"]>>["data"]>["all"][number]
+// Provider/model catalog projected from the V2 server endpoints
+// (`/api/provider`, `/api/model`). The V2 `ProviderV2Info` does not bundle its
+// models, so the CLI joins the two lists by `providerID`/`id` here rather than
+// relying on a single legacy-shaped response.
+export type RunModel = {
+  id: string
+  name: string
+  status: "alpha" | "beta" | "deprecated" | "active"
+  limit: { context: number }
+  variants: Record<string, { headers: Record<string, string>; body: Record<string, unknown> }>
+  cost?: { input: number }
+}
+
+export type RunProvider = {
+  id: string
+  name: string
+  models: Record<string, RunModel>
+}
 
 export type RunPrompt = {
   messageID?: string

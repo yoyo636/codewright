@@ -12,13 +12,16 @@ function enabledByExperimental(key: string) {
   return process.env[key] === undefined ? truthy("CODEWRIGHT_EXPERIMENTAL") : truthy(key)
 }
 
-// Session V2 kernel selection. A per-path key (CODEWRIGHT_SESSION_V2_RUN and
-// friends) overrides the global key so one entry point can be moved to V2
-// without moving the others. Falls back to the experimental master switch.
+// Session kernel selection. V1 is the legacy prompt loop (packages/codewright);
+// V2 is the core session runner (packages/core). The RUN path is permanently V2
+// and the per-path keys are retained only as escape hatches: ACP and TUI still
+// fall back to V1 until their consumers are migrated. The V1 kernel surface is
+// marked @deprecated in the mean time; deletion is gated on the legacy server
+// and the ACP/TUI consumers moving to V2.
 function sessionV2(scope?: "RUN" | "ACP" | "TUI") {
   const scoped = scope ? process.env[`CODEWRIGHT_SESSION_V2_${scope}`] : undefined
   const value = scoped ?? process.env["CODEWRIGHT_SESSION_V2"]
-  if (value === undefined) return truthy("CODEWRIGHT_EXPERIMENTAL")
+  if (value === undefined) return scope === "RUN" ? true : truthy("CODEWRIGHT_EXPERIMENTAL")
   return truthy(value)
 }
 

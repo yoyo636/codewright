@@ -401,4 +401,5 @@ export const node = LayerNode.make({
   ],
 })
 
+/** @deprecated V1 session LLM integration. Retained for legacy server compatibility; V2 uses @codewright-ai/llm directly. */
 export * as LLM from "./llm"

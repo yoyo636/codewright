@@ -11,6 +11,7 @@ const TRAJECTORY_PREFIX = "traj"
 const NODE_PREFIX = "tnd"
 const EDGE_PREFIX = "edg"
 const BRANCH_PREFIX = "brc"
+const POLICY_PREFIX = "pol"
 
 export const ID = Schema.String
 export type ID = Schema.Schema.Type<typeof ID>
@@ -27,6 +28,9 @@ export function newEdgeID(): string {
 }
 export function newBranchID(): string {
   return Identifier.create(BRANCH_PREFIX, "ascending")
+}
+export function newPolicyID(): string {
+  return Identifier.create(POLICY_PREFIX, "ascending")
 }
 
 export const ResourceUsage = Schema.Struct({
@@ -52,6 +56,8 @@ export const Trajectory = Schema.Struct({
   version: NonNegativeInt,
   title: Schema.optional(Schema.String),
   metadata: Schema.optional(Schema.Record(Schema.String, Schema.Json)),
+  /** Session this trajectory backs; indexed for fast lookups. */
+  session_id: Schema.optional(Schema.String),
   time_created: Schema.Number,
 })
 export type Trajectory = Schema.Schema.Type<typeof Trajectory>
@@ -90,8 +96,47 @@ export const Node = Schema.Struct({
 })
 export type Node = Schema.Schema.Type<typeof Node>
 
-export const EdgeKind = Schema.Literals(["causal", "data", "control", "merge"])
+/**
+ * Kinds of edges in the trajectory DAG.
+ *
+ * The first four (`causal`/`data`/`control`/`merge`) are structural: they
+ * describe how nodes are derived from one another. The last two are
+ * **semantic** — they are written by the self-evolution loop, not by the
+ * runner, and carry the fitness signal that the graph-differential
+ * self-evolution (GDSE) reads:
+ *
+ *   - `retry`   — a node that failed and was re-attempted from a prior state.
+ *                 High counts are a recovery signal (the agent can back off);
+ *                 the edge points from the failed node back to the state it
+ *                 retried from.
+ *   - `shortcut` — a validated prefix of a successful path, promoted so a
+ *                 later run of the same task class can skip the prefix and
+ *                 resume mid-graph. The edge points from the shortcut's tail
+ *                 to the node that resumes execution.
+ */
+export const EdgeKind = Schema.Literals(["causal", "data", "control", "merge", "retry", "shortcut"])
 export type EdgeKind = Schema.Schema.Type<typeof EdgeKind>
+
+/**
+ * A policy is the unit of self-evolution: "in state S on task class T, prefer
+ * this tool sequence". Produced by `Evolution.distill` when it aligns a bad
+ * graph against a good one of the same task class, and consumed by the
+ * runner before each step to skip a validated prefix.
+ */
+export const Policy = Schema.Struct({
+  id: Schema.String,
+  state_hash: Schema.String,
+  task_class: Schema.String,
+  /** Ordered tool names to try before falling back to the model's own plan. */
+  tool_sequence: Schema.Array(Schema.String),
+  /** Set by the distillation pass; a validated policy is eligible for shortcutting. */
+  validated: Schema.optional(Schema.Boolean),
+  /** Generation of the trajectory the policy was distilled from. */
+  generation: Schema.optional(Schema.Number),
+  trajectory_id: Schema.optional(Schema.String),
+  time_created: Schema.Number,
+})
+export type Policy = Schema.Schema.Type<typeof Policy>
 
 /**
  * An Edge records an explicit data dependency between Nodes (not a time

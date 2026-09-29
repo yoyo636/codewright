@@ -623,4 +623,5 @@ function formatBytes(value: number) {
   return `${Math.ceil(value / (1024 * 1024))} MB`
 }
 
+/** @deprecated V1 session tools. Retained for legacy server compatibility; V2 uses ToolRegistry in @codewright-ai/core. */
 export * as SessionTools from "./tools"

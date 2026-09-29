@@ -143,4 +143,5 @@ export const node = LayerNode.make({
   deps: [Session.node, Snapshot.node, Storage.node, EventV2Bridge.node, SessionSummary.node, SessionRunState.node],
 })
 
+/** @deprecated V1 session revert. Retained for legacy server compatibility; V2 revert is not yet implemented. */
 export * as SessionRevert from "./revert"

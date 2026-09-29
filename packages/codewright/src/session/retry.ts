@@ -198,4 +198,5 @@ export function policy(opts: {
   )
 }
 
+/** @deprecated V1 session retry policy. Retained for legacy server compatibility; V2 recovery is expressed via trajectory retry edges. */
 export * as SessionRetry from "./retry"

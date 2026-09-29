@@ -1,3 +1,4 @@
+/** @deprecated V1 permission schema. Retained for legacy server compatibility; new code uses PermissionV2. */
 export * as PermissionV1 from "./permission"
 
 import { Schema } from "effect"

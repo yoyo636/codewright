@@ -28,6 +28,7 @@ import type {
   RunInput,
   RunPrompt,
   RunProvider,
+  RunModel,
   RunTuiConfig,
   StreamCommit,
 } from "@/cli/cmd/run/types"
@@ -56,61 +57,20 @@ function model(input: {
 }) {
   return {
     id: input.id,
-    providerID: "codewright",
-    api: {
-      id: "codewright",
-      url: "https://codewright.dev",
-      npm: "@ai-sdk/openai-compatible",
-    },
     name: input.name,
-    capabilities: {
-      temperature: true,
-      reasoning: true,
-      attachment: true,
-      toolcall: true,
-      input: {
-        text: true,
-        audio: false,
-        image: true,
-        video: false,
-        pdf: true,
-      },
-      output: {
-        text: true,
-        audio: false,
-        image: false,
-        video: false,
-        pdf: false,
-      },
-      interleaved: false,
-    },
-    cost: {
-      input: input.cost ?? 1,
-      output: 1,
-      cache: {
-        read: 0,
-        write: 0,
-      },
-    },
-    limit: {
-      context: 128000,
-      output: 8192,
-    },
     status: input.status ?? "active",
-    options: {},
-    headers: {},
-    release_date: "2026-01-01",
-    variants: input.variants,
-  } satisfies RunProvider["models"][string]
+    limit: { context: 128000 },
+    variants: Object.fromEntries(
+      Object.entries(input.variants ?? {}).map(([key]) => [key, { headers: {}, body: {} }]),
+    ),
+    cost: { input: input.cost ?? 1 },
+  } satisfies RunModel
 }
 
 function provider() {
   return {
     id: "codewright",
     name: "codewright",
-    source: "api",
-    env: [],
-    options: {},
     models: {
       "gpt-5": model({ id: "gpt-5", name: "GPT-5", variants: { high: {}, minimal: {} } }),
       "gpt-free": model({ id: "gpt-free", name: "GPT Free", cost: 0 }),

@@ -157,4 +157,5 @@ export const node = LayerNode.make({
   deps: [Session.node, Snapshot.node, EventV2Bridge.node, Config.node],
 })
 
+/** @deprecated V1 session summary. Retained for legacy server compatibility; V2 summary is not yet implemented. */
 export * as SessionSummary from "./summary"

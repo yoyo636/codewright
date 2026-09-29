@@ -7,11 +7,12 @@
 // none block each other.
 import { Context, Effect, Layer } from "effect"
 import { resolve } from "@codewright-ai/tui/config"
+import type { ModelV2Info, ProviderV2Info } from "@codewright-ai/sdk/v2"
 import { TuiConfig } from "@/config/tui"
 import { makeRuntime } from "@/effect/run-service"
 import { reusePendingTask } from "./runtime.shared"
 import { resolveSession, sessionHistory } from "./session.shared"
-import type { RunDiffStyle, RunInput, RunPrompt, RunProvider, RunTuiConfig } from "./types"
+import type { RunDiffStyle, RunInput, RunModel, RunPrompt, RunProvider, RunTuiConfig } from "./types"
 import { pickVariant } from "./variant.shared"
 
 export type ModelInfo = {
@@ -58,6 +59,38 @@ function emptyModelInfo(): ModelInfo {
   }
 }
 
+// The V2 server lists providers and models separately (`/api/provider` does
+// not embed models), so the CLI joins them here by provider id. Only the
+// fields the footer/variant UI actually render are projected -- this keeps
+// the legacy-shaped `RunProvider` decoupled from either generated schema.
+function projectModel(item: ModelV2Info): RunModel {
+  return {
+    id: item.id,
+    name: item.name,
+    status: item.status,
+    limit: { context: item.limit.context },
+    variants: Object.fromEntries(item.variants.map((variant) => [variant.id, { headers: variant.headers, body: variant.body }])),
+    cost: item.cost.length ? { input: item.cost[0].input } : undefined,
+  }
+}
+
+function projectProviders(items: ProviderV2Info[], models: ModelV2Info[]): RunProvider[] {
+  const byProvider = new Map<string, RunModel[]>()
+  for (const model of models) {
+    const list = byProvider.get(model.providerID) ?? []
+    list.push(projectModel(model))
+    byProvider.set(model.providerID, list)
+  }
+
+  return items
+    .filter((provider) => !provider.disabled)
+    .map((provider) => ({
+      id: provider.id,
+      name: provider.name,
+      models: Object.fromEntries((byProvider.get(provider.id) ?? []).map((model) => [model.id, model])),
+    }))
+}
+
 function emptySessionInfo(): SessionInfo {
   return {
     first: true,
@@ -95,24 +128,18 @@ const layer = Layer.effect(
       directory: string,
       model: RunInput["model"],
     ) {
-      const connected = yield* Effect.promise(() =>
-        sdk.config
-          .providers({ directory })
-          .then((item) => item.data?.providers)
-          .catch(() => undefined),
+      const location = { directory }
+      const [providerItems, modelItems] = yield* Effect.promise(() =>
+        Promise.all([
+          sdk.v2.provider.list({ location }).then((x) => x.data?.data ?? []).catch(() => []),
+          sdk.v2.model.list({ location }).then((x) => x.data?.data ?? []).catch(() => []),
+        ]),
       )
-      const providers = yield* Effect.promise(() =>
-        connected
-          ? Promise.resolve(connected)
-          : sdk.provider
-              .list()
-              .then((item) => item.data?.all ?? [])
-              .catch(() => []),
-      )
+      const providers = projectProviders(providerItems, modelItems)
       const limits = Object.fromEntries(
         providers.flatMap((provider) =>
-          Object.entries(provider.models ?? {}).flatMap(([modelID, info]) => {
-            const limit = info?.limit?.context
+          Object.entries(provider.models).flatMap(([modelID, info]) => {
+            const limit = info.limit.context
             if (typeof limit !== "number" || limit <= 0) {
               return []
             }
@@ -130,7 +157,7 @@ const layer = Layer.effect(
         }
       }
 
-      const info = providers.find((item) => item.id === model.providerID)?.models?.[model.modelID]
+      const info = providers.find((item) => item.id === model.providerID)?.models[model.modelID]
       return {
         providers,
         variants: Object.keys(info?.variants ?? {}),

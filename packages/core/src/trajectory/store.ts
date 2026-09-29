@@ -45,6 +45,20 @@ export interface AppendInput {
   readonly step_index?: number
   /** Explicit causal/data dependencies, in addition to control edges from parent_ids. */
   readonly data_edges?: readonly { readonly from_node_id: string; readonly data_key?: string }[]
+  /**
+   * Semantic edges written at append time by the self-evolution loop.
+   *
+   * These are the only place `retry` / `shortcut` edges are ever created —
+   * the runner never writes them. A `retry` edge records that a failed node
+   * was re-attempted from a prior state; a `shortcut` edge records a
+   * validated prefix of a successful path. They are the fitness signal the
+   * graph-differential self-evolution reads (see `evolution/`).
+   */
+  readonly extra_edges?: readonly {
+    readonly from_node_id: string
+    readonly kind: TrajectorySchema.EdgeKind
+    readonly data_key?: string
+  }[]
 }
 
 export interface ForkInput {
@@ -85,8 +99,17 @@ export interface Interface {
   }) => Effect.Effect<TrajectorySchema.Trajectory>
   readonly append: (input: AppendInput) => Effect.Effect<TrajectorySchema.Node, InstanceType<typeof NodeStepConflict>>
   readonly getTrajectory: (id: string) => Effect.Effect<TrajectorySchema.Trajectory | undefined>
+  /** Get-or-create the durable execution graph for a session. */
+  readonly forSession: (
+    sessionID: string,
+  ) => Effect.Effect<TrajectorySchema.Trajectory>
   readonly getNode: (id: string) => Effect.Effect<TrajectorySchema.Node | undefined>
   readonly children: (nodeID: string) => Effect.Effect<TrajectorySchema.Node[]>
+  /** Latest node on a branch (highest step_index); undefined when the branch is empty. */
+  readonly lastNode: (
+    trajectoryID: string,
+    branchID: string,
+  ) => Effect.Effect<TrajectorySchema.Node | undefined>
   readonly ancestors: (
     nodeID: string,
     options?: { readonly max_depth?: number },
@@ -94,6 +117,20 @@ export interface Interface {
   readonly byToolName: (toolName: string) => Effect.Effect<TrajectorySchema.Node[]>
   readonly byInputFingerprint: (fingerprint: string) => Effect.Effect<TrajectorySchema.Node[]>
   readonly byDurationRange: (minMs: number, maxMs: number) => Effect.Effect<TrajectorySchema.Node[]>
+  /** All edges in a trajectory, in write order. Used by the self-evolution loop. */
+  readonly edges: (trajectoryID: string) => Effect.Effect<TrajectorySchema.Edge[]>
+  /**
+   * Write a single edge between two existing nodes. Used by the
+   * self-evolution loop to retroactively tag a validated prefix with a
+   * `shortcut` edge after distillation; the runner never calls this.
+   */
+  readonly writeEdge: (input: {
+    readonly trajectory_id: string
+    readonly from_node_id: string
+    readonly to_node_id: string
+    readonly kind: TrajectorySchema.EdgeKind
+    readonly data_key?: string
+  }) => Effect.Effect<TrajectorySchema.Edge>
   readonly fork: (input: ForkInput) => Effect.Effect<ForkResult, InstanceType<typeof TrajectoryNotFound> | InstanceType<typeof NodeNotFound>>
   readonly merge: (input: MergeInput) => Effect.Effect<MergeResult, InstanceType<typeof MergeConflict> | InstanceType<typeof NodeNotFound>>
   readonly replay: (
@@ -147,6 +184,7 @@ const layer = Layer.effect(
         version: row.version,
         title: row.title ?? undefined,
         metadata: row.metadata ?? undefined,
+        session_id: row.session_id ?? undefined,
         time_created: row.time_created,
       }).pipe(Effect.orDie)
 
@@ -207,9 +245,30 @@ const layer = Layer.effect(
       const row = yield* db.select().from(TrajectoryTable).where(eq(TrajectoryTable.id, id)).get().pipe(Effect.orDie)
       return row ? yield* fromTrajectoryRow(row) : undefined
     })
+    const forSession = Effect.fn("TrajectoryStore.forSession")(function* (sessionID: string) {
+      const existing = yield* db
+        .select()
+        .from(TrajectoryTable)
+        .where(eq(TrajectoryTable.session_id, sessionID))
+        .get()
+        .pipe(Effect.orDie)
+      if (existing) return yield* fromTrajectoryRow(existing)
+      return yield* create({ metadata: { session_id: sessionID }, sessionID })
+    })
 
     const getNode = Effect.fn("TrajectoryStore.getNode")(function* (id: string) {
       const row = yield* db.select().from(TrajectoryNodeTable).where(eq(TrajectoryNodeTable.id, id)).get().pipe(Effect.orDie)
+      return row ? yield* fromNodeRow(row) : undefined
+    })
+    const lastNode = Effect.fn("TrajectoryStore.lastNode")(function* (trajectoryID: string, branchID: string) {
+      const row = yield* db
+        .select()
+        .from(TrajectoryNodeTable)
+        .where(and(eq(TrajectoryNodeTable.trajectory_id, trajectoryID), eq(TrajectoryNodeTable.branch_id, branchID)))
+        .orderBy(desc(TrajectoryNodeTable.step_index))
+        .limit(1)
+        .get()
+        .pipe(Effect.orDie)
       return row ? yield* fromNodeRow(row) : undefined
     })
 
@@ -321,6 +380,16 @@ const layer = Layer.effect(
                 data_key: edge.data_key,
               })),
             )
+            yield* writeEdges(
+              tx,
+              node.trajectory_id,
+              (input.extra_edges ?? []).map((edge) => ({
+                from: edge.from_node_id,
+                to: node.id,
+                kind: edge.kind,
+                data_key: edge.data_key,
+              })),
+            )
           }),
         )
         .pipe(Effect.orDie)
@@ -331,6 +400,7 @@ const layer = Layer.effect(
       readonly title?: string
       readonly resource_hash?: string
       readonly metadata?: Record<string, TrajectorySchema.JSONValue>
+      readonly sessionID?: string
     }) {
       const id = TrajectorySchema.newTrajectoryID()
       const timeCreated = Date.now()
@@ -343,6 +413,7 @@ const layer = Layer.effect(
           version: 1,
           title: input?.title,
           metadata: input?.metadata ?? null,
+          session_id: input?.sessionID ?? null,
         })
         .pipe(Effect.orDie)
 
@@ -367,6 +438,7 @@ const layer = Layer.effect(
         version: 1,
         title: input?.title,
         metadata: input?.metadata,
+        session_id: input?.sessionID,
         time_created: timeCreated,
       }
     })
@@ -444,6 +516,47 @@ const layer = Layer.effect(
         .orderBy(asc(TrajectoryNodeTable.time_created))
         .pipe(Effect.orDie)
       return yield* Effect.forEach(rows, fromNodeRow).pipe(Effect.orDie)
+    })
+    const edges = Effect.fn("TrajectoryStore.edges")(function* (trajectoryID: string) {
+      const rows = yield* db
+        .select()
+        .from(TrajectoryEdgeTable)
+        .where(eq(TrajectoryEdgeTable.trajectory_id, trajectoryID))
+        .orderBy(asc(TrajectoryEdgeTable.time_created))
+        .pipe(Effect.orDie)
+      return yield* Effect.forEach(rows, (row) =>
+        decodeEdge({ ...row, data_key: row.data_key ?? undefined }).pipe(Effect.orDie),
+      ).pipe(Effect.orDie)
+    })
+    const writeEdge = Effect.fn("TrajectoryStore.writeEdge")(function* (input: {
+      readonly trajectory_id: string
+      readonly from_node_id: string
+      readonly to_node_id: string
+      readonly kind: TrajectorySchema.EdgeKind
+      readonly data_key?: string
+    }) {
+      const edge: TrajectorySchema.Edge = {
+        id: TrajectorySchema.newEdgeID(),
+        trajectory_id: input.trajectory_id,
+        from_node_id: input.from_node_id,
+        to_node_id: input.to_node_id,
+        kind: input.kind,
+        data_key: input.data_key,
+        time_created: Date.now(),
+      }
+      yield* db
+        .insert(TrajectoryEdgeTable)
+        .values({
+          id: edge.id,
+          trajectory_id: edge.trajectory_id,
+          from_node_id: edge.from_node_id,
+          to_node_id: edge.to_node_id,
+          kind: edge.kind,
+          data_key: edge.data_key ?? null,
+          time_created: edge.time_created,
+        })
+        .pipe(Effect.orDie)
+      return edge
     })
 
     const fork = Effect.fn("TrajectoryStore.fork")(function* (input: ForkInput) {
@@ -577,13 +690,17 @@ const layer = Layer.effect(
     return Service.of({
       create,
       append,
+      forSession,
       getTrajectory,
       getNode,
+      lastNode,
       children,
       ancestors,
       byToolName,
       byInputFingerprint,
       byDurationRange,
+      edges,
+      writeEdge,
       fork,
       merge,
       replay,
