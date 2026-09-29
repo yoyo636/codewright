@@ -34,7 +34,7 @@ const IS_PREVIEW = CHANNEL !== "latest"
 const VERSION = await (async () => {
   if (env.CODEWRIGHT_VERSION) return env.CODEWRIGHT_VERSION
   if (IS_PREVIEW) return `0.0.0-${CHANNEL}-${new Date().toISOString().slice(0, 16).replace(/[-:T]/g, "")}`
-  const version = await fetch("https://registry.npmjs.org/codewright-ai/latest")
+  const version = await fetch("https://registry.npmjs.org/@codewright-ai/codewright/latest")
     .then((res) => {
       if (!res.ok) throw new Error(res.statusText)
       return res.json()

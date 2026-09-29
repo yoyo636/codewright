@@ -8,7 +8,7 @@
 #   brew install codewright
 #
 # Or from a local checkout:
-#   brew install --build-from-source script/homebrew/codewright.rb
+#   brew install --build-from-source Formula/codewright.rb
 #
 # Dependencies:
 #   - ripgrep (rg) - required for code search (recommended)

@@ -29,9 +29,10 @@ git fetch "$REMOTE" "$BRANCH" --quiet
 git worktree add --force "$WORKTREE" "$REMOTE/$BRANCH" >/dev/null
 
 cp "$ROOT/index.html" "$WORKTREE/index.html"
+cp "$ROOT/script/install.sh" "$WORKTREE/install"
 touch "$WORKTREE/.nojekyll"
 
-git -C "$WORKTREE" add index.html .nojekyll
+git -C "$WORKTREE" add index.html install .nojekyll
 if git -C "$WORKTREE" diff --cached --quiet; then
   echo "website already up to date on $BRANCH"
   exit 0

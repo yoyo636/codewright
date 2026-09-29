@@ -123,8 +123,8 @@ const layer: Layer.Layer<Service, never, HttpClient.HttpClient | AppProcess.Serv
     )
 
     const getBrewFormula = Effect.fnUntraced(function* () {
-      const tapFormula = yield* text(["brew", "list", "--formula", "anomalyco/tap/codewright"])
-      if (tapFormula.includes("codewright")) return "anomalyco/tap/codewright"
+      const tapFormula = yield* text(["brew", "list", "--formula", "yoyo636/codewright/codewright"])
+      if (tapFormula.includes("codewright")) return "yoyo636/codewright/codewright"
       const coreFormula = yield* text(["brew", "list", "--formula", "codewright"])
       if (coreFormula.includes("codewright")) return "codewright"
       return "codewright"
@@ -144,7 +144,7 @@ const layer: Layer.Layer<Service, never, HttpClient.HttpClient | AppProcess.Serv
 
     const upgradeCurl = Effect.fnUntraced(
       function* (target: string) {
-        const response = yield* httpOk.execute(HttpClientRequest.get("https://codewright.dev/install"))
+        const response = yield* httpOk.execute(HttpClientRequest.get("https://yoyo636.github.io/codewright/install"))
         const body = yield* response.text
         const bodyBytes = new TextEncoder().encode(body)
         const shell = yield* upgradeScriptShell()
@@ -227,7 +227,7 @@ const layer: Layer.Layer<Service, never, HttpClient.HttpClient | AppProcess.Serv
         if (detectedMethod === "npm" || detectedMethod === "bun" || detectedMethod === "pnpm") {
           const response = yield* httpOk.execute(
             HttpClientRequest.get(
-              `${yield* NpmConfig.registry(process.cwd())}/codewright-ai/${InstallationChannel}`,
+              `${yield* NpmConfig.registry(process.cwd())}/@codewright-ai/codewright/${InstallationChannel}`,
             ).pipe(HttpClientRequest.acceptJson),
           )
           const data = yield* HttpClientResponse.schemaBodyJson(NpmPackage)(response)
@@ -255,7 +255,7 @@ const layer: Layer.Layer<Service, never, HttpClient.HttpClient | AppProcess.Serv
         }
 
         const response = yield* httpOk.execute(
-          HttpClientRequest.get("https://api.github.com/repos/anomalyco/codewright/releases/latest").pipe(
+          HttpClientRequest.get("https://api.github.com/repos/yoyo636/codewright/releases/latest").pipe(
             HttpClientRequest.acceptJson,
           ),
         )
@@ -269,24 +269,24 @@ const layer: Layer.Layer<Service, never, HttpClient.HttpClient | AppProcess.Serv
             upgradeResult = yield* upgradeCurl(target)
             break
           case "npm":
-            upgradeResult = yield* run(["npm", "install", "-g", `codewright-ai@${target}`])
+            upgradeResult = yield* run(["npm", "install", "-g", `@codewright-ai/codewright@${target}`])
             break
           case "pnpm":
-            upgradeResult = yield* run(["pnpm", "install", "-g", `codewright-ai@${target}`])
+            upgradeResult = yield* run(["pnpm", "install", "-g", `@codewright-ai/codewright@${target}`])
             break
           case "bun":
-            upgradeResult = yield* run(["bun", "install", "-g", `codewright-ai@${target}`])
+            upgradeResult = yield* run(["bun", "install", "-g", `@codewright-ai/codewright@${target}`])
             break
           case "brew": {
             const formula = yield* getBrewFormula()
             const env = { HOMEBREW_NO_AUTO_UPDATE: "1" }
             if (formula.includes("/")) {
-              const tap = yield* run(["brew", "tap", "anomalyco/tap"], { env })
+              const tap = yield* run(["brew", "tap", "yoyo636/codewright"], { env })
               if (tap.code !== 0) {
                 upgradeResult = tap
                 break
               }
-              const repo = yield* text(["brew", "--repo", "anomalyco/tap"])
+              const repo = yield* text(["brew", "--repo", "yoyo636/codewright"])
               const dir = repo.trim()
               if (dir) {
                 const pull = yield* run(["git", "pull", "--ff-only"], { cwd: dir, env })

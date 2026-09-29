@@ -15,7 +15,7 @@ This extension requires the [codewright CLI](https://codewright.dev) to be insta
 
 ## Support
 
-This is an early release. If you encounter issues or have feedback, please create an issue at https://github.com/anomalyco/codewright/issues.
+This is an early release. If you encounter issues or have feedback, please create an issue at https://github.com/yoyo636/codewright/issues.
 
 ## Development
 
