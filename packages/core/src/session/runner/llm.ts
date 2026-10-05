@@ -43,7 +43,7 @@ import { Snapshot } from "../../snapshot"
 import { SessionStatusEvent } from "@codewright-ai/schema/session-status-event"
 import { makeLocationNode } from "../../effect/app-node"
 import { llmClient } from "../../effect/app-node-platform"
-import { NodeStepper, PolicyStore, Trajectory, ToolTransaction, TrajectoryStore, Evolution } from "../../trajectory"
+import { NodeStepper, PolicyStore, Trajectory, ToolTransaction, TrajectoryStore, Evolution, EvolutionCycle, SelfEvolution } from "../../trajectory"
 
 /**
  * Runs one durable coding-agent Session until it settles.
@@ -134,6 +134,7 @@ const layer = Layer.effect(
     const toolTransaction = yield* ToolTransaction.Service
     const policyStore = yield* PolicyStore.Service
     const evolution = yield* Evolution.Service
+    const evolutionCycle = yield* EvolutionCycle.Service
     const compaction = SessionCompaction.make({ events, llm, config: yield* config.entries() })
     const getSession = Effect.fn("SessionRunner.getSession")(function* (sessionID: SessionSchema.ID) {
       const session = yield* store.get(sessionID)
@@ -464,6 +465,15 @@ const layer = Layer.effect(
       readonly promotion: SessionInput.Delivery | undefined
     }
     type StepResult = { readonly needsContinuation: boolean; readonly step: number; readonly nodeId: string; readonly stepIndex: number }
+
+    /**
+     * Whether following a policy's tool sequence paid off. A step counts as a
+     * miss when the model errored out or left tools unresolved — either way the
+     * sequence did not get the run through its next step unaided.
+     */
+    const policySucceeded = (result: { readonly needsContinuation: boolean; readonly step: number }) =>
+      result.step > 0 && result.needsContinuation
+
     const recordStep = Effect.fn("SessionRunner.recordStep")(function* (
       input: {
         readonly sessionID: SessionSchema.ID
@@ -489,6 +499,12 @@ const layer = Layer.effect(
       )
       const policy = yield* policyStore.lookup(stateHash, taskClass)
       const result = yield* runTurn(input.sessionID, input.promotion, input.step, policy?.tool_sequence)
+      // Grade the policy we just followed. This is what keeps a distilled
+      // sequence falsifiable: `PolicyStore.demote` retires one whose observed
+      // success rate decays, so a stale policy cannot steer every future run.
+      if (policy) {
+        yield* policyStore.recordOutcome(policy.id, policySucceeded(result) ? "hit" : "miss").pipe(Effect.ignore)
+      }
       const epoch = yield* readEpoch(input.sessionID)
       const payload: StepPayload = { sessionID: input.sessionID, step: input.step, promotion: input.promotion }
       const fingerprint = yield* toolTransaction.fingerprint({
@@ -513,6 +529,11 @@ const layer = Layer.effect(
           metadata: {
             annotations: {
               fingerprint,
+              // Provenance for the graph-differential loop: which policy was
+              // followed here and whether it was still validated when it was.
+              // Failure itself is recorded by the tool layer via `status`, not
+              // derived from continuation — a step that simply finished is not
+              // a failure, and marking it so would collapse the fitness signal.
               ...(policy
                 ? { policy_id: policy.id, task_class: taskClass, policy_validated: policy.validated }
                 : {}),
@@ -578,6 +599,17 @@ const layer = Layer.effect(
             .publish(SessionStatusEvent.Status, { sessionID: input.sessionID, status: { type: "idle" } })
             .pipe(Effect.ignore),
         ),
+      ).pipe(
+        // Self-evolution runs after the session settles, never during it: the
+        // runner must not block the user's next turn on graph comparison, and a
+        // failed run must still publish idle before the cycle can observe the
+        // graph it is about to score.
+        Effect.ensuring(
+          Effect.gen(function* () {
+            const taskClass = yield* resolveTaskClass(input.sessionID)
+            yield* Effect.forkDetach(evolutionCycle.run({ taskClass }).pipe(Effect.ignore))
+          }).pipe(Effect.ignore),
+        ),
       )
     })
 
@@ -609,5 +641,7 @@ export const node = makeLocationNode({
     ToolTransaction.node,
     PolicyStore.node,
     Evolution.node,
+    EvolutionCycle.node,
+    SelfEvolution.node,
   ],
 })

@@ -16,8 +16,18 @@ export const TrajectoryTable = sqliteTable("trajectory", {
   title: text(),
   metadata: text({ mode: "json" }).$type<Record<string, unknown>>(),
   session_id: text(),
+  /**
+   * Stable intent this trajectory pursues (`sha256(agent:title)`). Two
+   * trajectories of the same class are comparable, which is what makes
+   * convergence measurable — see the `task_class` index below and
+   * `TrajectoryStore.byTaskClass`.
+   */
+  task_class: text(),
   ...Timestamps,
-})
+}, (table) => [
+  /** Supports `TrajectoryStore.byTaskClass`, which compares same-intent graphs. */
+  index("trajectory_task_class_idx").on(table.task_class),
+])
 
 export const TrajectoryNodeTable = sqliteTable(
   "trajectory_node",
@@ -96,6 +106,18 @@ export const PolicyTable = sqliteTable(
     validated: integer().notNull().default(0),
     generation: integer(),
     trajectory_id: text(),
+    /**
+     * Lifecycle counters. A validated policy is a hypothesis, not a fact: it was
+     * distilled from one good/bad pair at one point in time. These fields let
+     * the runner grade that hypothesis against reality, and `PolicyStore.demote`
+     * retires one whose predictions stop paying off.
+     */
+    /** Steps that followed the sequence and settled successfully. */
+    hits: integer().notNull().default(0),
+    /** Steps that followed the sequence and did not settle successfully. */
+    misses: integer().notNull().default(0),
+    /** Timestamp of the last recorded outcome. */
+    last_used_at: integer(),
     time_created: integer().notNull().$default(() => Date.now()),
   },
   (table) => [

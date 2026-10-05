@@ -150,6 +150,20 @@ const binary = (resource: string, bytes: Uint8Array) => {
   }
   return nonPrintable / bytes.length > 0.3
 }
+/**
+ * Audio, video and document formats the model can consume as media input.
+ * Detected by extension (their magic bytes are not always distinctive), so the
+ * allowlist is explicit rather than "anything the mime db knows about".
+ */
+const mediaExtensions = new Set([
+  ".mp3", ".m4a", ".ogg", ".flac", ".aac", ".wav",
+  ".mp4", ".webm", ".mov", ".avi", ".mkv", ".m4v",
+  ".pdf",
+])
+const nonImageMediaMime = (resource: string): string | undefined => {
+  const ext = path.extname(resource).toLowerCase()
+  return mediaExtensions.has(ext) ? FSUtil.mimeType(resource) : undefined
+}
 const decodeUtf8 = (resource: string, decoder: TextDecoder, bytes?: Uint8Array) =>
   Effect.try({
     try: () => decoder.decode(bytes, { stream: bytes !== undefined }),
@@ -184,7 +198,7 @@ export const read = Effect.fn("ReadTool.read")(function* (
         yield* file.readAlloc(Math.min(64 * 1024, Number(info.size) || 4 * 1024)),
         () => new Uint8Array(),
       )
-      const mime = imageMime(first)
+      const mime = imageMime(first) ?? nonImageMediaMime(resource)
       if (mime) {
         if (info.size > MAX_MEDIA_INGEST_BYTES)
           return yield* Effect.fail(new MediaIngestLimitError({ resource, maximumBytes: MAX_MEDIA_INGEST_BYTES }))

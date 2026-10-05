@@ -43,5 +43,6 @@ export const migrations = (
     import("./migration/20260820131045_deep_thing"),
     import("./migration/20260927000000_add_trajectory_session_id"),
     import("./migration/20260929000000_add_trajectory_policy"),
+    import("./migration/20260930094249_add_trajectory_task_class_and_policy_lifecycle"),
   ])
 ).map((module) => module.default) satisfies DatabaseMigration.Migration[]

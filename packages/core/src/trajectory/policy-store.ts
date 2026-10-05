@@ -30,6 +30,26 @@ export interface Interface {
   readonly listByTaskClass: (task_class: string) => Effect.Effect<TrajectorySchema.Policy[]>
   /** Insert or refresh a policy. Re-distilling the same state refreshes it. */
   readonly put: (policy: Omit<TrajectorySchema.Policy, "id" | "time_created">) => Effect.Effect<TrajectorySchema.Policy>
+  /**
+   * Grade a policy against what actually happened when it was followed. This is
+   * the falsification channel: without it a policy distilled once from one
+   * good/bad pair steers every future run forever, even after the codebase or
+   * tool surface has moved on.
+   */
+  readonly recordOutcome: (
+    policyID: string,
+    outcome: "hit" | "miss",
+  ) => Effect.Effect<TrajectorySchema.Policy | undefined>
+  /**
+   * Retire policies whose observed success rate has decayed below `floor` once
+   * they have enough observations to judge (`minSamples`). Returns the
+   * demoted policies.
+   *
+   * A demoted policy keeps its row — its counters are the evidence that it did
+   * not work, and dropping them would let the next distillation re-propose the
+   * same sequence with a clean slate.
+   */
+  readonly demote: (input: { readonly taskClass: string; readonly floor: number; readonly minSamples: number }) => Effect.Effect<TrajectorySchema.Policy[]>
 }
 
 export class Service extends Context.Service<Service, Interface>()("@codewright/v2/trajectory/PolicyStore") {}
@@ -50,6 +70,9 @@ const layer = Layer.effect(
         validated: row.validated === 1,
         generation: row.generation ?? undefined,
         trajectory_id: row.trajectory_id ?? undefined,
+        hits: row.hits,
+        misses: row.misses,
+        last_used_at: row.last_used_at ?? undefined,
         time_created: row.time_created,
       }).pipe(Effect.orDie)
 
@@ -57,7 +80,7 @@ const layer = Layer.effect(
       const row = yield* db
         .select()
         .from(PolicyTable)
-        .where(and(eq(PolicyTable.state_hash, state_hash), eq(PolicyTable.task_class, task_class)))
+        .where(and(eq(PolicyTable.state_hash, state_hash), eq(PolicyTable.task_class, task_class), eq(PolicyTable.validated, 1)))
         .get()
         .pipe(Effect.orDie)
       return row ? yield* fromRow(row) : undefined
@@ -107,11 +130,61 @@ const layer = Layer.effect(
         validated: input.validated,
         generation: input.generation,
         trajectory_id: input.trajectory_id,
+        hits: input.hits ?? 0,
+        misses: input.misses ?? 0,
+        last_used_at: input.last_used_at,
         time_created: timeCreated,
       }
     })
 
-    return Service.of({ lookup, listByTaskClass, put })
+    const recordOutcome = Effect.fn("PolicyStore.recordOutcome")(function* (
+      policyID: string,
+      outcome: "hit" | "miss",
+    ) {
+      const row = yield* db
+        .select()
+        .from(PolicyTable)
+        .where(eq(PolicyTable.id, policyID))
+        .get()
+        .pipe(Effect.orDie)
+      if (!row) return undefined
+      const timeUsed = Date.now()
+      const hits = row.hits + (outcome === "hit" ? 1 : 0)
+      const misses = row.misses + (outcome === "miss" ? 1 : 0)
+      yield* db
+        .update(PolicyTable)
+        .set({ hits, misses, last_used_at: timeUsed })
+        .where(eq(PolicyTable.id, policyID))
+        .pipe(Effect.orDie)
+      return yield* fromRow({ ...row, hits, misses, last_used_at: timeUsed })
+    })
+
+    const demote = Effect.fn("PolicyStore.demote")(function* (input: {
+      readonly taskClass: string
+      readonly floor: number
+      readonly minSamples: number
+    }) {
+      const rows = yield* db
+        .select()
+        .from(PolicyTable)
+        .where(and(eq(PolicyTable.task_class, input.taskClass), eq(PolicyTable.validated, 1)))
+        .pipe(Effect.orDie)
+      const demoted: TrajectorySchema.Policy[] = []
+      for (const row of rows) {
+        const samples = row.hits + row.misses
+        if (samples < input.minSamples) continue
+        if (row.hits / samples >= input.floor) continue
+        yield* db
+          .update(PolicyTable)
+          .set({ validated: 0 })
+          .where(eq(PolicyTable.id, row.id))
+          .pipe(Effect.orDie)
+        demoted.push(yield* fromRow({ ...row, validated: 0 }))
+      }
+      return demoted
+    })
+
+    return Service.of({ lookup, listByTaskClass, put, recordOutcome, demote })
   }),
 )
 

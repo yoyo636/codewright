@@ -145,22 +145,32 @@ const detour = (input: PerturbInput): GraphInput => {
   }
 }
 
-/** Mark a mid-path node failed and attach a retry edge back to its parent. */
+/**
+ * Mark a mid-path node failed and abort the run there. The bad graph keeps
+ * the prefix up to the failure and drops the good suffix entirely — that is
+ * the whole point of the variant: `distill` aligns by state hash, so a bad
+ * graph that merely *marks* a node failed still shares every state with the
+ * good graph and yields no divergence. Aborting is what makes the good suffix
+ * distillable: the bad graph took the prefix and never reached the tail.
+ */
 const failure = (input: PerturbInput): GraphInput => {
   const { graph } = input
   const path = mainPath(graph)
   if (path.length < 3) return clone(graph, freshTrajectory(graph))
   const target = path[Math.floor(path.length / 2)]!
+  const suffix = path.slice(path.indexOf(target))
+  const drop = new Set(suffix.map((node) => node.id))
   const failed: TrajectorySchema.Node = {
     ...target,
     id: TrajectorySchema.newNodeID(),
     branch_id: "failure",
     step_index: target.step_index + 1,
+    state_snapshot: { ...(target.state_snapshot as object), error: "failed", status: "failed" },
     metadata: { ...(target.metadata as object | undefined), annotations: { status: "failed" } },
   }
   const parentID = target.parent_ids[0]
   const edges = [
-    ...graph.edges,
+    ...graph.edges.filter((edge) => !drop.has(edge.from_node_id) && !drop.has(edge.to_node_id)),
     {
       id: TrajectorySchema.newEdgeID(),
       trajectory_id: graph.trajectory.id,
@@ -173,8 +183,8 @@ const failure = (input: PerturbInput): GraphInput => {
   const trajectory = freshTrajectory(graph)
   return {
     trajectory,
-    nodes: [...graph.nodes, { ...failed, trajectory_id: trajectory.id }].map((node) =>
-      node.id === failed.id ? node : { ...node, trajectory_id: trajectory.id },
+    nodes: [...graph.nodes.filter((node) => !drop.has(node.id)), { ...failed, trajectory_id: trajectory.id }].map(
+      (node) => (node.id === failed.id ? node : { ...node, trajectory_id: trajectory.id }),
     ),
     edges: edges.map((edge) => ({ ...edge, trajectory_id: trajectory.id })),
   }

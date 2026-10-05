@@ -58,6 +58,12 @@ export const Trajectory = Schema.Struct({
   metadata: Schema.optional(Schema.Record(Schema.String, Schema.Json)),
   /** Session this trajectory backs; indexed for fast lookups. */
   session_id: Schema.optional(Schema.String),
+  /**
+   * Stable intent this trajectory pursues. Trajectories of the same class are
+   * directly comparable, which is what makes `Evolution.convergence` definable
+   * at all: it measures how much strategy the graphs of one class share.
+   */
+  task_class: Schema.optional(Schema.String),
   time_created: Schema.Number,
 })
 export type Trajectory = Schema.Schema.Type<typeof Trajectory>
@@ -134,6 +140,19 @@ export const Policy = Schema.Struct({
   /** Generation of the trajectory the policy was distilled from. */
   generation: Schema.optional(Schema.Number),
   trajectory_id: Schema.optional(Schema.String),
+  /**
+   * Lifecycle counters. A policy is a hypothesis distilled from one good/bad
+   * pair, so it must remain falsifiable: the runner grades each step that
+   * follows a sequence, and a policy whose success rate decays below the
+   * configured floor is demoted (see `PolicyStore.demote`) rather than left to
+   * steer future runs on stale evidence.
+   */
+  /** Steps that followed the sequence and settled successfully. */
+  hits: Schema.optional(NonNegativeInt),
+  /** Steps that followed the sequence and did not settle successfully. */
+  misses: Schema.optional(NonNegativeInt),
+  /** Timestamp of the last recorded outcome. */
+  last_used_at: Schema.optional(Schema.Number),
   time_created: Schema.Number,
 })
 export type Policy = Schema.Schema.Type<typeof Policy>

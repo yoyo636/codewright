@@ -96,13 +96,27 @@ export interface Interface {
     readonly title?: string
     readonly resource_hash?: string
     readonly metadata?: Record<string, TrajectorySchema.JSONValue>
+    readonly sessionID?: string
+    readonly taskClass?: string
   }) => Effect.Effect<TrajectorySchema.Trajectory>
   readonly append: (input: AppendInput) => Effect.Effect<TrajectorySchema.Node, InstanceType<typeof NodeStepConflict>>
   readonly getTrajectory: (id: string) => Effect.Effect<TrajectorySchema.Trajectory | undefined>
   /** Get-or-create the durable execution graph for a session. */
   readonly forSession: (
     sessionID: string,
+    options?: { readonly taskClass?: string },
   ) => Effect.Effect<TrajectorySchema.Trajectory>
+  /** All nodes of a trajectory across every branch, ordered by step. */
+  readonly nodes: (trajectoryID: string) => Effect.Effect<TrajectorySchema.Node[]>
+  /**
+   * Trajectories pursuing the same intent, newest first. This is the comparison
+   * set `Evolution.convergence` needs: without it a graph could only ever be
+   * scored against itself.
+   */
+  readonly byTaskClass: (
+    taskClass: string,
+    options?: { readonly limit?: number },
+  ) => Effect.Effect<TrajectorySchema.Trajectory[]>
   readonly getNode: (id: string) => Effect.Effect<TrajectorySchema.Node | undefined>
   readonly children: (nodeID: string) => Effect.Effect<TrajectorySchema.Node[]>
   /** Latest node on a branch (highest step_index); undefined when the branch is empty. */
@@ -185,6 +199,7 @@ const layer = Layer.effect(
         title: row.title ?? undefined,
         metadata: row.metadata ?? undefined,
         session_id: row.session_id ?? undefined,
+        task_class: row.task_class ?? undefined,
         time_created: row.time_created,
       }).pipe(Effect.orDie)
 
@@ -245,15 +260,59 @@ const layer = Layer.effect(
       const row = yield* db.select().from(TrajectoryTable).where(eq(TrajectoryTable.id, id)).get().pipe(Effect.orDie)
       return row ? yield* fromTrajectoryRow(row) : undefined
     })
-    const forSession = Effect.fn("TrajectoryStore.forSession")(function* (sessionID: string) {
+    const forSession = Effect.fn("TrajectoryStore.forSession")(function* (
+      sessionID: string,
+      options?: { readonly taskClass?: string },
+    ) {
       const existing = yield* db
         .select()
         .from(TrajectoryTable)
         .where(eq(TrajectoryTable.session_id, sessionID))
         .get()
         .pipe(Effect.orDie)
-      if (existing) return yield* fromTrajectoryRow(existing)
-      return yield* create({ metadata: { session_id: sessionID }, sessionID })
+      if (existing) {
+        // Backfill the task class when it is known now but was not at creation
+        // (e.g. before the session had a title). Without this, early graphs get
+        // silently excluded from their own comparison set.
+        if (options?.taskClass && existing.task_class === null) {
+          yield* db
+            .update(TrajectoryTable)
+            .set({ task_class: options.taskClass })
+            .where(eq(TrajectoryTable.id, existing.id))
+            .pipe(Effect.orDie)
+          return { ...(yield* fromTrajectoryRow(existing)), task_class: options.taskClass }
+        }
+        return yield* fromTrajectoryRow(existing)
+      }
+      return yield* create({
+        metadata: { session_id: sessionID },
+        sessionID,
+        taskClass: options?.taskClass,
+      })
+    })
+
+    const nodes = Effect.fn("TrajectoryStore.nodes")(function* (trajectoryID: string) {
+      const rows = yield* db
+        .select()
+        .from(TrajectoryNodeTable)
+        .where(eq(TrajectoryNodeTable.trajectory_id, trajectoryID))
+        .orderBy(asc(TrajectoryNodeTable.step_index), asc(TrajectoryNodeTable.time_created))
+        .pipe(Effect.orDie)
+      return yield* Effect.forEach(rows, fromNodeRow).pipe(Effect.orDie)
+    })
+
+    const byTaskClass = Effect.fn("TrajectoryStore.byTaskClass")(function* (
+      taskClass: string,
+      options?: { readonly limit?: number },
+    ) {
+      const rows = yield* db
+        .select()
+        .from(TrajectoryTable)
+        .where(eq(TrajectoryTable.task_class, taskClass))
+        .orderBy(desc(TrajectoryTable.time_created))
+        .limit(options?.limit ?? 32)
+        .pipe(Effect.orDie)
+      return yield* Effect.forEach(rows, fromTrajectoryRow).pipe(Effect.orDie)
     })
 
     const getNode = Effect.fn("TrajectoryStore.getNode")(function* (id: string) {
@@ -401,6 +460,7 @@ const layer = Layer.effect(
       readonly resource_hash?: string
       readonly metadata?: Record<string, TrajectorySchema.JSONValue>
       readonly sessionID?: string
+      readonly taskClass?: string
     }) {
       const id = TrajectorySchema.newTrajectoryID()
       const timeCreated = Date.now()
@@ -414,6 +474,7 @@ const layer = Layer.effect(
           title: input?.title,
           metadata: input?.metadata ?? null,
           session_id: input?.sessionID ?? null,
+          task_class: input?.taskClass ?? null,
         })
         .pipe(Effect.orDie)
 
@@ -439,6 +500,7 @@ const layer = Layer.effect(
         title: input?.title,
         metadata: input?.metadata,
         session_id: input?.sessionID,
+        task_class: input?.taskClass,
         time_created: timeCreated,
       }
     })
@@ -696,6 +758,8 @@ const layer = Layer.effect(
       lastNode,
       children,
       ancestors,
+      nodes,
+      byTaskClass,
       byToolName,
       byInputFingerprint,
       byDurationRange,

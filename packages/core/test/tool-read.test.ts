@@ -241,7 +241,7 @@ describe("ReadTool", () => {
       ).toEqual({
         type: "content",
         value: [
-          { type: "text", text: "Image read successfully" },
+          { type: "text", text: "Media read successfully" },
           { type: "file", uri: `data:image/png;base64,${png}`, mime: "image/png", name: "pixel.png" },
         ],
       })
@@ -264,7 +264,7 @@ describe("ReadTool", () => {
         encoding: "base64",
       })
       expect(settled.output?.content).toMatchObject([
-        { type: "text", text: "Image read successfully" },
+        { type: "text", text: "Media read successfully" },
         { type: "file", mime: "image/png", uri: `data:image/png;base64,${png}` },
       ])
     }),
@@ -303,7 +303,7 @@ describe("ReadTool", () => {
       expect(settled.result).toEqual({
         type: "content",
         value: [
-          { type: "text", text: "Image read successfully" },
+          { type: "text", text: "Media read successfully" },
           { type: "file", uri: `data:image/png;base64,${png}`, mime: "image/png", name: "large.png" },
         ],
       })
@@ -485,6 +485,32 @@ describe("ReadTool", () => {
         type: "content",
         value: [{ type: "text" }, { type: "file", mime: "image/png", name: "pixel.bin" }],
       })
+    }),
+  )
+
+  it.effect("passes audio, video and PDF through as native media", () =>
+    Effect.gen(function* () {
+      const registry = yield* ToolRegistry.Service
+      const cases = [
+        { mime: "audio/mpeg", name: "clip.mp3", content: "GgA=" },
+        { mime: "video/mp4", name: "clip.mp4", content: "AAAA" },
+        { mime: "application/pdf", name: "doc.pdf", content: "JVBERi0=" },
+      ]
+      for (const { mime, name, content } of cases) {
+        readResult = { uri: `file:///${name}`, name, content, encoding: "base64", mime }
+        const result = yield* executeTool(registry, {
+          sessionID,
+          ...toolIdentity,
+          call: { type: "tool-call", id: `call-${name}`, name: "read", input: { path: name } },
+        })
+        expect(result).toMatchObject({
+          type: "content",
+          value: [
+            { type: "text", text: "Media read successfully" },
+            { type: "file", mime, name, uri: `data:${mime};base64,${content}` },
+          ],
+        })
+      }
     }),
   )
 

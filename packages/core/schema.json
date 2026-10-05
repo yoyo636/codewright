@@ -1,9 +1,9 @@
 {
   "version": "7",
   "dialect": "sqlite",
-  "id": "45afdc1c-9b1b-4776-8675-b9ff0537fd7c",
+  "id": "ae91983a-4990-4485-9c12-bfe72fd1b0c4",
   "prevIds": [
-    "f14a9b18-8207-487e-a3d3-227e629ba9ad"
+    "45afdc1c-9b1b-4776-8675-b9ff0537fd7c"
   ],
   "ddl": [
     {
@@ -80,6 +80,10 @@
     },
     {
       "name": "session_share",
+      "entityType": "tables"
+    },
+    {
+      "name": "policy",
       "entityType": "tables"
     },
     {
@@ -1502,6 +1506,116 @@
       "generated": null,
       "name": "id",
       "entityType": "columns",
+      "table": "policy"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "state_hash",
+      "entityType": "columns",
+      "table": "policy"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "task_class",
+      "entityType": "columns",
+      "table": "policy"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "tool_sequence",
+      "entityType": "columns",
+      "table": "policy"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "0",
+      "generated": null,
+      "name": "validated",
+      "entityType": "columns",
+      "table": "policy"
+    },
+    {
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "generation",
+      "entityType": "columns",
+      "table": "policy"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "trajectory_id",
+      "entityType": "columns",
+      "table": "policy"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "0",
+      "generated": null,
+      "name": "hits",
+      "entityType": "columns",
+      "table": "policy"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "0",
+      "generated": null,
+      "name": "misses",
+      "entityType": "columns",
+      "table": "policy"
+    },
+    {
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "last_used_at",
+      "entityType": "columns",
+      "table": "policy"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "time_created",
+      "entityType": "columns",
+      "table": "policy"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "id",
+      "entityType": "columns",
       "table": "trajectory_edge"
     },
     {
@@ -1811,6 +1925,26 @@
       "default": null,
       "generated": null,
       "name": "metadata",
+      "entityType": "columns",
+      "table": "trajectory"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "session_id",
+      "entityType": "columns",
+      "table": "trajectory"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "task_class",
       "entityType": "columns",
       "table": "trajectory"
     },
@@ -2238,6 +2372,15 @@
         "id"
       ],
       "nameExplicit": false,
+      "name": "policy_pk",
+      "table": "policy",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
       "name": "trajectory_edge_pk",
       "table": "trajectory_edge",
       "entityType": "pks"
@@ -2573,6 +2716,52 @@
     {
       "columns": [
         {
+          "value": "state_hash",
+          "isExpression": false
+        },
+        {
+          "value": "task_class",
+          "isExpression": false
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "origin": "manual",
+      "name": "policy_state_task_idx",
+      "entityType": "indexes",
+      "table": "policy"
+    },
+    {
+      "columns": [
+        {
+          "value": "state_hash",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "policy_state_hash_idx",
+      "entityType": "indexes",
+      "table": "policy"
+    },
+    {
+      "columns": [
+        {
+          "value": "task_class",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "policy_task_class_idx",
+      "entityType": "indexes",
+      "table": "policy"
+    },
+    {
+      "columns": [
+        {
           "value": "trajectory_id",
           "isExpression": false
         }
@@ -2715,6 +2904,20 @@
       "name": "trajectory_node_time_ms_idx",
       "entityType": "indexes",
       "table": "trajectory_node"
+    },
+    {
+      "columns": [
+        {
+          "value": "task_class",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "trajectory_task_class_idx",
+      "entityType": "indexes",
+      "table": "trajectory"
     }
   ],
   "renames": []

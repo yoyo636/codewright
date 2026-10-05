@@ -14,7 +14,29 @@ import { Tool } from "./tool"
 import { Tools } from "./tools"
 
 export const name = "read"
-const SUPPORTED_IMAGE_MIMES = new Set(["image/jpeg", "image/png", "image/gif", "image/webp"])
+const IMAGE_MIMES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "image/bmp",
+  "image/tiff",
+])
+/** Image, audio, video and PDF — anything the model can consume as media input. */
+const SUPPORTED_MEDIA_MIMES = new Set([
+  ...IMAGE_MIMES,
+  "audio/mpeg",
+  "audio/mp4",
+  "audio/ogg",
+  "audio/wav",
+  "audio/flac",
+  "audio/aac",
+  "video/mp4",
+  "video/webm",
+  "video/quicktime",
+  "video/x-msvideo",
+  "application/pdf",
+])
 const LocationInput = Schema.Struct({
   path: Schema.String,
   offset: ReadToolFileSystem.PageInput.fields.offset.annotate({
@@ -39,14 +61,14 @@ const layer = Layer.effectDiscard(
       .register({
         [name]: Tool.make({
           description:
-            "Read a text file or supported image, page through a large UTF-8 text file by line offset, or list a directory page. Relative paths resolve from the current location; absolute paths inside it are accepted, while external absolute paths require external_directory approval.",
+            "Read a text file, image, audio, video or PDF, page through a large UTF-8 text file by line offset, or list a directory page. Relative paths resolve from the current location; absolute paths inside it are accepted, while external absolute paths require external_directory approval.",
           input: Input,
           output: Output,
           toModelOutput: ({ input, output }) => {
-            if (!("encoding" in output) || output.encoding !== "base64" || !SUPPORTED_IMAGE_MIMES.has(output.mime))
+            if (!("encoding" in output) || output.encoding !== "base64" || !SUPPORTED_MEDIA_MIMES.has(output.mime))
               return []
             return [
-              { type: "text", text: "Image read successfully" },
+              { type: "text", text: "Media read successfully" },
               { type: "file", data: output.content, mime: output.mime, name: input.path },
             ]
           },
@@ -83,12 +105,12 @@ const layer = Layer.effectDiscard(
                 offset: input.offset,
                 limit: input.limit,
               })
-              if ("encoding" in content && content.encoding === "base64" && SUPPORTED_IMAGE_MIMES.has(content.mime)) {
+              if ("encoding" in content && content.encoding === "base64" && IMAGE_MIMES.has(content.mime)) {
                 return yield* image
                   .normalize(resource, { ...content, encoding: "base64" })
                   .pipe(Effect.catchTag("Image.ResizerUnavailableError", () => Effect.succeed(content)))
               }
-              if ("encoding" in content && content.encoding === "base64")
+              if ("encoding" in content && content.encoding === "base64" && !SUPPORTED_MEDIA_MIMES.has(content.mime))
                 return yield* Effect.fail(new ReadToolFileSystem.BinaryFileError({ resource }))
               return content
             }).pipe(

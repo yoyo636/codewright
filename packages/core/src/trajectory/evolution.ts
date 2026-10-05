@@ -48,8 +48,26 @@ export interface Fitness {
   readonly detour: number
   /** Failed nodes that have a retry edge / total failed nodes. */
   readonly recovery: number
-  /** 0..1; undefined when the task class has no other graphs to compare against. */
+  /**
+   * 0..1 — how much of this graph's strategy is already shared with the other
+   * graphs of its task class. Undefined when the caller supplied no peers,
+   * because convergence is a property of a *set* and is meaningless for one
+   * graph alone.
+   *
+   * High convergence combined with low redundancy/detour is the actual signal
+   * that self-evolution is working: the agent is converging on a shape and that
+   * shape is efficient. High redundancy at high convergence means it has
+   * fossilised a bad habit, which is what policy demotion exists to catch.
+   */
   readonly convergence?: number
+}
+
+/**
+ * A graph plus the peers it should be scored against. Absent peers, convergence
+ * is simply not computed rather than defaulted to a flattering number.
+ */
+export interface FitnessInput extends GraphInput {
+  readonly peers?: readonly GraphInput[]
 }
 
 export interface Interface {
@@ -73,8 +91,21 @@ export interface Interface {
   }
   /** All edges in a trajectory, in write order. */
   readonly edges: (trajectoryID: string) => Effect.Effect<TrajectorySchema.Edge[]>
-  /** Compute the four-attribute fitness of a graph (pure; no I/O). */
-  readonly fitness: (input: GraphInput) => Fitness
+  /**
+   * Compute all four fitness attributes (pure; no I/O). `convergence` is only
+   * present when the input carries peers of the same task class to compare
+   * against.
+   */
+  readonly fitness: (input: FitnessInput) => Fitness
+  /**
+   * Scalar good/bad ordering over peer graphs of one task class. Lower is worse.
+   *
+   * Used by the evolution cycle to pick which graph is "good" and which is
+   * "bad". Redundancy and detour are penalties, recovery and convergence are
+   * credits, and failure itself dominates: a graph that never reached a
+   * terminal node cannot be the exemplar no matter how well-shaped it is.
+   */
+  readonly score: (input: FitnessInput & { readonly graph: GraphInput }) => number
 }
 
 export class Service extends Context.Service<Service, Interface>()("@codewright/v2/trajectory/Evolution") {}
@@ -109,7 +140,7 @@ const layer = Layer.effect(
      * - convergence: across graphs of the same task class, how much of the
      *   successful strategy is shared. Higher means the agent is stabilising.
      */
-    const fitness = (input: GraphInput): Fitness => {
+    const fitness = (input: FitnessInput): Fitness => {
       const { nodes, edges } = input
 
       // --- redundancy: state_snapshot subsumption by a successor -------------
@@ -152,14 +183,71 @@ const layer = Layer.effect(
       }
       const recovery = failed.length === 0 ? 0 : [...retried].filter((id) => failed.some((node) => node.id === id)).length / failed.length
 
-      return { redundancy, detour, recovery }
+      const convergence =
+        input.peers === undefined || input.peers.length === 0 ? undefined : measureConvergence(input, input.peers)
+
+      return { redundancy, detour, recovery, convergence }
     }
 
-    return Service.of({ markRetry, markShortcut, edges, fitness })
+    const score = (input: FitnessInput & { readonly graph: GraphInput }): number => {
+      const f = fitness(input)
+      const failed = input.graph.nodes.filter((node) => isFailed(node)).length
+      const converged = f.convergence ?? 0
+      // A graph that never reached a terminal node is disqualified outright —
+      // topology alone must not promote a half-finished run into an exemplar.
+      if (failed > 0 && f.recovery === 0) return Number.NEGATIVE_INFINITY
+      return -2 * f.redundancy - 1.5 * (f.detour - 1) + 0.5 * f.recovery + 1.5 * converged - 3 * failed
+    }
+
+    return Service.of({ markRetry, markShortcut, edges, fitness, score })
   }),
 )
 
 export const node = makeGlobalNode({ service: Service, layer, deps: [TrajectoryStore.node] })
+
+/**
+ * Convergence: how much of this graph's main-path strategy is already shared
+ * with peers of the same task class. Undefined without peers.
+ *
+ * Measured as mean weighted Jaccard over the peers' main paths — tools are
+ * weighted by occurrence count, so "read 5x, edit 2x" against "read 1x, edit 1x"
+ * scores below two graphs whose tool multisets match. Two graphs solving the
+ * same intent with the same tools in the same proportions score 1 regardless of
+ * node IDs, which is the point: what identifies a strategy is its states and
+ * tool usage, not its row keys.
+ */
+function measureConvergence(graph: GraphInput, peers: readonly GraphInput[]): number {
+  const self = toolMultiset(mainPathFromRoot(graph))
+  if (self.size === 0) return 0
+  let total = 0
+  let compared = 0
+  for (const peer of peers) {
+    if (peer === graph) continue
+    const other = toolMultiset(mainPathFromRoot(peer))
+    if (other.size === 0) continue
+    let intersection = 0
+    let union = 0
+    for (const tool of new Set([...self.keys(), ...other.keys()])) {
+      const a = self.get(tool) ?? 0
+      const b = other.get(tool) ?? 0
+      intersection += Math.min(a, b)
+      union += Math.max(a, b)
+    }
+    if (union === 0) continue
+    total += intersection / union
+    compared++
+  }
+  return compared === 0 ? 0 : total / compared
+}
+
+function toolMultiset(path: readonly TrajectorySchema.Node[]): Map<string, number> {
+  const counts = new Map<string, number>()
+  for (const node of path) {
+    if (node.tool_name === undefined) continue
+    counts.set(node.tool_name, (counts.get(node.tool_name) ?? 0) + 1)
+  }
+  return counts
+}
 
 /**
  * Align a bad graph against a good graph of the same task class and extract
