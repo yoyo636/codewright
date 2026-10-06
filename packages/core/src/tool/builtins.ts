@@ -11,6 +11,7 @@ import { ImageGenTool } from "./imagegen"
 import { QuestionTool } from "./question"
 import { ReadTool } from "./read"
 import { SkillTool } from "./skill"
+import { TaskTool } from "./task"
 import { TodoWriteTool } from "./todowrite"
 import { TTSTool } from "./tts"
 import { WebFetchTool } from "./webfetch"
@@ -43,6 +44,7 @@ export const node = makeLocationNode({
     QuestionTool.node,
     ReadTool.node,
     SkillTool.node,
+    TaskTool.node,
     TodoWriteTool.node,
     TTSTool.node,
     WebFetchTool.node,

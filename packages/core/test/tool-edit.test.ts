@@ -423,7 +423,6 @@ test("keeps the locked edit schema, semantics docstring, and deferred TODOs visi
     "absolute external paths retain mutation capability through a separate\n * external_directory approval before edit approval.",
   )
   for (const todo of [
-    "Port V1 fuzzy correction strategies only after exact-edit behavior is established: line-trimmed matching, block-anchor fallback, indentation correction, and similarity-threshold review.",
     "Add formatter integration after V2 formatter runtime exists.",
     "Publish watcher/file-edit events after V2 watcher integration exists.",
     "Add snapshots / undo after design exists.",
@@ -431,4 +430,152 @@ test("keeps the locked edit schema, semantics docstring, and deferred TODOs visi
   ]) {
     expect(source).toContain(`TODO: ${todo}`)
   }
+  expect(source).toContain("fuzzyMatch")
+  expect(source).toContain("Fuzzy fallbacks for when the exact")
+})
+
+describe("EditTool fuzzy matching", () => {
+  it.live("falls back to a trailing-whitespace-tolerant match when exact text is missing", () =>
+    Effect.acquireUseRelease(
+      Effect.promise(() => tmpdir()),
+      (tmp) => {
+        reset()
+        const file = path.join(tmp.path, "ws.txt")
+        const original = "alpha   \nbeta   \ngamma\n"
+        return Effect.promise(() => fs.writeFile(file, original)).pipe(
+          Effect.andThen(
+            withTool(tmp.path, (registry) =>
+              Effect.gen(function* () {
+                const settled = yield* settleTool(
+                  registry,
+                  call({ path: "ws.txt", oldString: "alpha\nbeta\ngamma", newString: "alpha\nbeta\nX" }),
+                )
+                expect(settled.output?.structured).toMatchObject({ replacements: 1, fuzzy: true })
+                expect((settled.output?.content?.[0] as { text: string })?.text).toContain("fuzzy match")
+                expect(
+                  yield* Effect.promise(() => fs.readFile(file, "utf8")),
+                ).toBe("alpha\nbeta\nX\n")
+              }),
+            ),
+          ),
+        )
+      },
+      (tmp) => Effect.promise(() => tmp[Symbol.asyncDispose]()),
+    ),
+  )
+
+  it.live("falls back to a block-anchor match when a line inside the block differs", () =>
+    Effect.acquireUseRelease(
+      Effect.promise(() => tmpdir()),
+      (tmp) => {
+        reset()
+        const file = path.join(tmp.path, "anchor.txt")
+        const original = "header\nkeep this line\nkeep this  line\nfooter\n"
+        return Effect.promise(() => fs.writeFile(file, original)).pipe(
+          Effect.andThen(
+            withTool(tmp.path, (registry) =>
+              Effect.gen(function* () {
+                const settled = yield* settleTool(
+                  registry,
+                  call({ path: "anchor.txt", oldString: "keep this line\nkeep this line\nfooter", newString: "keep this line\nREPLACED\nfooter" }),
+                )
+                expect(settled.output?.structured).toMatchObject({ replacements: 1, fuzzy: true })
+                expect(
+                  yield* Effect.promise(() => fs.readFile(file, "utf8")),
+                ).toBe("header\nkeep this line\nREPLACED\nfooter\n")
+              }),
+            ),
+          ),
+        )
+      },
+      (tmp) => Effect.promise(() => tmp[Symbol.asyncDispose]()),
+    ),
+  )
+
+  it.live("does not apply a fuzzy match when it is ambiguous", () =>
+    Effect.acquireUseRelease(
+      Effect.promise(() => tmpdir()),
+      (tmp) => {
+        reset()
+        const file = path.join(tmp.path, "dup.txt")
+        const original = "alpha   \nbeta   \nalpha   \nbeta   \n"
+        return Effect.promise(() => fs.writeFile(file, original)).pipe(
+          Effect.andThen(
+            withTool(tmp.path, (registry) =>
+              Effect.gen(function* () {
+                const settled = yield* settleTool(
+                  registry,
+                  call({ path: "dup.txt", oldString: "alpha\nbeta", newString: "alpha\nBETA" }),
+                )
+                expect(settled.result).toEqual({
+                  type: "error",
+                  value: "Could not find oldString in the file. It must match exactly, including whitespace and indentation.",
+                })
+                expect(writes).toEqual([])
+              }),
+            ),
+          ),
+        )
+      },
+      (tmp) => Effect.promise(() => tmp[Symbol.asyncDispose]()),
+    ),
+  )
+
+  it.live("rejects a fuzzy match that is too dissimilar", () =>
+    Effect.acquireUseRelease(
+      Effect.promise(() => tmpdir()),
+      (tmp) => {
+        reset()
+        const file = path.join(tmp.path, "dissim.txt")
+        const original = "completely different content here\n"
+        return Effect.promise(() => fs.writeFile(file, original)).pipe(
+          Effect.andThen(
+            withTool(tmp.path, (registry) =>
+              Effect.gen(function* () {
+                const settled = yield* settleTool(
+                  registry,
+                  call({ path: "dissim.txt", oldString: "totally unrelated text", newString: "x" }),
+                )
+                expect(settled.result).toEqual({
+                  type: "error",
+                  value: "Could not find oldString in the file. It must match exactly, including whitespace and indentation.",
+                })
+                expect(writes).toEqual([])
+              }),
+            ),
+          ),
+        )
+      },
+      (tmp) => Effect.promise(() => tmp[Symbol.asyncDispose]()),
+    ),
+  )
+
+  it.live("keeps exact matches free of the fuzzy flag", () =>
+    Effect.acquireUseRelease(
+      Effect.promise(() => tmpdir()),
+      (tmp) => {
+        reset()
+        const file = path.join(tmp.path, "exact.txt")
+        const original = "exact match\n"
+        return Effect.promise(() => fs.writeFile(file, original)).pipe(
+          Effect.andThen(
+            withTool(tmp.path, (registry) =>
+              Effect.gen(function* () {
+                const settled = yield* settleTool(
+                  registry,
+                  call({ path: "exact.txt", oldString: "exact match", newString: "exact replaced" }),
+                )
+                expect(settled.output?.structured).toMatchObject({ replacements: 1 })
+                expect(settled.output?.structured).not.toHaveProperty("fuzzy")
+                expect(
+                  yield* Effect.promise(() => fs.readFile(file, "utf8")),
+                ).toBe("exact replaced\n")
+              }),
+            ),
+          ),
+        )
+      },
+      (tmp) => Effect.promise(() => tmp[Symbol.asyncDispose]()),
+    ),
+  )
 })

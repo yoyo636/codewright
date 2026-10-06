@@ -36,6 +36,7 @@ export const Input = Schema.Struct({
 export const Output = Schema.Struct({
   files: Schema.Array(FileDiff.Info),
   replacements: Schema.Number,
+  fuzzy: Schema.optional(Schema.Boolean),
 })
 export type Output = typeof Output.Type
 
@@ -63,6 +64,73 @@ const countOccurrences = (content: string, search: string) => {
   return count
 }
 
+/**
+ * Fuzzy fallbacks for when the exact `oldString` is not found. Each strategy
+ * must yield a unique match, otherwise the edit is rejected as ambiguous.
+ */
+const trimTrailingWhitespace = (text: string) =>
+  normalizeLineEndings(text).split("\n").map((line) => line.replace(/\s+$/g, "")).join("\n")
+
+const mapTrimmedOffset = (trimmed: string, matchStart: number, source: string): number => {
+  const before = trimmed.slice(0, matchStart)
+  const lineIndex = (before.match(/\n/g) ?? []).length
+  const col = matchStart - (before.lastIndexOf("\n") + 1)
+  let srcLineStart = 0
+  for (let i = 0; i < lineIndex; i++) srcLineStart = source.indexOf("\n", srcLineStart) + 1
+  return srcLineStart + col
+}
+
+const lineTrimmedMatch = (source: string, oldString: string): { start: number; end: number } | undefined => {
+  const trimmedSource = trimTrailingWhitespace(source)
+  const trimmedOld = trimTrailingWhitespace(oldString)
+  if (trimmedOld.length === 0 || !trimmedSource.includes(trimmedOld)) return undefined
+  if (countOccurrences(trimmedSource, trimmedOld) !== 1) return undefined
+  const matchStart = trimmedSource.indexOf(trimmedOld)
+  const start = mapTrimmedOffset(trimmedSource, matchStart, source)
+  const end = mapTrimmedOffset(trimmedSource, matchStart + trimmedOld.length, source)
+  return { start, end }
+}
+
+const blockAnchorMatch = (source: string, oldString: string): { start: number; end: number } | undefined => {
+  const oldLines = normalizeLineEndings(oldString).split("\n")
+  const first = oldLines.find((line) => line.trim().length > 0)
+  const last = [...oldLines].reverse().find((line) => line.trim().length > 0)
+  if (!first || !last) return undefined
+  const startIdx = source.indexOf(first)
+  if (startIdx === -1) return undefined
+  const endIdx = source.indexOf(last, startIdx + first.length)
+  if (endIdx === -1) return undefined
+  return { start: startIdx, end: endIdx + last.length }
+}
+
+const similarity = (a: string, b: string): number => {
+  if (a === b) return 1
+  if (a.length === 0 || b.length === 0) return 0
+  const m = a.length
+  const n = b.length
+  const max = Math.max(m, n)
+  if (max === 0) return 1
+  const prev = new Array<number>(n + 1).fill(0)
+  const next = new Array<number>(n + 1).fill(0)
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      next[j] = a[i - 1] === b[j - 1] ? prev[j - 1] + 1 : Math.max(prev[j], next[j - 1])
+    }
+    for (let j = 0; j <= n; j++) prev[j] = next[j]
+  }
+  return (2 * prev[n]) / (m + n)
+}
+
+const fuzzyMatch = (source: string, oldString: string): { start: number; end: number } | undefined => {
+  const lineTrimmed = lineTrimmedMatch(source, oldString)
+  if (lineTrimmed) return lineTrimmed
+  const anchor = blockAnchorMatch(source, oldString)
+  if (!anchor) return undefined
+  const block = source.slice(anchor.start, anchor.end)
+  if (similarity(block, oldString) < 0.9) return undefined
+  return anchor
+}
+
 const previewLines = (value: string, prefix: "+" | "-") => {
   const lines = normalizeLineEndings(value).split("\n")
   const shown = lines.slice(0, 6).map((line) => `${prefix}${line.length > 240 ? `${line.slice(0, 240)}...` : line}`)
@@ -74,14 +142,14 @@ export const toModelOutput = (output: Output, oldString: string, newString: stri
   [
     `Edited file successfully: ${output.files[0]?.file}`,
     `Replacements: ${output.replacements}`,
+    output.fuzzy ? "Note: applied using a fuzzy match (trailing-whitespace-tolerant or block-anchor fallback)" : undefined,
     "```diff",
     ...previewLines(oldString, "-"),
     ...previewLines(newString, "+"),
     "```",
-  ].join("\n")
+  ].filter((line): line is string => line !== undefined).join("\n")
 
 /** Deferred V2 edit behavior and UX integrations remain visible at the model-facing seam. */
-// TODO: Port V1 fuzzy correction strategies only after exact-edit behavior is established: line-trimmed matching, block-anchor fallback, indentation correction, and similarity-threshold review.
 // TODO: Add formatter integration after V2 formatter runtime exists.
 // TODO: Publish watcher/file-edit events after V2 watcher integration exists.
 // TODO: Add snapshots / undo after design exists.
@@ -163,13 +231,26 @@ const layer = Layer.effectDiscard(
                 const oldString = convertToLineEnding(input.oldString, ending)
                 const newString = convertToLineEnding(input.newString, ending)
                 const replacements = countOccurrences(source.text, oldString)
+                let matchedOld = oldString
+                let fuzzy = false
                 if (replacements === 0) {
+                  const match = fuzzyMatch(source.text, oldString)
+                  if (!match) {
+                    return yield* new ToolFailure({
+                      message:
+                        "Could not find oldString in the file. It must match exactly, including whitespace and indentation.",
+                    })
+                  }
+                  matchedOld = source.text.slice(match.start, match.end)
+                  fuzzy = true
+                }
+                const count = countOccurrences(source.text, matchedOld)
+                if (count === 0) {
                   return yield* new ToolFailure({
-                    message:
-                      "Could not find oldString in the file. It must match exactly, including whitespace and indentation.",
+                    message: "Could not find oldString in the file. It must match exactly, including whitespace and indentation.",
                   })
                 }
-                if (replacements > 1 && input.replaceAll !== true) {
+                if (count > 1 && input.replaceAll !== true) {
                   return yield* new ToolFailure({
                     message:
                       "Found multiple exact matches for oldString. Provide more surrounding context or set replaceAll to true.",
@@ -178,8 +259,8 @@ const layer = Layer.effectDiscard(
 
                 const replaced =
                   input.replaceAll === true
-                    ? source.text.replaceAll(oldString, newString)
-                    : source.text.replace(oldString, newString)
+                    ? source.text.replaceAll(matchedOld, newString)
+                    : source.text.replace(matchedOld, newString)
                 const counts = diffLines(source.text, replaced).reduce(
                   (result, item) => ({
                     additions: result.additions + (item.added ? (item.count ?? 0) : 0),
@@ -204,7 +285,8 @@ const layer = Layer.effectDiscard(
                       ...counts,
                     },
                   ],
-                  replacements,
+                  replacements: count,
+                  ...(fuzzy ? { fuzzy: true as const } : {}),
                 } satisfies Output
               })
             },
