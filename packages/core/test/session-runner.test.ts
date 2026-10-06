@@ -42,6 +42,7 @@ import { AgentV2 } from "@codewright-ai/core/agent"
 import { Config } from "@codewright-ai/core/config"
 import { ConfigCompaction } from "@codewright-ai/core/config/compaction"
 import { Tool } from "@codewright-ai/core/tool/tool"
+import { TaskTool } from "@codewright-ai/core/tool/task"
 import { Hash } from "@codewright-ai/core/util/hash"
 import {
   SessionContextEpochTable,
@@ -73,12 +74,19 @@ let toolExecutionsStarted: Deferred.Deferred<void> | undefined
 let toolExecutionsReady = 5
 let activeToolExecutions = 0
 let maxActiveToolExecutions = 0
+let childResponseStream: Stream.Stream<LLMEvent, LLMError> | undefined
 const client = Layer.succeed(
   LLMClient.Service,
   LLMClient.Service.of({
     prepare: () => Effect.die("unused"),
     stream: ((request: LLMRequest) => {
       requests.push(request)
+      const cacheKey = (request.providerOptions as { openai?: { promptCacheKey?: string } } | undefined)?.openai?.promptCacheKey
+      if (cacheKey?.startsWith("child") && childResponseStream) {
+        const stream = childResponseStream
+        childResponseStream = undefined
+        return stream
+      }
       if (responseStream) {
         const stream = responseStream
         responseStream = undefined
@@ -277,6 +285,7 @@ const it = testEffect(
       ToolRegistry.node,
       ToolRegistry.toolsNode,
       echoNode,
+      TaskTool.node,
       SessionRunnerModel.node,
       SystemContextRegistry.node,
       SkillGuidance.node,
@@ -348,6 +357,7 @@ const setup = Effect.gen(function* () {
   toolExecutionsReady = 5
   activeToolExecutions = 0
   maxActiveToolExecutions = 0
+  childResponseStream = undefined
   yield* db
     .insert(ProjectTable)
     .values({ id: Project.ID.global, worktree: AbsolutePath.make("/project"), sandboxes: [] })
@@ -666,7 +676,7 @@ describe("SessionRunnerLLM", () => {
 
       expect(requests).toHaveLength(1)
       expect(requests[0]?.model).toBe(model)
-      expect(requests[0]?.tools.map((tool) => tool.name)).toEqual(["echo", "defect"])
+      expect(requests[0]?.tools.map((tool) => tool.name).sort()).toEqual(["defect", "echo", "task"])
       expect(requests[0]?.messages.map((message) => ({ role: message.role, content: message.content }))).toEqual([
         { role: "user", content: [{ type: "text", text: "First" }] },
         { role: "user", content: [{ type: "text", text: "Second" }] },
@@ -1386,7 +1396,7 @@ describe("SessionRunnerLLM", () => {
       yield* session.resume(sessionID)
 
       expect(requests).toHaveLength(1)
-      expect(requests[0]?.tools.map((tool) => tool.name)).toEqual(["echo", "defect"])
+      expect(requests[0]?.tools.map((tool) => tool.name).sort()).toEqual(["defect", "echo", "task"])
       expect(yield* session.context(sessionID)).toMatchObject([
         { type: "user", text: "Use tools" },
         {
@@ -1699,6 +1709,60 @@ describe("SessionRunnerLLM", () => {
       expect(executions).toHaveLength(5)
       expect(maxActiveToolExecutions).toBe(5)
       expect(requests).toHaveLength(2)
+    }),
+  )
+
+  it.effect("runs a task sub-agent and returns its report to the parent", () =>
+    Effect.gen(function* () {
+      yield* setup
+      const session = yield* SessionV2.Service
+      yield* session.prompt({
+        sessionID,
+        prompt: Prompt.make({ text: "Use the task tool to research the answer" }),
+        resume: false,
+      })
+
+      requests.length = 0
+      const childReport = "The answer is 42"
+      childResponseStream = Stream.fromIterable([
+        LLMEvent.stepStart({ index: 0 }),
+        LLMEvent.textStart({ id: "text-child" }),
+        LLMEvent.textDelta({ id: "text-child", text: childReport }),
+        LLMEvent.textEnd({ id: "text-child" }),
+        LLMEvent.stepFinish({ index: 0, reason: "stop" }),
+        LLMEvent.finish({ reason: "stop" }),
+      ])
+      responseStream = Stream.fromIterable([
+        LLMEvent.stepStart({ index: 0 }),
+        LLMEvent.toolCall({
+          id: "call-task",
+          name: "task",
+          input: { description: "research", prompt: "What is the answer?" },
+        }),
+        LLMEvent.stepFinish({ index: 0, reason: "tool-calls" }),
+        LLMEvent.finish({ reason: "tool-calls" }),
+      ])
+      response = [
+        LLMEvent.stepStart({ index: 0 }),
+        LLMEvent.textStart({ id: "text-final" }),
+        LLMEvent.textDelta({ id: "text-final", text: `The sub-agent reported: ${childReport}` }),
+        LLMEvent.textEnd({ id: "text-final" }),
+        LLMEvent.stepFinish({ index: 0, reason: "stop" }),
+        LLMEvent.finish({ reason: "stop" }),
+      ]
+
+      yield* session.resume(sessionID)
+      const context = yield* session.context(sessionID)
+      const assistantText = context
+        .filter((message): message is SessionMessage.Message & { readonly type: "assistant" } => message.type === "assistant")
+        .flatMap((message) =>
+          message.content
+            .filter((part) => part.type === "text")
+            .map((part) => (part as { readonly id: string; readonly text: string }).text),
+        )
+        .join("\n")
+      expect(assistantText).toContain(childReport)
+      expect(assistantText).toContain("The sub-agent reported")
     }),
   )
 
