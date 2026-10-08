@@ -35,12 +35,20 @@ export const rpc = {
     if (auth && !headers["authorization"] && !headers["Authorization"]) {
       headers["Authorization"] = auth
     }
-    const request = new Request(input.url, {
-      method: input.method,
-      headers,
-      body: input.body,
-    })
-    const response = await V2().app.fetch(request)
+    const makeRequest = () =>
+      new Request(input.url, {
+        method: input.method,
+        headers,
+        body: input.body,
+      })
+    let response = await V2().app.fetch(makeRequest())
+    // The V2 protocol implements the session/message core; peripheral routes
+    // the TUI needs at boot (config, mcp, lsp, vcs, tui control) still live on
+    // the legacy surface. Forward 404s there until the V2 protocol covers the
+    // full route set.
+    if (response.status === 404) {
+      response = await Server.Default().app.fetch(makeRequest())
+    }
     const body = await response.text()
     return {
       status: response.status,
