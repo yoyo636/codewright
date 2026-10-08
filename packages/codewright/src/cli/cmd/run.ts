@@ -24,6 +24,7 @@ import { EOL } from "os"
 import { Filesystem } from "@/util/filesystem"
 import { errorMessage } from "@/util/error"
 import { createCodewrightClient, type CodewrightClient, type ToolPart } from "@codewright-ai/sdk/v2"
+import { lexicon } from "@codewright-ai/tui/theme/lexicon"
 import { Flag } from "@codewright-ai/core/flag/flag"
 import { createBackend } from "@/session/backend"
 import { FormatError, FormatUnknownError } from "../error"
@@ -223,7 +224,7 @@ export const RunCommand = effectCmd({
       })
       .option("thinking", {
         type: "boolean",
-        describe: "show thinking blocks",
+        describe: "show kindling (model reasoning) blocks",
       })
       .option("mini", {
         type: "boolean",
@@ -777,7 +778,7 @@ export const RunCommand = effectCmd({
               if (emit("reasoning", { text: props.text })) continue
               const text = props.text.trim()
               if (!text) continue
-              const line = `Thinking: ${text}`
+              const line = `${lexicon.reasoning.active}: ${text}`
               if (process.stdout.isTTY) {
                 UI.empty()
                 UI.println(`${UI.Style.TEXT_DIM}\u001b[3m${line}\u001b[0m${UI.Style.TEXT_NORMAL}`)

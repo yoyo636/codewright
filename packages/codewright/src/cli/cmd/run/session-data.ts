@@ -28,6 +28,7 @@ import type { Event, Part, PermissionRequest, QuestionRequest, ToolPart } from "
 import * as Locale from "@/util/locale"
 import { toolView } from "./tool"
 import type { FooterOutput, FooterPatch, FooterView, StreamCommit } from "./types"
+import { lexicon } from "@codewright-ai/tui/theme/lexicon"
 
 const money = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -529,7 +530,7 @@ function flushPart(data: SessionData, commits: SessionCommit[], partID: string, 
       return
     }
     if (kind === "reasoning" && chunk) {
-      chunk = `Thinking: ${chunk.replace(/\[REDACTED\]/g, "")}`
+      chunk = `${lexicon.reasoning.active}: ${chunk.replace(/\[REDACTED\]/g, "")}`
     }
     if (kind === "assistant" && chunk) {
       chunk = stripEcho(data, msg, chunk)

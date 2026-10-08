@@ -400,7 +400,7 @@ describe("run subagent data", () => {
     expect(snapshot.tabs).toEqual([expect.objectContaining({ sessionID: "child-1", status: "running" })])
     expect(visible(snapshot.details["child-1"]?.commits ?? [])).toEqual([
       "› Inspect footer tabs",
-      "_Thinking:_ planning next steps",
+      "_Kindling:_ planning next steps",
       "$ git status --short",
       "hello world",
     ])
@@ -479,7 +479,7 @@ describe("run subagent data", () => {
 
     expect(visible(snapshotSubagentData(data).details["child-1"]?.commits ?? [])).toEqual([
       "› Inspect footer tabs",
-      "_Thinking:_ planning next steps",
+      "_Kindling:_ planning next steps",
       "hello world",
     ])
   })

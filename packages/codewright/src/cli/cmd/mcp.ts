@@ -20,6 +20,7 @@ import { Global } from "@codewright-ai/core/global"
 import { modify, applyEdits } from "jsonc-parser"
 import { Filesystem } from "@/util/filesystem"
 import { Effect } from "effect"
+import { phrases } from "@codewright-ai/tui/theme/lexicon"
 
 function getAuthStatusIcon(status: MCP.AuthStatus): string {
   switch (status) {
@@ -260,7 +261,7 @@ export const McpAuthCommand = effectCmd({
       mcp.authenticate(serverName, (url) => {
         spinner.stop("Authorize in your browser:")
         prompts.log.info(url)
-        spinner.start("Waiting for authorization...")
+        spinner.start(phrases.authorization)
       }),
     ).pipe(
       Effect.tap((status) =>

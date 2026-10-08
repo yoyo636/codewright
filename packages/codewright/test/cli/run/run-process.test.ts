@@ -52,7 +52,7 @@ describe("codewright run (non-interactive subprocess)", () => {
         yield* llm.reason("  considering  ", { text: "  answer  " })
         const thinking = yield* codewright.run("think", { extraArgs: ["--thinking"] })
         codewright.expectExit(thinking, 0)
-        expect(thinking.stdout).toBe("Thinking: considering\nanswer\n")
+        expect(thinking.stdout).toBe("Kindling: considering\nanswer\n")
 
         yield* llm.reason("hidden", { text: "visible" })
         const plain = yield* codewright.run("think again")

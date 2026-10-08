@@ -705,7 +705,7 @@ function emitTask(state: State): void {
       },
       {
         kind: "reasoning",
-        text: "Thinking: tracing reducer and footer boundaries",
+        text: "Kindling: tracing reducer and footer boundaries",
         phase: "progress",
         source: "reasoning",
         messageID: "sub_demo_msg_reasoning",
@@ -1084,7 +1084,7 @@ async function emitFmt(state: State, kind: string, body: string, signal?: AbortS
   if (kind === "mix") {
     await emitText(state, SAMPLE_MARKDOWN, signal)
     await wait(50, signal)
-    await emitReasoning(state, "Thinking through formatter edge cases [REDACTED].", signal)
+    await emitReasoning(state, "Weighing formatter edge cases [REDACTED].", signal)
     await wait(50, signal)
     await emitBash(state, signal)
     emitWrite(state)

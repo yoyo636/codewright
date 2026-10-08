@@ -17,6 +17,7 @@ import { Process } from "@/util/process"
 import { errorMessage } from "@/util/error"
 import { text } from "node:stream/consumers"
 import { Effect, Option } from "effect"
+import { phrases } from "@codewright-ai/tui/theme/lexicon"
 
 type PluginAuth = NonNullable<Hooks["auth"]>
 
@@ -104,7 +105,7 @@ const handlePluginAuth = Effect.fn("Cli.providers.pluginAuth")(function* (
         yield* Prompt.log.info(authorize.instructions)
       }
       const spinner = Prompt.spinner()
-      yield* spinner.start("Waiting for authorization...")
+      yield* spinner.start(phrases.authorization)
       const result = yield* cliTry("Failed to authorize: ", () => authorize.callback())
       if (result.type === "failed") {
         yield* spinner.stop("Failed to authorize", 1)

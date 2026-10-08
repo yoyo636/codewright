@@ -2,6 +2,7 @@ import type { TuiPluginApi } from "@codewright-ai/plugin/tui"
 import { createMemo, For, type Accessor } from "solid-js"
 import { DEFAULT_THEMES, useTheme } from "../../context/theme"
 import { useCommandShortcut } from "../../keymap"
+import { lexicon } from "../../theme/lexicon"
 
 const themeCount = Object.keys(DEFAULT_THEMES).length
 
@@ -166,6 +167,7 @@ const TIPS: Tip[] = [
   "Start a message with {highlight}!{/highlight} to run shell commands (e.g., {highlight}!ls -la{/highlight})",
   (shortcuts) => press(shortcuts.agentCycle(), "to cycle between Build and Plan agents"),
   "Use {highlight}/undo{/highlight} to revert the last message and file changes",
+  `codewright speaks Aether — {highlight}${lexicon.reasoning.active}{/highlight} is model reasoning, {highlight}${lexicon.tool.active}{/highlight} is tool work`,
   "Use {highlight}/redo{/highlight} to restore previously undone messages and file changes",
   "Run {highlight}/share{/highlight} to create a public codewright.dev link",
   "Drag and drop images or PDFs into the terminal as context",

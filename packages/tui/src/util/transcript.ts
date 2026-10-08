@@ -1,6 +1,7 @@
 import type { AssistantMessage, Part, Provider, UserMessage } from "@codewright-ai/sdk/v2"
 import { Locale } from "./locale"
 import * as Model from "./model"
+import { lexicon } from "../theme/lexicon"
 
 export type TranscriptOptions = {
   thinking: boolean
@@ -88,7 +89,7 @@ export function formatPart(part: Part, options: TranscriptOptions): string {
 
   if (part.type === "reasoning") {
     if (options.thinking) {
-      return `_Thinking:_\n\n${part.text}\n\n`
+      return `_${lexicon.reasoning.active}:_\n\n${part.text}\n\n`
     }
     return ""
   }

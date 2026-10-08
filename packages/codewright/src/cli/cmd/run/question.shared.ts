@@ -15,6 +15,7 @@
 // answer" option appears. Selecting it enters editing mode with a text field.
 import type { QuestionInfo, QuestionRequest } from "@codewright-ai/sdk/v2"
 import type { QuestionReject, QuestionReply } from "./types"
+import { phrases } from "@codewright-ai/tui/theme/lexicon"
 
 export type QuestionBodyState = {
   requestID: string
@@ -320,7 +321,7 @@ export function questionReject(request: QuestionRequest): QuestionReject {
 
 export function questionHint(request: QuestionRequest, state: QuestionBodyState): string {
   if (state.submitting) {
-    return "Waiting for question event..."
+    return phrases.signal
   }
 
   if (questionConfirm(request, state)) {

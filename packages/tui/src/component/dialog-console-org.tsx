@@ -6,6 +6,7 @@ import { useDialog } from "../ui/dialog"
 import { useToast } from "../ui/toast"
 import { useTheme } from "../context/theme"
 import { errorMessage } from "../util/error"
+import { phrases } from "../theme/lexicon"
 import type { ExperimentalConsoleListOrgsResponse } from "@codewright-ai/sdk/v2"
 
 type OrgOption = ExperimentalConsoleListOrgsResponse["orgs"][number]
@@ -51,7 +52,7 @@ export function DialogConsoleOrg() {
     if (listed === undefined) {
       return [
         {
-          title: "Loading orgs...",
+          title: phrases.orgs,
           value: "loading",
           onSelect: () => {},
         },

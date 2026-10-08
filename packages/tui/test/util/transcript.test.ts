@@ -144,7 +144,7 @@ describe("transcript", () => {
         time: { start: 1000 },
       }
       const result = formatPart(part, options)
-      expect(result).toBe("_Thinking:_\n\nLet me think...\n\n")
+      expect(result).toBe("_Kindling:_\n\nLet me think...\n\n")
     })
 
     test("skips reasoning when thinking disabled", () => {

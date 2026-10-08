@@ -1,5 +1,6 @@
 import { toolEntryBody } from "./tool"
 import type { RunEntryBody, StreamCommit } from "./types"
+import { lexicon } from "@codewright-ai/tui/theme/lexicon"
 
 export type EntryFlags = {
   startOnNewLine: boolean
@@ -66,9 +67,9 @@ function reasoningBody(raw: string): RunEntryBody {
 
   const lead = clean.match(/^\n+/)?.[0] ?? ""
   const body = lead ? clean.slice(lead.length) : clean
-  const mark = "Thinking:"
+  const mark = `${lexicon.reasoning.active}:`
   if (body.startsWith(mark)) {
-    return codeBody(`${lead}_Thinking:_ ${body.slice(mark.length).trimStart()}`, "markdown")
+    return codeBody(`${lead}_${lexicon.reasoning.active}:_ ${body.slice(mark.length).trimStart()}`, "markdown")
   }
 
   return codeBody(clean, "markdown")

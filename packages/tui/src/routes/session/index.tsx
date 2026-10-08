@@ -23,6 +23,7 @@ import { useEvent } from "../../context/event"
 import { SplitBorder } from "../../ui/border"
 import { useTuiPaths, useTuiTerminalEnvironment } from "../../context/runtime"
 import { Spinner, ThinkingSpinner } from "../../component/spinner"
+import { lexicon, phrases } from "../../theme/lexicon"
 import { createSyntaxStyleMemo, generateSubtleSyntax, selectedForeground, useTheme } from "../../context/theme"
 import { BoxRenderable, ScrollBoxRenderable, addDefaultParsers, TextAttributes, RGBA } from "@opentui/core"
 import { Prompt, type PromptRef } from "../../component/prompt"
@@ -687,14 +688,14 @@ export function Session() {
     {
       title: (() => {
         const next = nextThinkingMode(thinkingMode())
-        if (next === "hide") return "Collapse thinking"
-        return "Expand thinking"
+        if (next === "hide") return `Collapse ${lexicon.reasoning.active.toLowerCase()}`
+        return `Expand ${lexicon.reasoning.active.toLowerCase()}`
       })(),
       value: "session.toggle.thinking",
       category: "Session",
       slash: {
-        name: "thinking",
-        aliases: ["toggle-thinking"],
+        name: "kindling",
+        aliases: ["thinking", "toggle-thinking"],
       },
       run: () => {
         thinking.set(nextThinkingMode(thinkingMode()))
@@ -1532,7 +1533,7 @@ function AssistantMessage(props: { message: AssistantMessage; parts: Part[]; las
                 <span style={{ fg: theme.textMuted }}> · {Locale.duration(duration())}</span>
               </Show>
               <Show when={props.message.error?.name === "MessageAbortedError"}>
-                <span style={{ fg: theme.textMuted }}> · interrupted</span>
+                <span style={{ fg: theme.textMuted }}> · {lexicon.interrupt.toLowerCase()}</span>
               </Show>
             </text>
             <box marginTop={1} marginLeft={2} onMouseUp={() => copyMessage()}>
@@ -1633,7 +1634,7 @@ function ReasoningHeader(props: {
     <Switch>
       <Match when={!props.done}>
         <box flexDirection="row">
-          <ThinkingSpinner color={fg()}>{props.title ? "Thinking: " + props.title : "Thinking"}</ThinkingSpinner>
+          <ThinkingSpinner color={fg()}>{props.title ? `${lexicon.reasoning.active}: ${props.title}` : lexicon.reasoning.active}</ThinkingSpinner>
         </box>
       </Match>
       <Match when={true}>
@@ -1641,7 +1642,7 @@ function ReasoningHeader(props: {
           <Show when={props.toggleable}>
             <span>{props.open ? "- " : "+ "}</span>
           </Show>
-          <span>Thought</span>
+          <span>{lexicon.reasoning.settled}</span>
           <Show when={props.title || props.duration}>
             <span>: </span>
           </Show>
@@ -2371,7 +2372,7 @@ export function formatSubagentTitle(agent: string, description: string, backgrou
 }
 
 export function formatSubagentRetry(attempt: number, message: string) {
-  return `Retrying (attempt ${attempt}) · ${message}`
+  return `${lexicon.retry} (attempt ${attempt}) · ${message}`
 }
 
 export function formatCompletedSubagentDetail(toolcalls: number, duration: string) {
@@ -2417,7 +2418,7 @@ function Execute(props: ToolProps) {
         icon={hasRuntimeError() ? "✗" : props.part.state.status === "completed" ? "✓" : "│"}
         color={hasRuntimeError() ? theme.error : undefined}
         spinner={isLoading()}
-        pending="execute"
+        pending={lexicon.tool.active}
         complete={true}
         part={props.part}
       >
@@ -2632,7 +2633,7 @@ function Question(props: ToolProps) {
 
 function Skill(props: ToolProps) {
   return (
-    <InlineTool icon="→" pending="Loading skill..." complete={stringValue(props.input.name)} part={props.part}>
+    <InlineTool icon="→" pending={phrases.skill} complete={stringValue(props.input.name)} part={props.part}>
       Skill "{stringValue(props.input.name)}"
     </InlineTool>
   )

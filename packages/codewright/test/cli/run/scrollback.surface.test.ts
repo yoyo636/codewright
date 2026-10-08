@@ -501,13 +501,13 @@ test("inserts spacers for new visible groups", async () => {
 // flush race is fixed. The reasoning commit is delivered as a `<code>`
 // renderable with `filetype="markdown"`, `streaming=true`, and
 // `drawUnstyledText=false`. On Windows the first paragraph of the reasoning
-// body (here `_Thinking:_ **Plan**`) is dropped from the committed rows —
+// body (here `_Kindling:_ **Plan**`) is dropped from the committed rows —
 // the failing assertion shows only `Say hello.` survives, while Linux
 // (where `useThread` is forced off in `@opentui/core/testing`) and macOS
 // both pass.
 //
 // Investigation summary (see PR description for the link to this work):
-//   1. `reasoning("Thinking: ...", "progress")` enters `entry.body.ts`
+//   1. `reasoning("Kindling: ...", "progress")` enters `entry.body.ts`
 //      `reasoningBody`, which becomes a `code` body with filetype="markdown".
 //   2. `RunScrollbackStream.writeStreaming` sets `renderable.content = ...`
 //      while `streaming=true`. `CodeRenderable.set content` short-circuits
@@ -528,7 +528,7 @@ test("inserts spacers for new visible groups", async () => {
 //
 // Linux CI can also drop the first paragraph of the replayed reasoning block,
 // so this test asserts the stable second paragraph instead of the first-line
-// `Thinking:` label. A real fix probably belongs in opentui (either force
+// `Kindling:` label. A real fix probably belongs in opentui (either force
 // deterministic rendering for tests, or eagerly call `textBuffer.setText` in
 // `CodeRenderable.set content` when streaming updates a non-empty body).
 //
@@ -552,7 +552,7 @@ test.skipIf(process.platform === "win32")(
 
       await out.scrollback.append(user("Hello you"))
       take()
-      await out.scrollback.append(reasoning("Thinking: **Plan**\n\nSay hello.", "progress"))
+      await out.scrollback.append(reasoning("Kindling: **Plan**\n\nSay hello.", "progress"))
       await out.scrollback.complete()
       take()
       await out.scrollback.append(assistant("Hello.", "progress"))

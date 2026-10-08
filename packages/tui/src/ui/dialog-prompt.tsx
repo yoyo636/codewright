@@ -3,6 +3,7 @@ import { useTheme } from "../context/theme"
 import { useDialog, type DialogContext } from "./dialog"
 import { Show, createEffect, createSignal, onMount, type JSX } from "solid-js"
 import { Spinner } from "../component/spinner"
+import { lexicon, phrases } from "../theme/lexicon"
 import { useTuiConfig } from "../config"
 import { useBindings, useCommandShortcut } from "../keymap"
 
@@ -98,11 +99,11 @@ export function DialogPrompt(props: DialogPromptProps) {
           cursorColor={props.busy ? theme.backgroundElement : theme.text}
         />
         <Show when={props.busy}>
-          <Spinner color={theme.textMuted}>{props.busyText ?? "Working..."}</Spinner>
+          <Spinner color={theme.textMuted}>{props.busyText ?? phrases.working}</Spinner>
         </Show>
       </box>
       <box paddingBottom={1} gap={1} flexDirection="row">
-        <Show when={!props.busy} fallback={<text fg={theme.textMuted}>processing...</text>}>
+        <Show when={!props.busy} fallback={<text fg={theme.textMuted}>{phrases.working}</text>}>
           <Show when={submitShortcut()}>
             <text fg={theme.text}>
               {submitShortcut()} <span style={{ fg: theme.textMuted }}>submit</span>

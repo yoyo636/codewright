@@ -16,6 +16,7 @@ import { fileURLToPath } from "url"
 import { useLocal } from "../../context/local"
 import { Flag } from "@codewright-ai/core/flag/flag"
 import { tint, useTheme } from "../../context/theme"
+import { lexicon } from "../../theme/lexicon"
 import { EmptyBorder, SplitBorder } from "../../ui/border"
 import { useTuiPaths, useTuiTerminalEnvironment } from "../../context/runtime"
 import { useClipboard } from "../../context/clipboard"
@@ -1621,7 +1622,7 @@ export function Prompt(props: PromptProps) {
                         const baseMessage = message()
                         const truncatedHint = isTruncated() ? " (click to expand)" : ""
                         const duration = formatDuration(seconds())
-                        const retryInfo = ` [retrying ${duration ? `in ${duration} ` : ""}attempt #${r.attempt}]`
+                        const retryInfo = ` [${lexicon.retry.toLowerCase()} ${duration ? `in ${duration} ` : ""}attempt #${r.attempt}]`
                         return baseMessage + truncatedHint + retryInfo
                       }
 

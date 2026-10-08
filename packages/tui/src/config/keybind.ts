@@ -4,6 +4,7 @@ import type { KeyEvent, Renderable } from "@opentui/core"
 import type { Binding } from "@opentui/keymap"
 import type { BindingCommandMap, BindingConfig, BindingDefaults } from "@opentui/keymap/extras"
 import { Schema } from "effect"
+import { lexicon } from "../theme/lexicon"
 
 const KeyStroke = Schema.Struct({
   name: Schema.String,
@@ -148,7 +149,7 @@ export const Definitions = {
   messages_redo: keybind("<leader>r", "Redo message"),
   messages_toggle_conceal: keybind("<leader>h", "Toggle code block concealment in messages"),
   tool_details: keybind("none", "Toggle tool details visibility"),
-  display_thinking: keybind("none", "Toggle thinking blocks visibility"),
+  display_thinking: keybind("none", `Toggle ${lexicon.reasoning.active.toLowerCase()} trail visibility`),
 
   prompt_submit: keybind("none", "Submit prompt"),
   prompt_voice: keybind("ctrl+alt+v", "Voice input with AI polish"),
