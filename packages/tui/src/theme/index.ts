@@ -251,6 +251,13 @@ export function resolveTheme(theme: ThemeJson, mode: "dark" | "light") {
 
       if (c.startsWith("#")) return RGBA.fromHex(c)
 
+      // `rgba(r, g, b, a)` / `rgb(r, g, b)` literals — translucent surfaces
+      const literal = /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)$/.exec(c)
+      if (literal) {
+        const alpha = literal[4] === undefined ? undefined : Math.round(Math.min(1, Math.max(0, Number(literal[4]))) * 255)
+        return RGBA.fromInts(Number(literal[1]), Number(literal[2]), Number(literal[3]), alpha)
+      }
+
       if (chain.includes(c)) {
         throw new Error(`Circular color reference: ${[...chain, c].join(" -> ")}`)
       }

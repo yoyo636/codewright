@@ -19,6 +19,7 @@ const CONTEXT_WARN_PCT = 60
 const CONTEXT_DANGER_PCT = 80
 
 function ModeIndicator() {
+  const { theme } = useTheme()
   const [mode, setMode] = createSignal<"normal" | "super">("normal")
 
   const readMode = () => {
@@ -44,7 +45,7 @@ function ModeIndicator() {
 
   return (
     <Show when={mode() === "super"}>
-      <text fg="#ff6b35">
+      <text fg={theme.warning}>
         <b>[SUPER]</b>
       </text>
     </Show>

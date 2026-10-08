@@ -6,7 +6,7 @@ import { useTuiPaths } from "../../context/runtime"
 import { useHomeSessionDestination } from "../../routes/home/session-destination"
 import { readFileSync, existsSync } from "node:fs"
 
-function ModeIndicator() {
+function ModeIndicator(props: { api: TuiPluginApi }) {
   const [mode, setMode] = createSignal<"normal" | "super">("normal")
 
   const readMode = () => {
@@ -32,7 +32,7 @@ function ModeIndicator() {
 
   return (
     <Show when={mode() === "super"}>
-      <text fg="#ff6b35">
+      <text fg={props.api.theme.current.warning}>
         <b>[SUPER]</b>
       </text>
     </Show>
@@ -107,7 +107,7 @@ function View(props: { api: TuiPluginApi }) {
       flexShrink={0}
       gap={2}
     >
-      <ModeIndicator />
+      <ModeIndicator api={props.api} />
       <Directory api={props.api} />
       <Mcp api={props.api} />
       <box flexGrow={1} />

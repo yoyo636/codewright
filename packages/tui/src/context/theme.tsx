@@ -81,7 +81,7 @@ export {
 
 const THEME_REFRESH_DELAYS = [250, 1000] as const
 
-const DEFAULT_THEME = "claude"
+const DEFAULT_THEME = "codewright"
 
 type State = {
   themes: Record<string, ThemeJson>

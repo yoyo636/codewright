@@ -75,7 +75,7 @@ function getThinkingColorGenerator(color: RGBA) {
 export function ThinkingSpinner(props: { children?: JSX.Element; color?: RGBA }) {
   const { theme } = useTheme()
   const kv = useKV()
-  const color = () => props.color ?? theme.warning
+  const color = () => props.color ?? theme.secondary
   const frames = createMemo(() => getThinkingFrames(color()))
   const colorGen = createMemo(() => getThinkingColorGenerator(color()))
   return (
