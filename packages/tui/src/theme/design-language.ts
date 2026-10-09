@@ -7,7 +7,11 @@
  * from drop shadows or glow. Motion is short and ease-out — nothing bouncy.
  *
  * This file is the single source of truth for both the TUI theme and the web
- * landing page. Keep the token names in sync with `assets/codewright.json`.
+ * landing page. Keep the token names in sync with `assets/codewright.json`,
+ * and the Aether token block in the repo-root `index.html`.
+ *
+ * Status wording — the words the interface uses while it works — lives in
+ * `./lexicon.ts`, which the CLI also consumes.
  */
 
 export const name = "aether" as const
@@ -77,6 +81,8 @@ export const color = {
   rose: "#f87171",
   sky: "#60a5fa",
   text: "#e6e6ee",
+  /** Mid step between `text` and `textMuted`, for secondary page copy. */
+  textSoft: "#a9a9c6",
   textMuted: "#777794",
 } as const
 
@@ -100,6 +106,7 @@ export const cssVars = {
   "--aether-border": color.inkBorder,
   "--aether-border-active": color.inkBorderActive,
   "--aether-text": color.text,
+  "--aether-text-soft": color.textSoft,
   "--aether-text-muted": color.textMuted,
   "--aether-aurora": color.aurora,
   "--aether-aurora-soft": color.auroraSoft,
