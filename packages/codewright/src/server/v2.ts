@@ -1,4 +1,5 @@
 import { createEmbeddedRoutes } from "@codewright-ai/server/routes"
+import * as Observability from "@codewright-ai/core/observability"
 import { Layer } from "effect"
 import { HttpRouter, HttpServer } from "effect/unstable/http"
 import { lazy } from "@/util/lazy"
@@ -17,7 +18,14 @@ type ServerApp = {
 // Callers get a plain `fetch` they can hand to the generated SDK client.
 export const V2 = lazy(() => {
   const web = HttpRouter.toWebHandler(
-    createEmbeddedRoutes().pipe(Layer.provide(HttpServer.layerServices)),
+    createEmbeddedRoutes().pipe(
+      Layer.provide(HttpServer.layerServices),
+      // Must stay last: layers provided later build beneath earlier ones, so
+      // Observability has to come after the service graph. Otherwise eagerly
+      // forked fibers (watcher, project copy, ModelsDev refresh) capture
+      // Effect's default stdout logger and print over the TUI (#34730).
+      Layer.provideMerge(Observability.layer),
+    ),
     { disableLogger: true },
   )
   const app: ServerApp = {
