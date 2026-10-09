@@ -17,7 +17,7 @@ class Codewright < Formula
   desc "AI coding agent for the terminal"
   homepage "https://github.com/yoyo636/codewright"
   license "MIT"
-  version "3.0.2-beta"
+  version "3.0.5-beta"
 
   # SHA256 digests are taken from the GitHub release assets for this version.
   # To update them for a new release, run:
@@ -26,24 +26,24 @@ class Codewright < Formula
   on_macos do
     if Hardware::CPU.intel?
       url "https://github.com/yoyo636/codewright/releases/download/v#{version}/codewright-darwin-x64.zip"
-      sha256 "4e52a68f41372f67c90fccfdc344b30c3f360ad8c242ba85c3f6d5a56f1fd246"
+      sha256 "7888f5a504dd695bd2e32b100bb8416b03fd9920039741fa34a0b825b68076c9"
     end
 
     if Hardware::CPU.arm?
       url "https://github.com/yoyo636/codewright/releases/download/v#{version}/codewright-darwin-arm64.zip"
-      sha256 "9b32de0b224082096d67ee29b8a18e67a3ddcd43b2d15e7c146b6690242bd804"
+      sha256 "e3c0c68c7d673d294b649c5ff22689884ee702124f2977aca378af52bc73ab5e"
     end
   end
 
   on_linux do
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
       url "https://github.com/yoyo636/codewright/releases/download/v#{version}/codewright-linux-x64.tar.gz"
-      sha256 "37bc634c9ba54dad7722184bd69719b0a52aba91e180385a40ebde929a67d245"
+      sha256 "6fb6cb4bc8d8bf25ff0874d735c32b1dbeae1b2637b10b125b11aa91f7523642"
     end
 
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
       url "https://github.com/yoyo636/codewright/releases/download/v#{version}/codewright-linux-arm64.tar.gz"
-      sha256 "4793e7a40174fcc6fdedadaf1f20c6d2c9a56503d541d4be1de332b145b259ed"
+      sha256 "8da834d1a6cfa6f3479bd1abe0dd2d1751db936ad5ea067a34d505371bd9a147"
     end
   end
 
