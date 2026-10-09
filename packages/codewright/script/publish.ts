@@ -23,10 +23,14 @@ async function publish(dir: string, name: string, version: string) {
   await $`npm publish *.tgz --access public --tag ${Script.channel}`.cwd(dir)
 }
 
-// Collect the per-platform binary packages produced by build.ts.
+// Collect the per-platform binary packages produced by build.ts. They live one
+// level deeper than the scope directory (dist/@codewright-ai/codewright-<os>-<arch>),
+// so the scan has to recurse. Skip the meta package itself, which an earlier run
+// may have left in the same tree.
 const binaries: Record<string, string> = {}
-for (const filepath of new Bun.Glob("*/package.json").scanSync({ cwd: "./dist" })) {
+for (const filepath of new Bun.Glob("**/package.json").scanSync({ cwd: "./dist" })) {
   const p = await Bun.file(`./dist/${filepath}`).json()
+  if (p.name === pkg.name) continue
   binaries[p.name] = p.version
 }
 console.log("binaries", binaries)
