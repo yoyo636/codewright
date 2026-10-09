@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Codewright — Open Source AI Coding Agent</title>
-  <meta name="description" content="Codewright is the open source AI coding agent that runs everywhere — terminal, desktop, web, and headless. 183+ providers, Claude-style TUI, persistent memory, fine-grained permissions, and an extensible hook system." />
-  <meta name="theme-color" content="#06060c" />
+  <meta name="description" content="Codewright is the open source AI coding agent that runs everywhere — terminal, desktop, web, and headless. 183+ providers, Aether-designed TUI, persistent memory, fine-grained permissions, and an extensible hook system." />
+  <meta name="theme-color" content="#07070a" />
   <meta name="color-scheme" content="dark" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://github.com/yoyo636/codewright" />
@@ -14,14 +14,14 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Codewright" />
   <meta property="og:title" content="Codewright — Open Source AI Coding Agent" />
-  <meta property="og:description" content="The open source AI coding agent that runs everywhere. 183+ providers, Claude-style TUI, persistent memory, fine-grained permissions, and an extensible hook system." />
+  <meta property="og:description" content="The open source AI coding agent that runs everywhere. 183+ providers, Aether-designed TUI, persistent memory, fine-grained permissions, and an extensible hook system." />
   <meta property="og:url" content="https://github.com/yoyo636/codewright" />
   <meta property="og:image" content="https://opengraph.githubassets.com/yoyo636/codewright" />
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Codewright — Open Source AI Coding Agent" />
-  <meta name="twitter:description" content="The open source AI coding agent that runs everywhere. 183+ providers, Claude-style TUI, persistent memory, fine-grained permissions, and an extensible hook system." />
+  <meta name="twitter:description" content="The open source AI coding agent that runs everywhere. 183+ providers, Aether-designed TUI, persistent memory, fine-grained permissions, and an extensible hook system." />
   <meta name="twitter:image" content="https://opengraph.githubassets.com/yoyo636/codewright" />
 
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%20fill%3D%22none%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20stop-color%3D%22%23FF5A3C%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23C81E2E%22%2F%3E%0A%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%3C%2Fdefs%3E%0A%20%20%3Cpolygon%20points%3D%222%2C6%202%2C26%2013%2C16%22%20fill%3D%22url%28%23g%29%22%20stroke%3D%22%231A1A1A%22%20stroke-width%3D%221%22%20stroke-linejoin%3D%22round%22%2F%3E%0A%20%20%3Crect%20x%3D%2213%22%20y%3D%2215%22%20width%3D%229%22%20height%3D%222%22%20rx%3D%221%22%20fill%3D%22%23FFFFFF%22%20opacity%3D%220.92%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M%2022%206%20V%2026%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20opacity%3D%220.92%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M%2022%206%20H%2027%20A%205%205%200%200%201%2027%2016%20H%2022%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20fill%3D%22none%22%20opacity%3D%220.92%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M%2027%2016%20L%2030%2026%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20opacity%3D%220.92%22%2F%3E%0A%3C%2Fsvg%3E%0A" />
@@ -37,7 +37,7 @@
     "name": "Codewright",
     "applicationCategory": "DeveloperApplication",
     "operatingSystem": "macOS, Windows, Linux, Web",
-    "description": "Open source AI coding agent that runs in the terminal, desktop, web, and headless. 183+ providers, Claude-style TUI, persistent memory, fine-grained permissions, and an extensible hook system.",
+    "description": "Open source AI coding agent that runs in the terminal, desktop, web, and headless. 183+ providers, Aether-designed TUI, persistent memory, fine-grained permissions, and an extensible hook system.",
     "url": "https://github.com/yoyo636/codewright",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
     "author": { "@type": "Organization", "name": "Codewright" }
@@ -47,29 +47,58 @@
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg-primary: #06060c;
-      --bg-secondary: #0a0a14;
-      --bg-card: rgba(15, 15, 30, 0.6);
-      --bg-card-solid: #0d0d1a;
-      --border: rgba(255, 255, 255, 0.07);
-      --border-glow: rgba(0, 212, 255, 0.25);
-      --text-primary: #f0f0f5;
-      --text-secondary: #9292b3;
-      --text-muted: #5a5a7a;
-      --accent: #00d4ff;
-      --accent-warm: #a855f7;
-      --accent-hot: #ff5fae;
-      --accent-warm-soft: #f5a623;
-      --accent-glow: rgba(0, 212, 255, 0.4);
-      --gradient-1: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ff5fae 100%);
-      --gradient-2: linear-gradient(135deg, #00d4ff 0%, #00ff88 100%);
-      --gradient-warm: linear-gradient(135deg, #f5a623 0%, #ff5fae 50%, #a855f7 100%);
-      --gradient-mesh: radial-gradient(ellipse at 20% 50%, rgba(0, 212, 255, 0.08) 0%, transparent 50%),
-                        radial-gradient(ellipse at 80% 20%, rgba(168, 85, 247, 0.07) 0%, transparent 50%),
-                        radial-gradient(ellipse at 50% 80%, rgba(255, 95, 174, 0.05) 0%, transparent 50%);
-      --radius-sm: 10px;
-      --radius-md: 16px;
-      --radius-lg: 24px;
+      /* ─── Aether tokens — mirrors packages/tui/src/theme/design-language.ts ─── */
+      --aether-ink: #07070a;
+      --aether-ink-lift: #0b0b12;
+      --aether-surface: rgba(16, 16, 26, 0.72);
+      --aether-surface-strong: rgba(22, 22, 34, 0.82);
+      --aether-surface-solid: #10101a;
+      --aether-border: rgba(255, 255, 255, 0.07);
+      --aether-border-active: rgba(255, 255, 255, 0.14);
+      --aether-text: #e6e6ee;
+      --aether-text-soft: #a9a9c6;
+      --aether-text-muted: #777794;
+      --aether-aurora: #8b7cff;
+      --aether-aurora-soft: #5eead4;
+      --aether-aurora-lavender: #c4b5fd;
+      --aether-ember: #f59e0b;
+      --aether-emerald: #34d399;
+      --aether-rose: #f87171;
+      --aether-sky: #60a5fa;
+      --aether-glow: rgba(139, 124, 255, 0.4);
+      --aether-border-glow: rgba(139, 124, 255, 0.25);
+      --aether-gradient: linear-gradient(135deg, #8b7cff 0%, #c4b5fd 50%, #5eead4 100%);
+      --aether-gradient-soft: linear-gradient(135deg, #8b7cff 0%, #5eead4 100%);
+      --aether-mesh: radial-gradient(ellipse at 20% 50%, rgba(139, 124, 255, 0.10) 0%, transparent 55%),
+                     radial-gradient(ellipse at 80% 20%, rgba(94, 234, 212, 0.07) 0%, transparent 55%),
+                     radial-gradient(ellipse at 50% 80%, rgba(196, 181, 253, 0.06) 0%, transparent 55%);
+      --aether-motion-fast: 120ms ease-out;
+      --aether-motion-base: 180ms ease-out;
+      --aether-motion-slow: 280ms ease-out;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
+      --radius-xl: 30px;
+
+      /* ─── Legacy aliases — every existing rule resolves onto Aether ─── */
+      --bg-primary: var(--aether-ink);
+      --bg-secondary: var(--aether-ink-lift);
+      --bg-card: var(--aether-surface);
+      --bg-card-solid: var(--aether-surface-solid);
+      --border: var(--aether-border);
+      --border-glow: var(--aether-border-glow);
+      --text-primary: var(--aether-text);
+      --text-secondary: var(--aether-text-soft);
+      --text-muted: var(--aether-text-muted);
+      --accent: var(--aether-aurora);
+      --accent-warm: var(--aether-aurora-lavender);
+      --accent-hot: var(--aether-aurora-soft);
+      --accent-warm-soft: var(--aether-ember);
+      --accent-glow: var(--aether-glow);
+      --gradient-1: var(--aether-gradient);
+      --gradient-2: var(--aether-gradient-soft);
+      --gradient-warm: var(--aether-gradient);
+      --gradient-mesh: var(--aether-mesh);
     }
 
     html { font-size: 16px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-behavior: smooth; }
@@ -82,7 +111,7 @@
       overflow-x: hidden;
     }
 
-    ::selection { background: rgba(0, 212, 255, 0.3); }
+    ::selection { background: rgba(139, 124, 255, 0.3); }
 
     /* ─── Animated Background ─── */
     .bg-mesh { position: fixed; inset: 0; z-index: 0; background: var(--gradient-mesh); pointer-events: none; }
@@ -199,7 +228,7 @@
     @keyframes typeLine { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
     .terminal-prompt { color: var(--accent); }
     .terminal-output { color: var(--text-secondary); }
-    .terminal-highlight { color: #00ff88; }
+    .terminal-highlight { color: var(--aether-emerald); }
     .terminal-warm { color: #ffd47a; }
     .terminal-dim { color: var(--text-muted); }
     .cursor-blink { display: inline-block; width: 8px; height: 16px; background: var(--accent); animation: blink 1s step-end infinite; vertical-align: middle; margin-left: 2px; }
@@ -280,7 +309,7 @@
       padding: 0.25rem 0.6rem; border-radius: 6px; margin-bottom: 1rem;
       background: rgba(245,166,35,0.12); color: var(--accent-warm-soft); border: 1px solid rgba(245,166,35,0.2);
     }
-    .highlight-tag.tui { background: rgba(255,95,174,0.1); color: var(--accent-hot); border-color: rgba(255,95,174,0.2); }
+    .highlight-tag.tui { background: rgba(94,234,212,0.1); color: var(--accent-hot); border-color: rgba(94,234,212,0.22); }
     .highlight-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; }
     .highlight-card p { font-size: 0.9rem; color: var(--text-secondary); }
     .highlight-cmd {
@@ -329,8 +358,8 @@
     .theme-swatch { display: flex; gap: 0.3rem; justify-content: center; margin-bottom: 0.8rem; }
     .theme-swatch span { width: 26px; height: 26px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
     .theme-card .theme-name { font-size: 0.85rem; font-weight: 600; }
-    .theme-card.badge-claude { border-color: rgba(217, 119, 87, 0.5); background: linear-gradient(145deg, rgba(217,119,87,0.1) 0%, transparent 100%); }
-    .theme-card .theme-flag { display: block; font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: #d97757; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.3rem; }
+    .theme-card.badge-claude { border-color: rgba(139, 124, 255, 0.5); background: linear-gradient(145deg, rgba(139,124,255,0.1) 0%, transparent 100%); }
+    .theme-card .theme-flag { display: block; font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.3rem; }
 
     /* ─── Stats ─── */
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center; }
@@ -356,7 +385,7 @@
     .install-cmd code .hl { color: var(--text-primary); font-weight: 600; }
     .install-copy { display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
     .install-copy svg { width: 15px; height: 15px; }
-    .install-copy .check { display: none; color: #00ff88; }
+    .install-copy .check { display: none; color: var(--aether-emerald); }
     .install-card.success .install-copy .copy { display: none; }
     .install-card.success .install-copy .check { display: block; }
 
@@ -474,9 +503,10 @@
         <li><a href="#features">Features</a></li>
         <li><a href="#how">How it works</a></li>
         <li><a href="#providers">Providers</a></li>
-        <li><a href="#v3">v3.0.3</a></li>
+        <li><a href="#v3">v3.0.5</a></li>
         <li><a href="#extend">Extend</a></li>
         <li><a href="#themes">Themes</a></li>
+        <li><a href="#lexicon">Lexicon</a></li>
         <li><a href="#faq">FAQ</a></li>
         <li><a href="https://github.com/yoyo636/codewright" target="_blank" rel="noopener">GitHub</a></li>
         <li><a href="#install" class="nav-cta">Install</a></li>
@@ -491,13 +521,13 @@
   <section class="hero">
     <div class="hero-badge">
       <span class="dot"></span>
-      <strong>v3.0.3-beta</strong> · V2 execution kernel · Claude-style UI · Memory · 183+ providers
+      <strong>v3.0.5-beta</strong> · V2 execution kernel · Aether design language · Own status vocabulary · 183+ providers
     </div>
     <h1>
       Code at the speed<br />of <span class="gradient-text">thought</span>
     </h1>
     <p class="hero-subtitle">
-      Codewright is the open source AI coding agent that <strong>understands your codebase</strong>, <strong>executes complex tasks</strong>, and <strong>ships features</strong> — from your terminal, desktop, browser, or CI. Built on a <strong>V2 execution kernel</strong>: every turn is a persistent, resumable graph, so interrupted work picks up exactly where it stopped. Now with a <strong>Claude-style interface</strong>, <strong>persistent memory</strong>, <strong>fine-grained permissions</strong>, and <strong>183+ providers</strong>.
+      Codewright is the open source AI coding agent that <strong>understands your codebase</strong>, <strong>executes complex tasks</strong>, and <strong>ships features</strong> — from your terminal, desktop, browser, or CI. Built on a <strong>V2 execution kernel</strong>: every turn is a persistent, resumable graph, so interrupted work picks up exactly where it stopped. Now with the <strong>Aether design language</strong> and a <strong>status vocabulary of its own</strong>, plus <strong>persistent memory</strong>, <strong>fine-grained permissions</strong>, and <strong>183+ providers</strong>.
     </p>
     <div class="hero-actions">
       <a href="https://github.com/yoyo636/codewright" class="btn-primary" target="_blank" rel="noopener">
@@ -517,7 +547,7 @@
           <span class="terminal-dot red"></span>
           <span class="terminal-dot yellow"></span>
           <span class="terminal-dot green"></span>
-          <span class="terminal-title">codewright — ~/project [Claude]</span>
+          <span class="terminal-title">codewright — ~/project [Codewright]</span>
         </div>
         <div class="terminal-body">
           <div class="terminal-line">
@@ -525,7 +555,7 @@
             <span class="terminal-output">codewright "Refactor auth to use JWT tokens"</span>
           </div>
           <div class="terminal-line">
-            <span class="terminal-output terminal-dim">Thinking about the auth flow...</span>
+            <span class="terminal-output terminal-dim">Kindling: reviewing the auth flow…</span>
           </div>
           <div class="terminal-line">
             <span class="terminal-output terminal-highlight">✓ Found 12 files referencing auth logic</span>
@@ -558,7 +588,7 @@
         <ul class="showcase-list" style="margin-top: 2rem;">
           <li class="showcase-item">
             <div class="showcase-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
             </div>
             <div>
               <h4>Local-first &amp; private</h4>
@@ -567,7 +597,7 @@
           </li>
           <li class="showcase-item">
             <div class="showcase-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
             </div>
             <div>
               <h4>Plan, then act</h4>
@@ -576,7 +606,7 @@
           </li>
           <li class="showcase-item">
             <div class="showcase-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
             </div>
             <div>
               <h4>Yours to extend</h4>
@@ -609,70 +639,70 @@
     <div class="features-grid">
       <div class="feature-card reveal reveal-delay-1">
         <div class="feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8b7cff" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
         </div>
         <h3>Two Built-in Agents</h3>
         <p>Switch with Tab: <strong>build</strong> for full-access development, <strong>plan</strong> for read-only analysis and exploration.</p>
       </div>
       <div class="feature-card reveal reveal-delay-2">
         <div class="feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8b7cff" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
         </div>
         <h3>Subagents</h3>
         <p>Delegate complex searches and multi-step tasks with <code>@general</code>. Parallel execution, isolated context.</p>
       </div>
       <div class="feature-card reveal reveal-delay-3">
         <div class="feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8b7cff" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
         </div>
         <h3>Tools & Extensibility</h3>
         <p>Built-in file, shell, and web tools. Extend with MCP servers (OAuth supported) and plugins for infinite capability.</p>
       </div>
       <div class="feature-card reveal reveal-delay-1">
         <div class="feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8b7cff" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
         </div>
         <h3>Persistent Sessions</h3>
         <p>Conversations that last. Continue, resume by ID, or fork any session. Your context is never lost.</p>
       </div>
       <div class="feature-card reveal reveal-delay-2">
         <div class="feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8b7cff" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
         <h3>Fine-grained Permissions</h3>
         <p>Control exactly which tools and commands may run. Stay in charge of what touches your system.</p>
       </div>
       <div class="feature-card reveal reveal-delay-3">
         <div class="feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8b7cff" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
         </div>
         <h3>Runs Everywhere</h3>
         <p>Terminal TUI, web interface (<code>codewright web</code>), headless mode for CI/CD pipelines, and <code>codewright serve</code> to self-host the server API. Desktop app (Electron) coming soon.</p>
       </div>
       <div class="feature-card reveal reveal-delay-1">
         <div class="feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8b7cff" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
         <h3>Safety &amp; Approval</h3>
         <p>Banned commands are blocked; risky ones (sudo, force-push, destructive ops) escalate to explicit approval. Presets: <code>suggest</code>, <code>auto-edit</code>, <code>full-auto</code>.</p>
       </div>
       <div class="feature-card reveal reveal-delay-2">
         <div class="feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><path d="M4 4h16v12H4z"/><path d="M8 20h8"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8b7cff" stroke-width="2"><path d="M4 4h16v12H4z"/><path d="M8 20h8"/></svg>
         </div>
         <h3>Slash Commands</h3>
         <p>Built-in <code>/check</code> for two-round project verification and <code>/undo</code> to revert the last change — plus your own commands via templates.</p>
       </div>
       <div class="feature-card reveal reveal-delay-3">
         <div class="feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8b7cff" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
         </div>
         <h3>Background Tasks</h3>
         <p>Kick off long builds and test suites in the background, keep working, and get notified when they finish — without blocking the conversation.</p>
       </div>
       <div class="feature-card reveal reveal-delay-1">
         <div class="feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><path d="M21 12a9 9 0 11-9-9"/><path d="M21 3v6h-6"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8b7cff" stroke-width="2"><path d="M21 12a9 9 0 11-9-9"/><path d="M21 3v6h-6"/></svg>
         </div>
         <h3>Smart Compaction</h3>
         <p>Long sessions auto-compact to stay on track, with a small-model fallback so summaries never fail when the primary model is busy.</p>
@@ -734,9 +764,9 @@
         <span class="provider-pill"><span class="pdot" style="background:#4d6bfe"></span>DeepSeek</span>
         <span class="provider-pill"><span class="pdot" style="background:#00b96b"></span>Zhipu GLM</span>
         <span class="provider-pill"><span class="pdot" style="background:#1f8e50"></span>Moonshot Kimi</span>
-        <span class="provider-pill"><span class="pdot" style="background:#00d4ff"></span>Token River</span>
+        <span class="provider-pill"><span class="pdot" style="background:#8b7cff"></span>Token River</span>
         <span class="provider-pill"><span class="pdot" style="background:#ff5f5f"></span>Volcano Engine</span>
-        <span class="provider-pill"><span class="pdot" style="background:#a855f7"></span>OpenRouter</span>
+        <span class="provider-pill"><span class="pdot" style="background:#c4b5fd"></span>OpenRouter</span>
         <span class="provider-pill"><span class="pdot" style="background:#ff4d6d"></span>MiniMax</span>
         <span class="provider-pill"><span class="pdot" style="background:#22c55e"></span>Xiaomi MiMo</span>
         <span class="provider-pill"><span class="pdot" style="background:#3b82f6"></span>Tencent HunYuan</span>
@@ -748,9 +778,9 @@
         <span class="provider-pill"><span class="pdot" style="background:#4d6bfe"></span>DeepSeek</span>
         <span class="provider-pill"><span class="pdot" style="background:#00b96b"></span>Zhipu GLM</span>
         <span class="provider-pill"><span class="pdot" style="background:#1f8e50"></span>Moonshot Kimi</span>
-        <span class="provider-pill"><span class="pdot" style="background:#00d4ff"></span>Token River</span>
+        <span class="provider-pill"><span class="pdot" style="background:#8b7cff"></span>Token River</span>
         <span class="provider-pill"><span class="pdot" style="background:#ff5f5f"></span>Volcano Engine</span>
-        <span class="provider-pill"><span class="pdot" style="background:#a855f7"></span>OpenRouter</span>
+        <span class="provider-pill"><span class="pdot" style="background:#c4b5fd"></span>OpenRouter</span>
         <span class="provider-pill"><span class="pdot" style="background:#ff4d6d"></span>MiniMax</span>
         <span class="provider-pill"><span class="pdot" style="background:#22c55e"></span>Xiaomi MiMo</span>
         <span class="provider-pill"><span class="pdot" style="background:#3b82f6"></span>Tencent HunYuan</span>
@@ -761,21 +791,21 @@
     <div class="features-grid" style="margin-top: 3rem;">
       <div class="feature-card reveal reveal-delay-1">
         <div class="feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8b7cff" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
         </div>
         <h3>Token River</h3>
         <p>20 models in one place — Kimi K3/K2.6, DeepSeek V4, GLM 5.x, Qwen 3.x, MiniMax, HunYuan, and more.</p>
       </div>
       <div class="feature-card reveal reveal-delay-2">
         <div class="feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><path d="M4 4h16v12H4z"/><path d="M8 20h8"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8b7cff" stroke-width="2"><path d="M4 4h16v12H4z"/><path d="M8 20h8"/></svg>
         </div>
         <h3>Volcano Engine</h3>
         <p>Doubao Seed 1.6, Doubao Pro Code, 1.5 Thinking Pro, DeepSeek R1 — via ARK with agent &amp; coding plans.</p>
       </div>
       <div class="feature-card reveal reveal-delay-3">
         <div class="feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8b7cff" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
         </div>
         <h3>Bring your own key</h3>
         <p>Anthropic, OpenAI, Google, DeepSeek, OpenRouter, local models via Ollama. Switch providers anytime.</p>
@@ -788,7 +818,7 @@
   <!-- V3.0.0 Highlights -->
   <section class="section" id="v3">
     <div class="reveal">
-      <span class="section-label warm">What's new in v3.0.3</span>
+      <span class="section-label warm">What's new in v3.0.5</span>
       <h2 class="section-title">The V2<br />execution kernel</h2>
       <p class="section-desc">A major release that reimagines the interface and adds long-requested capabilities.</p>
     </div>
@@ -801,8 +831,8 @@
       </div>
       <div class="highlight-card reveal reveal-delay-2">
         <span class="highlight-tag tui">INTERFACE</span>
-        <h3>Claude-style TUI</h3>
-        <p>A clean, full-width terminal interface with a single status line showing model, context usage, and cost. Warm Claude-inspired theme by default, plus 30+ themes to choose from.</p>
+        <h3>Aether design language</h3>
+        <p>A quiet, full-width terminal interface: deep ink, one aurora accent, translucent surfaces — and a single status line that names every phase. The Codewright theme ships as the default, with 30+ more to choose from.</p>
       </div>
       <div class="highlight-card reveal reveal-delay-3">
         <span class="highlight-tag">MEMORY</span>
@@ -829,6 +859,48 @@
     </div>
   </section>
 
+  <!-- Aether Lexicon -->
+  <section class="section" id="lexicon">
+    <div class="reveal">
+      <span class="section-label">Aether Lexicon</span>
+      <h2 class="section-title">Every state has<br />a word of its own</h2>
+      <p class="section-desc">No other agent just tells you it is "thinking". Codewright names the phase — and whether it has landed — with a closed vocabulary that belongs to it alone. One word per state, no synonyms, no filler.</p>
+    </div>
+    <div class="highlights-grid" style="margin-top: 2.5rem;">
+      <div class="highlight-card reveal reveal-delay-1">
+        <span class="highlight-tag tui">REASONING</span>
+        <h3>Kindling → Kindled</h3>
+        <p>Model reasoning, from the first spark to the settled result — one line while it runs, expandable when you want the detail.</p>
+        <span class="highlight-cmd">/kindling</span>
+      </div>
+      <div class="highlight-card reveal reveal-delay-2">
+        <span class="highlight-tag">STREAMING</span>
+        <h3>Coursing → Coursed</h3>
+        <p>The answer arriving token by token, and the moment it comes to rest.</p>
+      </div>
+      <div class="highlight-card reveal reveal-delay-3">
+        <span class="highlight-tag tui">TOOLS</span>
+        <h3>Forging → Forged</h3>
+        <p>Every tool call in flight, and every result once it lands.</p>
+      </div>
+      <div class="highlight-card reveal reveal-delay-1">
+        <span class="highlight-tag">BOOT</span>
+        <h3>Attuning → Attuned</h3>
+        <p>Plugins, providers, and panels tuning in before the first frame — "Attuning the aether…", then "Stepping through…".</p>
+      </div>
+      <div class="highlight-card reveal reveal-delay-2">
+        <span class="highlight-tag">RETRY</span>
+        <h3>Relighting</h3>
+        <p>A provider hiccup is retold as a relight, with the attempt number and countdown kept in place.</p>
+      </div>
+      <div class="highlight-card reveal reveal-delay-3">
+        <span class="highlight-tag">RESOLUTION</span>
+        <h3>Quiescent · Eclipsed · Sundered</h3>
+        <p>Idle, failed, and interrupted turns each get their own name too — so the status line never lies to you.</p>
+      </div>
+    </div>
+  </section>
+
   <div class="glow-line"></div>
 
   <!-- Code Showcase -->
@@ -841,7 +913,7 @@
         <ul class="showcase-list" style="margin-top: 2rem;">
           <li class="showcase-item">
             <div class="showcase-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
             </div>
             <div>
               <h4>Instant Setup</h4>
@@ -850,7 +922,7 @@
           </li>
           <li class="showcase-item">
             <div class="showcase-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
             </div>
             <div>
               <h4>Provider Agnostic</h4>
@@ -859,7 +931,7 @@
           </li>
           <li class="showcase-item">
             <div class="showcase-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
             </div>
             <div>
               <h4>Project-level Config</h4>
@@ -951,13 +1023,17 @@
     <div class="reveal">
       <span class="section-label warm">Themes</span>
       <h2 class="section-title">A look you'll<br />actually enjoy</h2>
-      <p class="section-desc">30+ built-in themes, including the new warm <strong style="color:#d97757">Claude</strong> default. Bring your own JSON theme anytime.</p>
+      <p class="section-desc">30+ built-in themes, led by the new <strong style="color:#8b7cff">Codewright</strong> default. Bring your own JSON theme anytime.</p>
     </div>
     <div class="themes-grid" style="margin-top: 2.5rem;">
       <div class="theme-card badge-claude reveal reveal-delay-1">
+        <div class="theme-swatch"><span style="background:#07070a"></span><span style="background:#8b7cff"></span><span style="background:#5eead4"></span></div>
+        <div class="theme-name">Codewright</div>
+        <span class="theme-flag">★ new default</span>
+      </div>
+      <div class="theme-card reveal reveal-delay-2">
         <div class="theme-swatch"><span style="background:#1f1e1d"></span><span style="background:#d97757"></span><span style="background:#e25550"></span></div>
         <div class="theme-name">Claude</div>
-        <span class="theme-flag">★ new default</span>
       </div>
       <div class="theme-card reveal reveal-delay-2">
         <div class="theme-swatch"><span style="background:#0d1117"></span><span style="background:#3fb950"></span><span style="background:#58a6ff"></span></div>
@@ -1046,7 +1122,7 @@
     <div class="platforms-grid" style="margin-top: 2.5rem;">
       <div class="platform-card reveal reveal-delay-1">
         <div class="platform-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 8l8 8M16 8l-8 8"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b7cff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 8l8 8M16 8l-8 8"/></svg>
         </div>
         <div>
           <div class="platform-name">Terminal TUI</div>
@@ -1055,7 +1131,7 @@
       </div>
       <div class="platform-card reveal reveal-delay-2">
         <div class="platform-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b7cff" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
         </div>
         <div>
           <div class="platform-name">Desktop App <span style="color:var(--text-muted);font-weight:400;">· coming soon</span></div>
@@ -1064,7 +1140,7 @@
       </div>
       <div class="platform-card reveal reveal-delay-3">
         <div class="platform-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b7cff" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
         </div>
         <div>
           <div class="platform-name">Web Interface</div>
@@ -1073,7 +1149,7 @@
       </div>
       <div class="platform-card reveal reveal-delay-4">
         <div class="platform-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b7cff" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
         </div>
         <div>
           <div class="platform-name">Headless / CI</div>
@@ -1150,15 +1226,15 @@
     <div class="faq-list" style="margin-top: 2.5rem;">
       <div class="faq-item reveal">
         <button class="faq-q">How is Codewright different from other AI coding agents?<span class="faq-icon">+</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Codewright is fully open source, runs in your terminal with a Claude-style interface, and works with <strong>183+ providers</strong> — not just one vendor. It's built for deep codebase understanding, permission control, and extensibility via hooks, plugins, and MCP.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Codewright is fully open source, runs in your terminal with the Aether interface, and works with <strong>183+ providers</strong> — not just one vendor. It's built for deep codebase understanding, permission control, and extensibility via hooks, plugins, and MCP.</div></div>
       </div>
       <div class="faq-item reveal">
         <button class="faq-q">Which models and providers are supported?<span class="faq-icon">+</span></button>
         <div class="faq-a"><div class="faq-a-inner">Anthropic, OpenAI, Google, DeepSeek, OpenRouter, local models, and much more. Recent additions include <strong>Token River</strong> (20 models) and <strong>Volcano Engine</strong> (agent &amp; coding plans). Bring your own API key — Codewright never proxies your traffic.</div></div>
       </div>
       <div class="faq-item reveal">
-        <button class="faq-q">What's new in v3.0.3?<span class="faq-icon">+</span></button>
-        <div class="faq-a"><div class="faq-a-inner">A full Claude-style TUI redesign with a warm default theme, persistent memory via <code>/memory</code>, an environment health check via <code>/doctor</code>, context-usage warnings, and 183+ providers with dozens of new models. The new <strong>V2 execution kernel</strong> persists every turn as a resumable graph — interrupt a task and pick it up exactly where it stopped.</div></div>
+        <button class="faq-q">What's new in v3.0.5?<span class="faq-icon">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">The Aether redesign — a new default theme and a status vocabulary of its own (<strong>Kindling</strong>, <strong>Forging</strong>, <strong>Relighting</strong>) — plus persistent memory via <code>/memory</code>, an environment health check via <code>/doctor</code>, context-usage warnings, and 183+ providers with dozens of new models. The new <strong>V2 execution kernel</strong> persists every turn as a resumable graph — interrupt a task and pick it up exactly where it stopped.</div></div>
       </div>
       <div class="faq-item reveal">
         <button class="faq-q">Can I control what Codewright is allowed to do?<span class="faq-icon">+</span></button>
@@ -1216,7 +1292,7 @@
   <section class="cta-section" id="cta">
     <div class="cta-box reveal">
       <h2>Ready to code at lightspeed?</h2>
-      <p>Install globally with npm and start building with AI in seconds. v3.0.3 with the V2 execution kernel is here.</p>
+      <p>Install globally with npm and start building with AI in seconds. v3.0.5 with the Aether interface is here.</p>
       <div class="cta-buttons">
         <a href="https://github.com/yoyo636/codewright" class="btn-primary" target="_blank" rel="noopener">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
@@ -1246,7 +1322,7 @@
           <path d="M 22 6 H 27 A 5 5 0 0 1 27 16 H 22" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.92"/>
           <path d="M 27 16 L 30 26" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity="0.92"/>
         </svg>
-        <span>Codewright &copy; 2026 · v3.0.3-beta</span>
+        <span>Codewright &copy; 2026 · v3.0.5-beta</span>
       </div>
       <ul class="footer-links">
         <li><a href="https://github.com/yoyo636/codewright" target="_blank" rel="noopener">GitHub</a></li>
